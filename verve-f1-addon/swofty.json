@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "verve.driver-profiles",
+ "name": "Verve Driver Profiles",
+ "version": "0.1.0",
+ "author": "TC Verve",
+ "description": "Verve driver personalities for 23 drivers: aggression, control, mistakes, reaction, entry and exit speed, pace rating and pit strategy, from real-driver data.",
+ "license": "MIT",
+ "category": "ai",
+ "kind": [
+  "database"
+ ],
+ "compat": {
+  "game": "f1_25",
+  "game_builds": [
+   ">=25251167"
+  ],
+  "launcher": ">=1.5.13"
+ },
+ "requires": [
+  {
+   "id": "swofty.core",
+   "version": ">=0.2.13"
+  }
+ ],
+ "saves": {
+  "affects": false
+ },
+ "operations": {
+  "database": [
+   "db/verve.json"
+  ]
+ }
+}

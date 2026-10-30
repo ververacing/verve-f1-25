@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+*.zip
+# raw telemetry and game logs can be large; keep summaries, ignore raw captures
+runs/**/raw/
+*.bin
+.DS_Store
+Thumbs.db

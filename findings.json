@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "generated": "2026-10-30",
+  "subject": "F1 25 AI modding via Swofty Launcher, for the Verve driver-personality port",
+  "provenance": {
+    "game_build": "F1_25.exe sha256 d873a1c8d2044cef2fd76c99c9d5a97649c5b815d055540995105f46619865ae (Steam), image base 0x140000000",
+    "swofty_repo": "https://github.com/Swofty-Developments/SwoftyLauncher",
+    "swofty_commit": "0a071a43397c34378281b247cc10f4ffdfc90101",
+    "swofty_docs": "https://f1.swofty.net",
+    "confidence_scale": {
+      "proven": "stated as proven in the Swofty catalogue, or read directly from source code",
+      "decoded": "from a decompiled function with an RE note describing the data flow (Swofty L1/L2)",
+      "inferred": "from key names, value shapes or docs wording; no code read",
+      "hypothesis": "our interpretation; needs the listed test"
+    }
+  },
+  "findings": [
+    {
+      "id": "F-01",
+      "claim": "F1 25 has six per-driver AI characteristics (aggression, control, mistakes, reaction_speed, speed_in, speed_out), each 0..1, derived from the racecraft/awareness/pace ratings through 'distribution' curves on six DriverCharacteristicOverride rows.",
+      "confidence": "decoded",
+      "evidence": [
+        "tools/gamedb/catalog/keys.tsv.gz: driver_statistics.driver_statistics.driver_characteristic_overrides.DriverCharacteristicOverride_N.{driver_statistic (racecraft|awareness|pace), driver_characteristic (enum of six), distribution (curve minx 0 maxx 1 miny 0 maxy 1)}",
+        "re/db/functions.tsv Ai_Parse_DriverParameterMap 0x14065aec0: 'bilinear map of difficulty x driver characteristic (aggression, control, mistakes, reaction_speed, speed_in, speed_out)'",
+        "re/db/subsystems/ai.md inbox 2026-10-29: live record effective +0xa8 aggression, +0xac control, +0xb0 mistakes, +0xb4 reaction_speed, +0xb8 speed_in, +0xbc speed_out"
+      ],
+      "implications": "Verve scalars map onto an existing 0..1 model; no new systems needed for v0.1.",
+      "related_questions": [
+        "Q-03"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-02",
+      "claim": "Each driver row carries driver_characteristics.{aggression,control,mistakes,reaction_speed,speed_in,speed_out} override fields; a non-negative value overrides the derived characteristic. Stock sets none.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/subsystems/ai.md inbox 2026-10-29: 'raw driver_characteristics +0xf0..+0x104 (reader 0x14065ab10), overrides +0x108..+0x11c (negative = none)'",
+        "packages/core/src/activation/row_keys.txt.gz: @entrants.drivers.driver_N lists 7 driver_characteristics keys",
+        "addons/classicseasons/classic-seasons-2024/db/season.json fields list for entrants.drivers.driver includes all six plus preferred_tracks"
+      ],
+      "implications": "v0.1 mechanism. Stock values not yet dumped (expected -1).",
+      "related_questions": [
+        "Q-01",
+        "Q-04"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-03",
+      "claim": "Eleven per-package parameter maps turn (difficulty, characteristic) into controller factors; six of them still separate drivers at high difficulty; brake_off_time, slide_confidence, alongside_awareness and wet_weather_ability are 1 (or 0) at every corner in stock, i.e. dead.",
+      "confidence": "proven",
+      "evidence": [
+        "docs/reference/gamedb/schema.md rows ai_vehicle_package_config.driver_parameter_maps.* (43/43 rows): braking_distance_factor hi/lo 1.15..1.25 vs hi/hi 1; corner_curvature_factor 0.92 vs 1; follow_speed_factor 1.05 vs 1; alongside_space_factor 1.15 vs 1; throttle_exit_fallibility 1 vs 0.75; wet_weather_ability 1,1,1,1",
+        "re/db/functions.tsv Ai_Parse_DriverParameterMap: 'Stock wet_weather_ability = 1 everywhere (no effect)'"
+      ],
+      "implications": "Personality survives the 110 slider. Wet complaint plausibly linked to the dead wet map; consumer not found.",
+      "related_questions": [
+        "Q-07"
+      ],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-04",
+      "claim": "84 per-driver ai_driver_config.* keys (alongside 8, blocking 16, cede_position 6, divebomb_defense 4, exit_fallibility 2, offset_variation 7, overtake 19, race_start 9, space_seeking 13) exist on every driver row and are identical on all 197 stock drivers.",
+      "confidence": "decoded",
+      "evidence": [
+        "addons/classicseasons/classic-seasons-2024/db/season.json fields block (the 84 names; 'every listed field must exist on the source row')",
+        "re/db/subsystems/ai.md inbox 2026-10-29: 'ai_driver_config parsed per driver (0x142463b40 -> 0x14065dc50 at 0x14246671e; default_driver copy 0x14249a4f0) but stock identical for all 197 drivers'"
+      ],
+      "implications": "This is the 'same decision every time' complaint and the v0.2 surface. Catalogued in docs/ai_driver_config_keys.csv.",
+      "related_questions": [
+        "Q-08",
+        "Q-09"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-05",
+      "claim": "Per-driver corner-exit throttle error is computed once per exit from a random draw mapped through the driver's exit_fallibility.throttle_error_practice (sessions 1-4) or throttle_error_qualifying_race (sessions 5-18) curve, scaled, capped by the per-car ai_vehicle_config.exit_fallibility caps, and suppressed while yaw exceeds max_yaw_angle_deg.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/functions.tsv Ai_Read_GeneralSettings_3 0x1405f5dd0 notes (per-car AI data +0x348 / +0x350; caps at +0x300/+0x308/+0x310; max_yaw +0x318)"
+      ],
+      "implications": "Strongest decoded per-driver Consistency lever; A-rated in the catalogue.",
+      "related_questions": [],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-06",
+      "claim": "AI race-start reaction time is drawn from U[0.28 - 0.24kr, 0.42 - 0.18kr] with r = reaction_speed and k a per-session factor; the bounds come from ai_driver_config.race_start.{min,max}_reaction_time_{lower,upper}_bound; bad starts come from the mistakes characteristic via the bad_start bounds. Logged on channel RaceStarts.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/subsystems/ai.md inbox 2026-10-29: 'Race start 0x1406527c0 (ptr 0x145637220): reaction U[0.28-0.24kr, 0.42-0.18kr] (k = R+0x14c, r = +0xb4), bad start from mistakes +0xb0'",
+        "re/db/functions.tsv Ai_Parse_RaceStartConfig 0x14065e040; Ai_RaceStart_ReactionTime 0x1406527c0 log 'Reaction Time for driver with vehicle id %d: %f'",
+        "native/src/gamelog/log_channels.tsv: RaceStarts 0x4824eae3 (2 sites)"
+      ],
+      "implications": "Directly measurable readout for reaction_speed and the race_start bounds; use it as the first verification.",
+      "related_questions": [
+        "Q-02",
+        "Q-03"
+      ],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-07",
+      "claim": "The overtake decision evaluates ai_driver_config.overtake.overlap_percentage (curve) at x = the driver's effective aggression, only when the attacker is within 0.5 lap.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/subsystems/ai.md inbox 2026-10-29: 'Overtake helper 0x140650150 evaluates ai_driver_config overtake.overlap_percentage (config +0x1d0, curve **(aiobj+0x408)) at x = aggression (only if attacker within 0.5 lap)'"
+      ],
+      "implications": "aggression is live in overtaking; the curve itself need not vary per driver.",
+      "related_questions": [],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-08",
+      "claim": "AI ERS push reasons are gated by per-car battery levels: build gap 0.7, close gap 0.6, in/out lap 0.47, overtake 0.25 (0.15 xmode_passive, 0.30 xmode_enabled), defend 1.0; target battery 0.9 - 0.4 x lap progress (0.9 - 0.15 x in overtake mode); mode from the per-track ERS table.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/functions.tsv Ai_Ers_DecidePushReasons 0x1406487a0 notes; re/db/subsystems/ai.md inbox (ERSBoost behaviour test, vtable 0x145636d40 slot 4)",
+        "entrants.vehicles.vehicle_N.ai_vehicle_config.ers_use.* (26 keys) in re/db/subsystems/ai.md#vocabulary",
+        "tools/gamedb/catalog/keys.tsv.gz: tracks.Track_N.ERSSettings.{deployFactor 0.95..1.1, harvestFactor 0.50..1, hotlapFactor 1..1.3}"
+      ],
+      "implications": "The 'AI never defends / infinite ERS' complaints have per-car and per-track data levers.",
+      "related_questions": [],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-09",
+      "claim": "The 0-110 difficulty slider is calibrated per track per vehicle package by 10-point tables tracks.Track_N.ai_track_difficulties.<package>.{time, difficulty_ratio, mass_ratio} plus max_dificulty_no_balast_slider_position = 100; difficulty_ratio reaches 1.0 at point 7 and mass_ratio drops below 1 (to ~0.92-0.94) only at points 8-10.",
+      "confidence": "proven (keys read by exe) + hypothesis (index meaning)",
+      "evidence": [
+        "tools/gamedb/meanings.tsv: 'ai_track_difficulties.*: proven, time and max_dificulty_no_balast_slider_position are read by the exe'",
+        "tools/gamedb/catalog/keys.tsv.gz examples for f1_2025_vehicle_package: time 87.83,85.66,83.56,81.37,79.21,78.10,...; difficulty_ratio 0.41,0.455,0.575,0.655,0.805,0.895,1,1,1,1; mass_ratio 1x7,0.980,0.960,0.938",
+        "re/db/subsystems/ai.md: 'AI difficulty slider (0-110) application NOT located statically' (the code side); re/db/subsystems/car.md#ai: no difficulty-keyed grip/power/drag multiplier exists"
+      ],
+      "implications": "Difficulty ceiling and per-track pace swings are data-editable. Above 100 the AI advantage is mass, which predicts straight-line and traction gains, matching the top community complaints.",
+      "related_questions": [
+        "Q-05",
+        "Q-06"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-10",
+      "claim": "Race-form variation is global: 84 ai.driver_variation.in_race curves are picked per session type with availability flags; addedLapTime = (1 - curve(progress)) * lap_time_variations (default 4 s); no per-driver weighting exists.",
+      "confidence": "decoded",
+      "evidence": [
+        "re/db/functions.tsv Ai_DriverVariationInRace_Update 0x1409af4c0 notes",
+        "tools/gamedb/catalog/keys.tsv.gz: ai.driver_variation.in_race.graphs.driver_variation_in_race_N.{available_for_*, PreferredTracks}, game_modes"
+      ],
+      "implications": "Per-driver Consistency-as-form needs a native hook (v0.3).",
+      "related_questions": [],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-11",
+      "claim": "A database 'set' op resolves the key by FNV hash under the selected row and keeps the stock type tag; it does not need the key to be in the launcher's catalogue. The catalogue matters for add-row completeness.",
+      "confidence": "proven",
+      "evidence": [
+        "packages/core/src/activation/dbx.rs set_text(): get(key) -> tag, else Error::Resolve('no such key'); put(key, tag, value)",
+        "docs/reference/ops/database.md 'How add-row names keys' / 'Key names'"
+      ],
+      "implications": "ai_driver_config.* keys are settable per driver without a fields block.",
+      "related_questions": [],
+      "status": "verified"
+    },
+    {
+      "id": "F-12",
+      "claim": "Whether Grand Prix mode reads the driver statistics component (ratings) is unknown; career freezes ratings per season; driver.ratings.read hook exists for career.",
+      "confidence": "inferred (docs state the unknown)",
+      "evidence": [
+        "docs/std/systems/drivers.md: 'Grand Prix and Time Trial use base ratings in every box. Whether Grand Prix reads the statistics component at all needs reverse engineering.'"
+      ],
+      "implications": "If GP mode ignores ratings, driver-row overrides may be the only route to personality in GP races.",
+      "related_questions": [
+        "Q-02"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-13",
+      "claim": "The Swofty 1.6 registry/event API for AI (ai::vehicle_configs, package_maps, track_packs, general, difficulty, ai.config.load, ai.settings.resolve) is design-only; 1.6.0 ships only the ai.controller.update payload, itself unverified (T145).",
+      "confidence": "proven",
+      "evidence": [
+        "docs/std/systems/ai.md 'In 1.6.0' box; packages/sdk/include/swofty/systems/ai.hpp (25 lines, ControllerUpdate only)"
+      ],
+      "implications": "Write 1.5-style database ops; do not build on the C++ registry examples for AI yet.",
+      "related_questions": [
+        "Q-10"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-14",
+      "claim": "The game's internal log channels RaceStarts, CANNED_EVENTS, AI_VARIATION, QUALI_PACE_DEBUG, GARAGECREW, GARAGE can be copied into swofty/loader.log via swofty/session.json game_log.channels (or SWOFTY_GAME_LOG_CHANNELS).",
+      "confidence": "proven",
+      "evidence": [
+        "docs/reference/std/logging.md 'The game's own log'; native/src/gamelog/log_channels.tsv"
+      ],
+      "implications": "Cheap verification without a native plugin.",
+      "related_questions": [],
+      "status": "verified"
+    },
+    {
+      "id": "F-15",
+      "claim": "Per-driver strategy tendencies already vary in stock (driver_strategy.*, 10 keys, ranges e.g. fastest_strategy_base_selection_chance 0.15..0.85).",
+      "confidence": "proven",
+      "evidence": [
+        "docs/reference/gamedb/schema.md entrants.drivers.driver_N rows (197/197 with ranges)"
+      ],
+      "implications": "v0.1 re-derives three of them from Risk; this replaces editorial values, it does not add a mechanism.",
+      "related_questions": [],
+      "status": "verified"
+    },
+    {
+      "id": "F-16",
+      "claim": "The pit crew garage push-in is a GarageCrewInstanceLogic state machine (StateWaitPushIntoGarage -> StateZoomIntoMonitor -> StateCarIsReadyForTrack -> StateSendCarToTrack_P3) driven by Game_GarageCrew_StateTransition, separate from CutsceneManager cutscenes (podium, grid, garage, results, terminal_damage, intro_flag), whose scripts expose requestShutdown / testAndClrRequestStop / setStateShutdown.",
+      "confidence": "decoded (names from log strings)",
+      "evidence": [
+        "re/db/functions.tsv: 0x140386720, 0x140385b80, 0x140385760, 0x140386320, 0x14043e5a0, 0x14038cc80 (L2), 0x140213e10, 0x140227db0, 0x140228870, 0x140237150, 0x1402371f0, 0x140235f10, 0x1402374a0",
+        "re/db/subsystems/session.md 2026-10-25 vmknolle: pit status chain garage 0/9 -> 10 -> 11/12 -> 13 -> 14 -> 1"
+      ],
+      "implications": "Skip-all-cutscenes is a native plugin; the garage skip needs a traced state chain and is option-gated.",
+      "related_questions": [],
+      "status": "open"
+    },
+    {
+      "id": "F-17",
+      "claim": "Parser functions Ai_Parse_{Overtake,Blocking,SpaceSeeking,CedePosition}Config are annotated 'from ai_vehicle_config' in functions.tsv, but their leaf names match the per-driver ai_driver_config groups, and a later note places the per-driver parse at 0x142463b40 -> 0x14065dc50. Attribution unresolved.",
+      "confidence": "inferred",
+      "evidence": [
+        "re/db/functions.tsv rows 0x14065dad0, 0x14065dc50, 0x14065de80, 0x14065e120 vs re/db/subsystems/ai.md inbox 2026-10-29",
+        "re/db/subsystems/ai.md#vocabulary: per-car blocking has 5 differently named keys, overtake 4, exit_fallibility 4"
+      ],
+      "implications": "Does not block setting the per-driver keys (they exist on the rows); blocks interpreting the parser notes as per-driver semantics.",
+      "related_questions": [
+        "Q-08"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-18",
+      "claim": "Simulated and skipped sessions use baked lap times, driver statistics and randomness, not physics or R&D.",
+      "confidence": "proven (docs)",
+      "evidence": [
+        "docs/std/systems/ai.md limits: 'Simulated sessions: They use baked lap times, driver statistics, and randomness, not physics or R&D.'"
+      ],
+      "implications": "The pace rating must track Verve Pace or skipped sessions contradict driven ones; v0.1 writes it.",
+      "related_questions": [
+        "Q-11"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-19",
+      "claim": "Existing third-party AI addons on Swofty as of 2026-10-30: Kizikafuka 'Collision & AI Tweaks' (kizi.ai-tweaks; per-car buffer, throttle cut, lost-control angle, steering PID, TC off, native contact handling), 'More Aggressive AI Track Pack' (track markup: removes limited-overtake zones, widens racing limits), vmknolle sc-unlapping and red-flag-pit (native, use Ai_Apply_TetherSpeedCap and site_Ai_ScFollowFlagCmp). None varies behaviour per driver.",
+      "confidence": "proven (listings and docs)",
+      "evidence": [
+        "https://www.overtake.gg/downloads/collision-ai-tweaks-swofty-addon.87767/ (search snippet; page blocks fetch)",
+        "https://www.overtake.gg/downloads/f1-25-26-more-aggressive-ai-track-pack-swofty-addon.87859/",
+        "docs/design/std-2/coverage.md 'AI Racing Tweaks'; re/db/subsystems/ai.md inbox 2026-10-29 (vmknolle exports)"
+      ],
+      "implications": "Per-driver personality is an open niche.",
+      "related_questions": [],
+      "status": "verified"
+    },
+    {
+      "id": "F-20",
+      "claim": "Addon options surface in five places: the launcher Addons row (grouped by `category`), the per-addon ADDON SETTINGS page in game, a `career_setup` page between a career tile and the wizard (launcher >= 1.5.13), a Team HQ `hub_tab` per data group, and a race-MFD `hud.mfd` page. `binds: db` values are baked at build (rebuild + restart), `binds: native` values are live. `career_setup` values are profile-level; a plugin copies them into career storage at creation.",
+      "confidence": "proven",
+      "evidence": [
+        "docs/reference/addons/manifest.md (options, career_setup, hub_tab, hud)",
+        "docs/reference/addons/in-game-ui.md 'Add a career setup page'",
+        "docs/reference/addons/settings.md",
+        "addons/progressive/swofty.json (reference implementation)"
+      ],
+      "implications": "A per-profile My Team preset is pure data; a true wizard step is native. No cross-addon 'Verve category' exists in game.",
+      "related_questions": [
+        "Q-13"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-21",
+      "claim": "The `career_setup` route is documented as a copy of the Driver Career route (`career_wizard_driver_career_to_f1`) with `next` a screen in `flow_career_season_setup.erp`; attaching it to the My Team tile is undocumented.",
+      "confidence": "inferred",
+      "evidence": [
+        "docs/reference/addons/in-game-ui.md 'Add a career setup page'"
+      ],
+      "implications": "Option C of HANDOFF \u00a711.4 needs Q-13 answered first.",
+      "related_questions": [
+        "Q-13"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-22",
+      "claim": "Players' My Team complaints (EA forums, Oct 2025 to Oct 2026): cost cap never binds; thousands of unusable R&D points; all upgrades bought in season 1; AI teams maxed in 2-3 seasons; a maxed AI car ~1 s/lap faster than a maxed player car; regulation changes touch parts not departments.",
+      "confidence": "proven (player reports)",
+      "evidence": [
+        "https://forums.ea.com/discussions/f1-25-general-discussion-en/can-we-talk-about-myteam-now/12291949",
+        "https://forums.ea.com/idea/f1-25-bug-reports-en/rd-is-broken/12248339"
+      ],
+      "implications": "'Harder' = tighter player economy and slower progression, plus a fairness fix for the ceiling; not faster AI.",
+      "related_questions": [
+        "Q-15"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-23",
+      "claim": "The My Team economy is data: starting cash per background outcome (0 / 2.5M / 7.5M), team cash rate modifiers (player 0.7/1.25, AI 0.6/1.25), 80 one-shot cash rewards (100k-500k), sponsor income per decal tier (5k-25k), budget pools with caps (1.5M-100M) and enforce flags, cost-cap cutoffs (0.95/0.9) and breach game values, per-team initial RP (1000-1750) incl. AI teams, practice-programme RP multipliers, R&D cost/time/fail scales as MyTeam attribute defaults (280 definitions), upgrade prices (100k-600k cash, 500-1500 RP), 21 regulation-change schedules with per-department flags, AI-vs-player mass handicap tweakables, driver salary contract stats, and a `hardcore` difficulty-settings row.",
+      "confidence": "proven (keys and ranges from the catalogue); values not dumped",
+      "evidence": [
+        "tools/gamedb/catalog/keys.tsv.gz (bank.*, career.my_team_*, resource_points.*, attributes.Attributes_N.*, difficulty.settings_N.*, {13c5d2048aa484f5}.regulation_changes_schedule_N.*)",
+        "re/db/subsystems/career.md (Career_Load_RnDTweakables 0x14353cea0, Career_Load_DepartmentEntries 0x1412326e0, Career_Load_ResourceRateConfig 0x14122ada0, all L2)"
+      ],
+      "implications": "Standard/Hard/Hardest presets are database ops gated by a `when` option; see HANDOFF \u00a711.",
+      "related_questions": [
+        "Q-14",
+        "Q-16"
+      ],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-24",
+      "claim": "A new career tile can be data-only: `career.mode` + `career.content` records in registry/career.json plus db rows (ModeChampionship, entrant list, content set), per the Decades recipe; Progressive's tile ships without a DLL for the tile itself.",
+      "confidence": "proven (docs)",
+      "evidence": [
+        "docs/make/career.md 'With no DLL'"
+      ],
+      "implications": "Option B (separate My Team tiles per preset) is possible for data-group-scoped tables; global tables still apply profile-wide.",
+      "related_questions": [
+        "Q-14"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-25",
+      "claim": "Verve's driver-row overrides and ai_driver_config keys apply to every AI-driven car in every mode (Driver Career, My Team, GP, TT): the per-car AI driver record is built at session setup from the driver row, with no career-specific path; only AI-controlled cars read it.",
+      "confidence": "decoded (not yet run)",
+      "evidence": [
+        "re/db/subsystems/ai.md inbox 2026-10-29 (AI driver setup 0x140658ac0, overrides +0x108..+0x11c)",
+        "docs/std/systems/ai.md 'Only AI cars' and sessions::set_control"
+      ],
+      "implications": "My Team gets Verve personalities for the AI field and the player's teammate.",
+      "related_questions": [
+        "Q-02",
+        "Q-04"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-26",
+      "claim": "In career modes each rating's `evolution` curve spans x = 0..10 seasons (start to peak) and freezes per season; v0.1 writes a flat pace curve and static overrides, which removes per-season driver development for the overridden characteristics.",
+      "confidence": "proven (docs) + design observation",
+      "evidence": [
+        "docs/std/systems/drivers.md (Curve start/peak, 'Career season ratings are frozen when each season starts')",
+        "verve_to_swofty.py pace_curve()"
+      ],
+      "implications": "Issue 21: shift the stock curve instead of flattening it; per-season override rewrite needs a native hook.",
+      "related_questions": [],
+      "status": "verified"
+    },
+    {
+      "id": "F-27",
+      "claim": "An autonomous harness is feasible: `swofty run --apply --direct` launches and rolls back; a native plugin can fire menu routes, hand the player's car to the AI with sessions::set_control (as kizikafuka.ai-drive does), and exit on session.end; measurement via the game's official UDP telemetry (per-car lap/telemetry/status/damage and Overtake/Collision events, offline-capable) or the Swofty shared-memory feed; no headless mode exists, so tests run in real time on a GPU.",
+      "confidence": "inferred from docs; harness not built",
+      "evidence": [
+        "docs/reference/cli.md swofty run flags",
+        "docs/std/systems/sessions.md set_control and session.lap",
+        "packages/sdk/include/swofty_api.h SWOFTY_EVENT_* names",
+        "https://forums.ea.com/blog/f1-games-game-info-hub-en/ea-sports%e2%84%a2-f1%c2%ae25-2026-season-pack-udp-specification/12187347"
+      ],
+      "implications": "HANDOFF \u00a713; issue 24.",
+      "related_questions": [
+        "Q-10"
+      ],
+      "status": "open"
+    }
+  ]
+}
