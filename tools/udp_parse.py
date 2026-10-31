@@ -58,9 +58,19 @@ PART_LEAD = struct.Struct("<BBBBBBB32s")
 # entry is unchanged; ParticipantData widens driverId / networkId / teamId to uint16 (60 bytes); CarTelemetryData
 # narrows engineTemperature to uint8 (59 bytes, leading fields unchanged); packet 16 is CarTelemetry2.
 LAYOUTS = {
-    2025: {"cars": 22, "tel_size": TEL_SIZE, "tel_trailer": 3, "part": PART_LEAD, "part_size": 57},
-    2026: {"cars": 24, "tel_size": 59, "tel_trailer": 3, "part": struct.Struct("<BHHHBBB32s"), "part_size": 60},
+    2025: {"cars": 22, "tel_size": TEL_SIZE, "tel_trailer": 3, "part": PART_LEAD, "part_size": 57,
+           "unknown_driver": 255},
+    2026: {"cars": 24, "tel_size": 59, "tel_trailer": 3, "part": struct.Struct("<BHHHBBB32s"), "part_size": 60,
+           "unknown_driver": 65535},
 }
+
+
+def is_human(car: int, ai: int, driver_id: int, player: int, player2: int, unknown_driver: int) -> bool:
+    """A car whose name may be a player's own account name (public repo: never written out). The player's slot can
+    report aiControlled = 1 in benchmark and ai_drives_player runs, so the header's player indices count regardless,
+    and so does a driverId outside the game's driver list (the player's own slot reports the unknown id). networkId
+    can't tell: offline it is just the car index."""
+    return car == player or (player2 != 255 and car == player2) or ai == 0 or driver_id == unknown_driver
 
 
 def records(path: Path):
@@ -143,9 +153,9 @@ def parse(path: Path, launch_offsets: list[float]):
             parts = []
             for c in range(n_cars):
                 ai, drv, net, team, myteam, num, nat, name = lay["part"].unpack_from(body, 1 + c * size)
-                # a human car's name is the player's own account name: never written out (public repo)
+                human = is_human(c, ai, drv, player, player2, lay["unknown_driver"])
                 parts.append({"ai": ai, "driver_id": drv, "team_id": team, "race_number": num,
-                              "name": name.split(b"\0", 1)[0].decode("utf-8", "replace") if ai else "player"})
+                              "name": "player" if human else name.split(b"\0", 1)[0].decode("utf-8", "replace")})
             s["participants"] = parts
         elif pid == 6:
             tel = lay["tel_size"]
