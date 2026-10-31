@@ -1,0 +1,69 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.vehicles.vehicle_packages.vehicle_package_10.ai_vehicle_package_config.driver_parameter_maps
+# resolved: entrants.vehicles.vehicle_packages.vehicle_package_10.ai_vehicle_package_config.driver_parameter_maps
+alongside_awareness
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1
+  low_difficulty_high_characteristic_mapping  1
+  low_difficulty_low_characteristic_mapping  1
+alongside_space_factor
+  characteristic  aggression
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1.15
+  low_difficulty_high_characteristic_mapping  1.25
+  low_difficulty_low_characteristic_mapping  1.5
+brake_off_time
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  0
+  high_difficulty_low_characteristic_mapping  0
+  low_difficulty_high_characteristic_mapping  0
+  low_difficulty_low_characteristic_mapping  0
+braking_distance_factor
+  characteristic  speed_in
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1.15
+  low_difficulty_high_characteristic_mapping  2.632
+  low_difficulty_low_characteristic_mapping  2.74
+corner_curvature_factor
+  characteristic  speed_out
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  0.92
+  low_difficulty_high_characteristic_mapping  0.644
+  low_difficulty_low_characteristic_mapping  0.5888
+follow_speed_factor
+  characteristic  aggression
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1.05
+  low_difficulty_high_characteristic_mapping  1.3
+  low_difficulty_low_characteristic_mapping  1.4
+slide_confidence
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1
+  low_difficulty_high_characteristic_mapping  1
+  low_difficulty_low_characteristic_mapping  1
+throttle_confidence
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  0.96
+  low_difficulty_high_characteristic_mapping  0.86
+  low_difficulty_low_characteristic_mapping  0.78
+throttle_exit_fallibility
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  0.75
+  high_difficulty_low_characteristic_mapping  1
+  low_difficulty_high_characteristic_mapping  0.75
+  low_difficulty_low_characteristic_mapping  1
+throttle_on_time
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  0
+  high_difficulty_low_characteristic_mapping  0.6
+  low_difficulty_high_characteristic_mapping  6.033
+  low_difficulty_low_characteristic_mapping  6.6
+wet_weather_ability
+  characteristic  control
+  high_difficulty_high_characteristic_mapping  1
+  high_difficulty_low_characteristic_mapping  1
+  low_difficulty_high_characteristic_mapping  1
+  low_difficulty_low_characteristic_mapping  1

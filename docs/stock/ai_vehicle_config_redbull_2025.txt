@@ -1,0 +1,257 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.vehicles.vehicle[_metadata_=redbull_2025].ai_vehicle_config
+# resolved: entrants.vehicles.vehicle_71.ai_vehicle_config
+allow_to_pass
+  allow_to_pass_gap  2
+  dist_for_max_slow_down_before_pull_out  100
+  dist_for_min_slow_down_before_pull_out  17.5
+  dist_needed_after_racing_line_yield  100
+  high_urgently_speed_factor  0.4
+  high_urgently_speed_modifier  -1
+  low_urgently_speed_factor  1.05
+  low_urgently_speed_modifier  5
+  max_look_ahead_dist  200
+  min_look_ahead_dist  50
+  pull_out_time_to_braking_zone  1
+  time_behind_end  1.0
+  time_behind_start  @v2@minx:0,maxx:15,miny:0,maxy:1,0:0.05,0:0.1,0.1188214:0.5118202,0.2527089:0.8696675,0.3960423:0.9049404,0.6039579:0.6661934,1:0.5189125,1:0.5094562
+  yield_dist_to_corner_mult  0.5
+  yield_pullout_dist  100
+  yield_target_lengths  5
+blocking
+  block_pulled_out_factor  0.33
+  need_to_leave_space_offset  2
+  radius_for_sharp_corner_blocking  105
+  safe_blocking_distance  1.75
+  safe_blocking_distance_at_race_start  1.5
+buffer_space_settings
+  follow_buffer_max_distance  10
+  follow_buffer_min_distance  0.5
+  follow_buffer_speed_percentage  0.05
+  track_edge_buffer  @v2@minx:0,maxx:500,miny:0,maxy:1,0:0.55,0:0.45,0.16:0.29,0.4:0.25,0.7:0.24,1:0.175,1:0.15
+  vehicle_buffer  @v2@minx:50,maxx:500,miny:0,maxy:1,0:0.35,0:0.35,0.4736842:0.35,1:0.35,1:0.35
+celebration
+  lead_time_needed  1.2
+  speed_limit  25
+  speed_limit_fade_out_time  50
+damage_settings
+  aero_brake_distance_increase_factor  0.1
+  aero_radius_modifier  0.04
+  aero_speed_reduction_factor  0.12
+  burst_brake_distance_increase_factor  0.25
+  burst_radius_modifier  0.3
+  burst_speed_reduction_factor  0.325
+doughnut
+  dot_to_steering  @v2@minx:-1,maxx:1,miny:-1,maxy:1,0:1,0.4480207:0.9881798,0.6699224:0.9479911,0.8335135:0.8942116,0.9503989:0.8401801,1:0.8132358
+  dot_to_throttle  @v2@minx:-1,maxx:1,miny:0,maxy:1,0:1,0.2763852:0.9994054,0.4511874:0.9893569,0.7631929:0.9148946,1:0.7044941
+  grip_fl  0.7
+  grip_fr  0.7
+  grip_rl  0.7
+  grip_rr  0.7
+  lateral_grip_multiplier_fl  0.8
+  lateral_grip_multiplier_fr  1
+  lateral_grip_multiplier_rl  0.75
+  lateral_grip_multiplier_rr  0.75
+downforce_loss
+  aero_reduction_scalar  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.1:0.075,0.33:0.38,0.56:0.75,0.75:0.96,1:1,1:1
+  speed_removal_percentage  @v2@minx:0,maxx:110,miny:0,maxy:1,0:0,0:0,0.1818182:0.0069,0.3:0.0149,0.4:0.0219,0.5454546:0.0292,0.7090909:0.0356,0.9:0.0363,1:0.0349,1:0.0349
+drafting
+  time_to_braking_zone_to_start_drafting  3.5
+  time_to_braking_zone_to_stop_drafting  2.5
+  time_to_move  1.15
+  drafting_a_human
+    draft_approach_speed_needed  -3.25
+    draft_end_time  0.56
+    draft_max_correction  0.095
+    draft_offset_mult  0.5
+    draft_potential_speed_gain_needed  5
+    draft_start_time  0.51
+    drafting_a_drafter_start_time  -1
+  drafting_an_ai
+    draft_approach_speed_needed  -0.8
+    draft_end_time  0.46
+    draft_max_correction  0.075
+    draft_offset_mult  0.5
+    draft_potential_speed_gain_needed  5
+    draft_start_time  0.36
+    drafting_a_drafter_start_time  0.2
+ers_use
+  push_on_in_or_out_lap_battery_level  0.47
+  push_to_build_gap_battery_level  0.7
+  push_to_build_gap_time_to_car_ahead  2
+  push_to_build_gap_time_to_car_behind  2
+  push_to_close_gap_battery_level  0.6
+  push_to_close_gap_time_to_car_ahead  0.6
+  push_to_defend_battery_level  1
+  push_to_defend_speed_differential  2
+  push_to_overtake_battery_level  0.25
+  push_to_overtake_distance_to_corner  300
+  push_to_overtake_intercept_time_defecit  8
+  push_to_overtake_speed_differential  6
+  switch_from_medium_to_none_in_race_battery_level  0.1
+  switch_from_none_to_medium_in_race_battery_level  0.45
+  xmode_enabled
+    push_to_build_gap_battery_level  0.7
+    push_to_close_gap_battery_level  0.6
+    push_to_defend_battery_level  1
+    push_to_overtake_battery_level  0.15
+    switch_from_medium_to_none_in_race_battery_level  0.1
+    switch_from_none_to_medium_in_race_battery_level  0.45
+  xmode_passive
+    push_to_build_gap_battery_level  0.8
+    push_to_close_gap_battery_level  1
+    push_to_defend_battery_level  1
+    push_to_overtake_battery_level  0.3
+    switch_from_medium_to_none_in_race_battery_level  0.1
+    switch_from_none_to_medium_in_race_battery_level  0.45
+exit_fallibility
+  max_throttle_error_by_grip_dry  @v2@minx:0,maxx:1,miny:0,maxy:1,0:1,0:1,0.4:1,0.6:1,0.74:1,0.9:1,1:1,1:1
+  max_throttle_error_by_grip_wet  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.67,0:0.67,0.5:0.68,0.65:0.72,0.75:0.85,0.85:0.98,1:1,1:1
+  max_throttle_error_by_mass  @v2@minx:0,maxx:1,miny:0,maxy:1,0:1,0:1,1:1,1:1
+  max_yaw_angle_deg  23
+formation_lap
+  parking_speed_limit  @v2@minx:0,maxx:100,miny:0,maxy:25,0:0.144,0.03:0.146,0.2:0.2,1:0.9,1:1
+gearbox_controller
+  aggressive_downshift_grip_to_slip_angle_for_dry_tyres  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.025,0:0.025,0.3:0.025,0.55:0.025,0.62:0.045,0.675:0.17,0.8:0.2,1:0.2,1:0.2
+  aggressive_downshift_grip_to_slip_angle_for_wet_tyres  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.025,0:0.025,0.3:0.025,0.55:0.025,0.62:0.045,0.675:0.17,0.8:0.2,1:0.2,1:0.2
+  normal_downshift_grip_to_slip_angle_for_dry_tyres  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.2,0:0.2,0.3:0.2,0.55:0.2,0.6226386:0.225,0.675:0.36,0.8:0.4,1:0.4,1:0.4
+  normal_downshift_grip_to_slip_angle_for_wet_tyres  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.2,0:0.2,0.3:0.2,0.55:0.2,0.6226386:0.225,0.675:0.36,0.8:0.4,1:0.4,1:0.4
+  use_physics_auto_gearbox_downshift_speed  False
+lost_control
+  angle  0.4
+  over_rotation_to_spin_time  0.15
+  recovery_time  2
+  spin_angle_continue_ratio  1.05
+  spin_angle_intiate_ratio  1.25
+  spin_cancel_time  0.2
+  spin_continue_angle  0.2
+  spin_initiate_angle  0.3
+  spun_angle_to_max_steering_angle_ratio  3
+  unspun_angle_to_max_steering_angle_ratio  2
+merge_rates
+  corner_radius_merge_rage_graph  @v2@minx:150,maxx:300,miny:0,maxy:10,0:0.5,0:0.5,0.2355556:0.225,1:0.15,1:0.15
+  near_corner_merge_rate_graph  @v2@minx:0,maxx:300,miny:0,maxy:10,0:0.4,0:0.35,0.5:0.2,1:0.15,1:0.15
+  track_edge_proximity_merge_rate_graph  @v2@minx:1,maxx:3,miny:0,maxy:10,0:0.5,0:0.5,1:0.15,1:0.125
+  steering_heat_map
+    blocking_ending_merge_rate  @v2@minx:0,maxx:1,miny:0,maxy:10,0:0.175,0:0.175,0.5:0.2,1:0.3,1:0.31
+    blocking_starting_merge_rate  @v2@minx:0,maxx:1,miny:0,maxy:10,0:0.1,0:0.1,0.5:0.15,1:0.25,1:0.26
+    celebration_merge_rate  4
+    max_merge_rate  5
+    max_merge_rate_for_Side_Swipe  3
+    max_merge_rate_for_drafting_ai  3
+    max_merge_rate_for_drafting_human  6
+    space_seeking_merge_rate  4
+  vehicle_heat_map
+    blocking_ending_merge_rate  @v2@minx:0,maxx:1,miny:0,maxy:10,0:0.15,0:0.15,0.5:0.175,1:0.275,1:0.285
+    blocking_starting_merge_rate  @v2@minx:0,maxx:1,miny:0,maxy:10,0:0.1,0:0.1,0.5:0.125,1:0.225,1:0.235
+    celebration_merge_rate  6
+    max_merge_rate  5
+    max_merge_rate_for_Side_Swipe  1.5
+    max_merge_rate_for_drafting_ai  1.5
+    max_merge_rate_for_drafting_human  2
+    space_seeking_merge_rate  4
+merge_to_racing_line
+  end_offset  0.2
+  inside_start_offset  @v2@minx:5,maxx:400,miny:0,maxy:2,0:0.5,0:0.475,0.09319899:0.375,0.2443325:0.3,0.395466:0.28025,0.5465995:0.2775,1:0.275,1:0.275
+  max_merge_dist  150
+  merge_dist_mult  1
+  min_merge_dist  33
+  outside_start_offset  @v2@minx:5,maxx:400,miny:0,maxy:2,0:0.375,0:0.375,0.2443325:0.375,0.497541:0.365,0.7481108:0.32,1:0.225,1:0.2
+  rate_of_merge_in_cornor  @v2@minx:0,maxx:999,miny:0,maxy:1,0:1,0.02002002:1,0.05005005:0.85,0.1501502:0.55,0.3003003:0.35,0.5005005:0.2,1:0,1:0
+  safty_car_pull_out_merge_dist  200
+  safty_car_pull_out_time  15
+overtake
+  dist_from_pit_fork_to_stay_on_correct_side  300
+  divebomb_turned_in_radius  300
+  side_switch_time_requirement_graph  @v2@minx:0,maxx:2,miny:0,maxy:1,0:0,0:0,0.15:0,1:0.5,1:0.5
+  speed_difference_buffer  @v2@minx:0,maxx:50,miny:0,maxy:1,0:0,0:0,0.4518467:0.02675637,0.5092354:0.1251694,0.6536937:0.5347071,1:0.6524833,1:0.6382987
+pedal_controller
+  lateral_traction_slip_angle_cut_in_proportion  0.5
+  lift_and_coast_thottle  @v2@minx:0,maxx:100,miny:0,maxy:1,0:0.76,0:0.76,0.5:0,0.5:0,1:0
+  max_throttle_when_cruising  0.4
+  spin_out_ramp_up_time  3.5
+  track_speed_error_brake_scalar  0.2
+physics_settings
+  turning_circle_speed_scalar  @v2@minx:0,maxx:100,miny:0,maxy:1,0:1,0:1,0.1508356:0.9278916,0.2620933:0.6004719,0.4142481:0.4338061,0.6666667:0.4,0.8333334:0.4,1:0.4,1:0.4
+race_start
+  first_gear_short_shift_scalar  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.1,0:0.5,0.01:0.6,0.0587511:0.7388898,0.3630607:0.8518203,0.6:0.93,0.8:0.98,1:1,1:0.9361708
+  max_rpm  17200
+  min_rpm  3800
+  poor_traction_max_speed  92
+  race_start_time  4
+  random_to_traction_scalar_mod  @v2@minx:0,maxx:1,miny:0,maxy:2,0:0,0:0.01,0.005:0.75,0.1435356:0.5057328,0.1802111:0.4812766,0.2444592:0.5655438,0.5:0.6,0.7:0.625,0.85:0.7,1:0.85,1:0.85
+  random_to_traction_scalar_mod_wet  @v2@minx:0,maxx:1,miny:0,maxy:3,0:0,0:0.1,0.02:0.9,0.07:1.2,0.2:0.6,0.35:0.75,0.5:1.05,0.8:1.15,0.95:1.5,1:2.1,1:2.5
+  rev_time_max  3.7
+  rev_time_min  0.2
+  second_gear_short_shift_scalar  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0.6,0.01:0.7,0.1033422:0.8,0.3630607:0.88,0.6013193:0.933,0.8:0.98,1:1,1:0.95
+retire
+  dist_to_finish_aligning_to_grid  50
+  dist_to_start_aligning_to_grid  200
+  time_before_looking_for_retirement_gate  5
+speed_limit_settings
+  out_lap_distance_to_build_one_second_gap  1500
+  post_race_speed_limit  111.76
+  pre_retirement_speed_limit  30
+  puncture_speed_limit  40
+spinning_out
+  angle_to_track_to_mark_as_finished  70
+  low_speed_to_mark_as_finished  10
+  recovery_speed  5
+  slide_angle_component  0.05
+  stopped_spinning_speed  0.6
+steering_controller
+  peak_slip_cut_in_angle  3
+  peak_slip_cut_in_proportion  0.7
+  peak_slip_mulitplier_vehicle_alongside  1.5
+  peak_slip_multiplier_clear_either_side  1.2
+  peak_slip_smoothing_half_life  0.3
+  time_to_half_rotate_steering_wheel  0.125
+steering_pid_settings
+  derivative_gain  -0.5
+  derivative_limit  1
+  input_smoothing_half_life  0.3
+  integral_gain  -1
+  integral_limit  1
+  output_smoothing_half_life  0.3
+  proportional_gain  -2
+  proportional_limit  1
+  result_limit  100
+swerve
+  max_num_swerves  6
+  max_time_between_swerves  8
+  min_num_swerves  4
+  min_time_between_swerves  3
+  swerve_length  2
+  swerve_speed_cap_dry  160
+  swerve_speed_cap_wet  0.0
+  swerve_width  0.6
+throttle_pid_settings
+  derivative_gain  0.0
+  derivative_limit  0.0
+  integral_gain  1
+  integral_limit  1
+  proportional_gain  3
+  proportional_limit  0.3334
+  result_limit  1
+traction_control
+  grip_atc_strength  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0.84,0:0.84,0.35:0.84,0.58:0.84,0.59:0.84,0.6:0.92,0.63:1,0.73:1,0.76:0.92,0.77:0.5,0.8:0.07,0.84:0,0.9:0,1:0,1:0
+  peak_slip_factor  @v2@minx:0,maxx:1000,miny:0,maxy:3,0:0.25,0:0.25,0.35:0.25,0.4:0.25,0.45:0.25,0.455:0.25,0.475:0.2583333,0.495:0.2666667,0.5:0.2666667,0.55:0.2666667,0.6:0.2666667,1:0.2666667,1:0.2666667
+  radius_atc_strength_scalar  @v2@minx:0,maxx:1000,miny:0,maxy:1,0:1,0:1,0.35:1,0.4:1,0.48:1,0.497:1,0.498:0.98,0.499:0.63,0.5:0.63,0.55:0.63,0.6:0.63,1:0.63,1:0.63
+  throttle_fallibility_scalar  @v2@minx:0,maxx:1,miny:0,maxy:1,0:1,0:1,0.1552771:0.997636,0.4132585:0.96,0.6903434:0.8327192,0.8571923:0.635937,0.9544878:0.3640684,1:0,1:0
+trailbraking
+  braking_effectiveness_start_radius  500
+  gradient_braking_modifier_dry  @v2@minx:-20,maxx:20,miny:0,maxy:2,0:0.655,0:0.655,0.2625:0.64,0.35:0.58,0.445:0.515,0.5:0.51,0.65:0.51,0.7263193:0.5,0.8:0.49,1:0.49,1:0.49
+  gradient_braking_modifier_wet  @v2@minx:-20,maxx:20,miny:0,maxy:2,0:0.705,0:0.705,0.275:0.665,0.35:0.565,0.4:0.53,0.65:0.51,0.8:0.505,1:0.505,1:0.505
+under_safety_car
+  delta_pace_high_speed_point  5.5
+  delta_pace_low_speed_point  0.0
+  delta_pace_time_adjustment  0.5
+  large_follow_gap  @v2@minx:0,maxx:100,miny:0,maxy:30,0:0.1666667,0:0.1666667,0.6978833:0.6335737,1:0.6666667
+  small_follow_gap  @v2@minx:0,maxx:100,miny:0,maxy:30,0:0.08333334,0:0.08333334,0.6363193:0.3144208,1:0.3333333
+yielding
+  closing_too_fast_to_yield_speed  11.1760
+  distance_to_force_side  400
+  distance_to_pick_side  750
+  pit_slow_down_distance  300.0000
+  pit_start_yield_speed  111.76
+  pit_yield_speed  20.1168
