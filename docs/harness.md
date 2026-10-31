@@ -275,15 +275,37 @@ Evidence that the sandbox catches writes: in shell 8 the game rewrote the sandbo
   `wait screen=splash 180`.
 - A `pad <button> N` hold takes about 2N ms of wall time.
 
-Career wizard path (Driver Career), by screen id and tile id:
-1. `fe_home`: tile `career`.
-2. `fe_career` (tiles `driver_career`, `my_team_career`, `online_career`, `c_career`): `driver_career`.
-3. `fe_career_dlc_select` (tiles `career_default_content` = 2025, `career_dlc_content` = 2026): 2025.
-4. `career_wizard_experience_select` (Skip to F1 / Start in F2), with `career_wizard_summary`.
-5. `career_wizard_season_length_select` (Full / Custom season), then further screens (being mapped).
+**`tools/sandbox_shell.ps1`** drives a `test shell --fixture` session one step at a time from a plan file
+(`tile`, `wait screen=`, guarded `@while <screen> <n> pad a`, `@expect`, `@sleep`), under the same snapshot and
+sandbox checks, and relaunches on a skipped intro. `@control <idle s>` hands the session over to live steps
+appended to `<Out>/control.txt`, so a new screen can be mapped from frames (`tools/window_frames.ps1`) before it
+goes into a plan. `save now` is `{"cmd":"save","args":{"op":"now"}}` and answers `{"writes":2}`.
 
-The plan (supervisor): take control of the official Jack Doohan (#7 Alpine), so nobody is replaced. Exclude that
-car from every arm and field statistic.
+Career wizard path (Driver Career) by screen id: `fe_home` (tile `career`), `fe_career` (tile `driver_career`),
+`fe_career_dlc_select` (2025 = default; the tile id doesn't advance it, a guarded `a` does), then
+`slice_gen_screen_title` over `career_wizard_*` (status shows only the top screen) through to
+`driver_career_confirm_selections`, an agent cutscene (`dummy_driver_hq_panel`, ~60 s), the contract terms
+(`team_hq_driver_career_contracts_negotiation`), and Team HQ (`driver_hq_panel`). The full plan, with every
+choice, is `harness/fixtures/career_stroll_create.plan`.
+
+**Career fixture `stroll-career-20261031` (captured 2026-10-31 from run sandbox-28).** The official Jack Doohan
+isn't in the 2025 driver list, so the player is the official Lance Stroll (#18, Aston Martin). Nobody is replaced,
+and the default contract is signed unchanged. That car is excluded from every arm and field statistic. Details and
+rebuild steps: `harness/fixtures/README.md`.
+
+Fixture runs to Team HQ, Tyler's 11 files and 11 Steam records checked before and after each:
+
+| Run | How | Reached Team HQ | Saves |
+|---|---|---|---|
+| sandbox-28 | shell: create the career, sign, `save now` (writes the sandbox) | yes | unchanged |
+| sandbox-30 | `test run` `sandbox_check.test.json` | yes (log: "career ready at team_hq") | unchanged |
+| sandbox-31, -32 | `test run` | no: "no content tile continues a saved career" | unchanged |
+| sandbox-33 | shell: `career_stroll_continue.plan` | yes (frame: resume card, then HQ) | unchanged |
+
+The `test run` failures look like a race in swofty's career loader. It read `fe_career_dlc_select`'s tiles about
+60 ms after the screen appeared (in the pass, after about 500 ms), before the 2025 tile's route switched to
+"continue". Until that's fixed, `career_stroll_continue.plan` (shell, with a 3 s wait and guarded presses) is the
+reliable route to Team HQ.
 
 ## Time Trial by route (works since 2026-10-31)
 

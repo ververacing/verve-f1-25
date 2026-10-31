@@ -68,3 +68,19 @@ pad a
 # confirm selections (Stroll + Alonso at Aston Martin): creates the career in the sandbox
 @expect driver_career_confirm_selections
 pad a
+
+# Team HQ: agent cutscene (dummy_driver_hq_panel, ~60 s), then Aston Martin contract terms. Neutral choice
+# (supervisor, 2026-10-31): sign the default offer, target rating 78 (Stroll's current RTG), contract length
+# Season 1, no team change. Focus starts on the rating slider; SIGN CONTRACT is two down and needs `a` held.
+wait screen=team_hq_driver_career_contracts_negotiation 180
+@sleep 5
+@expect team_hq_driver_career_contracts_negotiation
+pad down
+@sleep 2
+pad down
+@sleep 2
+pad a 3000
+@sleep 6
+# "CONTRACT SIGNED!" keeps the same screen id; `a` = Continue
+@while team_hq_driver_career_contracts_negotiation 1 pad a
+@sleep 10

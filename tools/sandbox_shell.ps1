@@ -12,6 +12,7 @@ Plan file, one step per line ('#' comments):
     @while <regex> <max> <cmd>   while the current screen matches: send <cmd>, then pause 4 s; at most <max> times.
                                  This is the guard for wizard `a` presses: they stop the moment the screen leaves.
     @sleep <seconds>             wait without input
+    @control <idle seconds>      take more steps live from <Out>/control.txt (appended lines), until `@end` or idle
 
 Safety:
 - Tyler's `remote\` files and Steam's per-file remotecache records are snapshotted before and after; any change
@@ -49,7 +50,8 @@ function Snapshot {
     }
     $h
 }
-function Log([string] $s) { $s; Add-Content $transcript $s -Encoding utf8 }
+# Write-Host, not output: Log runs inside Send/Screen/Step, whose output is their return value
+function Log([string] $s) { Write-Host $s; Add-Content $transcript $s -Encoding utf8 }
 
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { throw 'F1 25 is running; start sandbox runs with the game closed.' }
 $steps = Get-Content $Plan | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') } | ForEach-Object { $_.Trim() }
@@ -130,14 +132,15 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
     Log "intro played (splash after $([math]::Round($ms / 1000)) s)"
 
-    $result = 'plan done'
-    foreach ($s in $steps | Select-Object -Skip 1) {
-        if ($p.HasExited) { $result = 'shell exited'; break }
-        if ($s -match '^@sleep (\d+)') { Start-Sleep -Seconds ([int]$Matches[1]); continue }
+    # one plan step; sets $script:stop to the reason when the plan must stop (Log writes to the output, so a
+    # return value would be mixed with log lines)
+    function Step([string] $s) {
+        $script:stop = $null
+        if ($s -match '^@sleep (\d+)') { Start-Sleep -Seconds ([int]$Matches[1]); return }
         if ($s -match '^@expect (.+)$') {
             $want = $Matches[1]; $scr = Screen
-            if ($scr -notmatch $want) { Log "EXPECT FAILED: screen '$scr' !~ $want; stopping the plan"; $result = "stopped at expect $want"; break }
-            continue
+            if ($scr -notmatch $want) { Log "EXPECT FAILED: screen '$scr' !~ $want; stopping the plan"; $script:stop = "stopped at expect $want" }
+            return
         }
         if ($s -match '^@while (\S+) (\d+) (.+)$') {
             $want = $Matches[1]; $max = [int]$Matches[2]; $cmd = $Matches[3]
@@ -146,9 +149,39 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
                 if ($scr -notmatch $want) { Log "while: screen '$scr' left $want after $i press(es)"; break }
                 Send $cmd | Out-Null; Start-Sleep -Seconds 4
             }
-            continue
+            return
         }
         Send $s | Out-Null
+    }
+
+    $result = 'plan done'
+    foreach ($s in $steps | Select-Object -Skip 1) {
+        if ($p.HasExited) { $result = 'shell exited'; break }
+        if ($s -match '^@control (\d+)$') {
+            # live control: take further steps from <Out>/control.txt as lines are appended, until `@end` or
+            # <idle> seconds without a new line. Lets a screen be mapped from frames before it is put in a plan.
+            $idle = [int]$Matches[1]; $ctl = Join-Path $Out 'control.txt'; $done = 0; $last = Get-Date
+            if (-not (Test-Path $ctl)) { New-Item -ItemType File $ctl | Out-Null }
+            Log "control: waiting for steps in $ctl"
+            while (-not $p.HasExited -and ((Get-Date) - $last).TotalSeconds -lt $idle) {
+                # shared read: the file is appended to while this runs (a plain Get-Content fails on the clash)
+                try {
+                    $fs = New-Object IO.FileStream $ctl, 'Open', 'Read', 'ReadWrite'
+                    $text = (New-Object IO.StreamReader $fs).ReadToEnd(); $fs.Dispose()
+                } catch { Start-Sleep -Milliseconds 300; continue }
+                # the last piece is "" after a final newline, or a line still being written: never count it
+                $lines = @($text -split "`r?`n" | Select-Object -SkipLast 1 | ForEach-Object { $_.Trim() })
+                $new = @($lines | Select-Object -Skip $done); $done = $lines.Count
+                foreach ($c in $new | Where-Object { $_ -and -not $_.StartsWith('#') }) {
+                    $last = Get-Date
+                    if ($c -eq '@end') { $last = [datetime]::MinValue; break }
+                    Step $c; if ($script:stop) { Log "control: $script:stop (going on)" }
+                }
+                Start-Sleep -Milliseconds 500
+            }
+            Log 'control: ended'; continue
+        }
+        Step $s; if ($script:stop) { $result = $script:stop; break }
     }
     if (-not $p.HasExited) { Send 'quit' 120 | Out-Null }
     if (-not $p.WaitForExit(120000)) { Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force }
@@ -160,6 +193,9 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
 Log "result: $result"
 
 Start-Sleep -Seconds 5
+# the shell leaves its game lock and test profile behind even after a clean quit; free them for the next run
+& $Swofty restore | Out-Null
+& powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
 $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }
