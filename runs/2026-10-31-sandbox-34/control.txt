@@ -1,0 +1,76 @@
+status
+pad a
+@sleep 6
+status
+@sleep 20
+status
+pad a
+@sleep 15
+status
+@sleep 25
+status
+@sleep 15
+status
+pad a
+@sleep 30
+status
+pad a
+@sleep 30
+status
+@sleep 25
+status
+pad a
+@sleep 5
+status
+pad a
+@sleep 30
+status
+@sleep 25
+status
+pad start
+@sleep 3
+status
+pad menu
+@sleep 3
+status
+status
+pad a
+@sleep 4
+status
+pad a
+@sleep 3
+status
+pad a
+@sleep 3
+status
+pad a
+@sleep 3
+status
+pad a
+@sleep 3
+status
+pad b
+@sleep 3
+pad menu
+@sleep 3
+status
+pad b
+@sleep 3
+status
+@expect \|hud\|
+pad x
+@sleep 4
+status
+pad menu
+@sleep 3
+@expect \|pause\|
+pad down
+@sleep 1
+pad down
+@sleep 1
+pad down
+@sleep 1
+pad down
+@sleep 2
+status
+@end

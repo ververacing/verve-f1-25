@@ -307,6 +307,25 @@ Fixture runs to Team HQ, Tyler's 11 files and 11 Steam records checked before an
 | sandbox-31, -32 | `test run` | no: "no content tile continues a saved career" | unchanged |
 | sandbox-33 | shell: `career_stroll_continue.plan` | yes (frame: resume card, then HQ) | unchanged |
 
+**Weekend route from Team HQ (mapping in progress, run sandbox-34, paused 16:05).** Everything below is by frame
+and screen id:
+1. `driver_hq_panel` overview: `a` = Advance Time. Time runs on its own until the next timeline event.
+2. 5 March, event "New Season Grid Reveal": the only option is `a` = Go to grid reveal. It plays a ~60 s cutscene,
+   then returns to the overview. `a` = Advance Time again.
+3. 13 March, "Season 1 - Round 1, Race Weekend": `a` = Go to Race Weekend (the other option is tyre allocation).
+4. `career_hub`: a garage cutscene (`a` = Skip; left to play, ~30 s), then the hub with the prompt `a` = Workstation.
+   The workstation shows "Go to next session" (Practice 1, 30 min) and session cards P1/P2/P3 30 min, Qualifying
+   One-Shot, **Race 5 laps**. Session length Very Short and qualifying One-Shot come from the Recommended preset.
+5. `a` on "Go to next session" loads the P1 garage (`hud`). The first time, an `a` = Garage Tutorial prompt comes
+   first: 3 pages, then the garage menu `r` Look Around / `x` Session Info / `a` Go to Track. Go to Track opens
+   `x` Drive Out / `a` Flying Lap / `y` Practice Programmes / `b` Back.
+6. `pad menu` opens `pause`: Restart Session, Race Director, Settings, Tutorials, Retire from Session, Mid Session
+   Save, Quit to Main Menu. No "Simulate Session" seen yet. Next to check: Retire from Session's confirmation text,
+   and Session Info.
+
+The agent answers `ok` to any pad name: `start` did nothing, `menu` works. A loop of unchecked presses ran past the
+tutorial into Go to Track (backed out with `b`). Map one press at a time.
+
 **Known Swofty issue: `test run` career loads fail at the content select (swofty 1.6.11).** Until it's fixed,
 `career_stroll_continue.plan` (shell: 3 s wait, then guarded presses) is the reliable route to Team HQ.
 

@@ -1,0 +1,29 @@
+﻿# Continue the saved Stroll career to Team HQ (tools/sandbox_shell.ps1 plan, fixture stroll-career-20261031).
+# The shell route for when `swofty test run`'s career loader reads the content tiles too early (2026-10-31: "no
+# content tile continues a saved career" in 2 of 3 runs, when it read them ~60 ms after the screen appeared).
+
+# boot: the game alternates its intro video; the controller relaunches when it was skipped
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+
+# main menu -> Career -> Driver Career -> 2025 content (continues the saved career) -> the save slot
+tile career
+wait screen=fe_career 60
+tile driver_career
+wait screen=fe_career_dlc_select 60
+@sleep 3
+@while \|fe_career_dlc_select\| 1 pad a
+wait screen=career_continue_driver 60
+@sleep 3
+@while \|career_continue_driver\| 1 pad a
+wait screen=driver_hq_panel 180
+@sleep 5
+@expect driver_hq_panel
+status
+
+# then: live control, mapping the weekend
+@control 2400

@@ -173,10 +173,13 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
                 # the last piece is "" after a final newline, or a line still being written: never count it
                 $lines = @($text -split "`r?`n" | Select-Object -SkipLast 1 | ForEach-Object { $_.Trim() })
                 $new = @($lines | Select-Object -Skip $done); $done = $lines.Count
+                $skip = $false
                 foreach ($c in $new | Where-Object { $_ -and -not $_.StartsWith('#') }) {
                     $last = Get-Date
                     if ($c -eq '@end') { $last = [datetime]::MinValue; break }
-                    Step $c; if ($script:stop) { Log "control: $script:stop (going on)" }
+                    # a failed @expect drops the rest of the lines that arrived with it, then control goes on
+                    if ($skip) { Log "control: skipped '$c'"; continue }
+                    Step $c; if ($script:stop) { Log "control: $script:stop (rest of this batch skipped)"; $skip = $true }
                 }
                 Start-Sleep -Milliseconds 500
             }
