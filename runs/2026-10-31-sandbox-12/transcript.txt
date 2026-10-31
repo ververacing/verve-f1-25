@@ -1,0 +1,3 @@
+﻿saves before: 22 entries
+attempt 1 started 11:13:21
+sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-181321-1 ({"schema":1,"run":"shell-20261031-181321-1","state":"armed","pid":27004,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-181321-1\\saves\\remote","why":""})
