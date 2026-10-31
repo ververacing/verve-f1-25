@@ -62,6 +62,41 @@ What the smoke run showed (Austria, 3 laps, 20 cars, clear):
 3. **Career race sessions** (B-0002): a fixture saved inside a race weekend, then `pad` to the race.
 4. **UDP logger** (#4).
 
+## Reading benchmark results (review findings on #32)
+
+1. **The player car.** Vehicle 19 was the fastest starter in both smoke runs (0.109 / 0.095 s) while every other
+   car moved around. It is probably the player car (AI-driven in benchmark), which may take a different start path.
+   Until B-0003 (#33) settles which vehicle is the player, leave the player's car and team out of every arm and
+   every field statistic.
+2. **Mode caveat.** Benchmark is its own session mode. Anything learned there about row vs rating precedence
+   (Q-17) or start behaviour holds *for benchmark*; Grand Prix and career need gaps 2 and 3 before they count.
+3. **Vehicle id = trace entry.** Reading RaceStarts by team assumes vehicle id *i* is entry *i* of the session
+   trace's `teams …` list. Per-team arms test it, since both cars of a modified team should move together.
+4. **Race Start performance** (65-93 in the smoke runs) has no known scale. Log it, but don't use it as a metric
+   until #8.
+5. **Per-session level.** The whole field's reaction times shift from start to start (F-06's per-session k), so
+   compare arms against the stock field of the *same* start, not across starts.
+
+## UDP telemetry
+
+On since 2026-10-30, with Tyler's approval: `Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml`
+`<udp enabled="true" broadcast="false" ip="127.0.0.1" port="20777" sendRate="20" format="2026"
+yourTelemetry="restricted" onlineNames="off" />`. Only `enabled` changed; the original is saved next to it as
+`hardware_settings_config.pre-udp.xml`. Record with `tools/udp_capture.py` (raw packets with wall-clock times) and
+read the Participants packet with `tools/udp_participants.py`.
+
+## PC hygiene after every run
+
+- `swofty doctor` must show `drift: swofty is not part of the game`, so launching from Steam gives the stock game.
+- The launcher must open on Tyler's own profile. `swofty test` creates `test-<run>` profiles; delete leftovers with
+  `swofty profile delete <name> --yes` (it fails while something holds `cache\overlay\<name>`; retry later).
+  Before the first run on this PC the only profile was an implicit `default` with no file, which the first test
+  profile replaced as the active one; there is no CLI command to pick the active profile, so that is done in the
+  launcher.
+- Reinstalling an addon over an existing install fails here ("files still in use") and half-deletes it. Delete
+  `%LOCALAPPDATA%\Swofty\addons\<id>` and any `.installing-<id>` folder first, then `swofty addons install`.
+- Close the Swofty Launcher window when it isn't needed (Tyler's OK, 2026-10-30).
+
 ## Side effect seen
 
 The first `swofty test run` on this PC created profile `test-<run>` and could not delete it afterwards: "is the
