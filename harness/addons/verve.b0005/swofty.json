@@ -1,0 +1,34 @@
+{
+    "schema_version":  1,
+    "id":  "verve.b0005",
+    "name":  "Verve test B-0005 (vehicle map via race_start tags)",
+    "version":  "0.0.1",
+    "author":  "TC Verve",
+    "description":  "Test-only addon for race batch B-0005: all four ai_driver_config.race_start reaction bounds = 0.65 on one driver per team (random, seed 5005). Not for play.",
+    "license":  "MIT",
+    "category":  "ai",
+    "kind":  [
+                 "database"
+             ],
+    "compat":  {
+                   "game":  "f1_25",
+                   "game_builds":  [
+                                       "25251167"
+                                   ],
+                   "launcher":  "\u003e=1.5.13"
+               },
+    "requires":  [
+                     {
+                         "id":  "swofty.core",
+                         "version":  "\u003e=0.2.13"
+                     }
+                 ],
+    "saves":  {
+                  "affects":  false
+              },
+    "operations":  {
+                       "database":  [
+                                        "db/b0005.json"
+                                    ]
+                   }
+}

@@ -1,0 +1,77 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=pierre_gasly]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=fernando_alonso]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.95,0:0.95,1:0.95,1:0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.95,0:0.95,1:0.95,1:0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.95,0:0.95,1:0.95,1:0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.95,0:0.95,1:0.95,1:0.95"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=awareness]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                }
+            ],
+    "schema_version":  1
+}
