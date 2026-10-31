@@ -1,0 +1,53 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.02"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.02"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=fernando_alonso]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.98"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.98"
+                }
+            ],
+    "schema_version":  1
+}
