@@ -106,6 +106,17 @@ yourTelemetry="restricted" onlineNames="off" />`. Only `enabled` changed; the or
 `hardware_settings_config.pre-udp.xml`. Record with `tools/udp_capture.py` (raw packets with wall-clock times) and
 read the Participants packet with `tools/udp_participants.py`.
 
+**Capturing with a test (#4).** `tools/run_with_udp.ps1 -Test <file> -Out runs/<id>` runs the capture next to
+`swofty test run` and parses the result with `tools/udp_parse.py` into `runs/<id>/udp/`:
+- `sessions.csv`: session type, track, packet counts per id, and any packet whose size doesn't match the F1 25 spec;
+- `cars.csv`: participant, grid, final position, laps, best lap, pit stops, overtakes, collisions, penalties, plus
+  speed, lap distance and position 1, 3 and 6 s after lights out (the behavioural side of F-38's bad-start draw);
+- `laps.csv` and `events.csv`.
+
+Python can't read files under `%APPDATA%` here, so the scripts and the raw recording live in
+`%LOCALAPPDATA%\verve-udp\<run>\`. `harness/tests/udp_tt.test.json` is the first in-game check: a Time Trial reached
+by pad (Swofty's documented sequence) with the AI driving.
+
 **Benchmark runs send no UDP.** During B-0003's 5 starts the capture received 0 packets, with the setting on and kept
 by the game. Either benchmark mode or the offline launch doesn't emit telemetry. A normal session (Time Trial by pad,
 `docs/std/testing.md`) is the next place to check (#4).
