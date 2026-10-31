@@ -105,7 +105,8 @@
         "Q-03"
       ],
       "status": "verified-static",
-      "correction": "Stock bounds from the dump: min_reaction_time lower/upper 0.04/0.28, max_reaction_time 0.24/0.42, min_bad_start 0.04/0.06, max_bad_start 0.28/0.42. The handoff's 'min = [0.28, 0.42], max = [0.04, 0.24]' had the labels swapped."
+      "correction": "Stock bounds from the dump: min_reaction_time lower/upper 0.04/0.28, max_reaction_time 0.24/0.42, min_bad_start 0.04/0.06, max_bad_start 0.28/0.42. The handoff's 'min = [0.28, 0.42], max = [0.04, 0.24]' had the labels swapped.",
+      "runtime_note": "B-0003 (#33, 5 stock benchmark starts at Austria): the stock field (vehicle 19 excluded) never started under 0.171 s; per-start mean 0.248-0.265 s, SD 0.036-0.058. That fits the formula only with k ~0.5 (r ~0.85 -> U[0.18, 0.34], mean ~0.26); at k = 1 it would be U[0.08, 0.27]. Vehicle 19 (a Ferrari, possibly the player car) fits k*r ~1 (0.054-0.109 s in 5 of 7 starts). The per-start drift (~0.017 s) suggests k varies by session. Fit by the supervisor review on #36."
     },
     {
       "id": "F-07",
