@@ -1,0 +1,35 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: driver_statistics.driver_statistics.driver_characteristic_overrides
+# resolved: driver_statistics.driver_statistics.driver_characteristic_overrides
+_DriverCharacteristicOverride_instancecount_  6
+DriverCharacteristicOverride  [table, 6 rows]
+  DriverCharacteristicOverride_0  (racecraft_aggression)
+    _metadata_  racecraft_aggression
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.25:0.25,0.75:0.75,1:1,1:1,1:1
+    driver_characteristic  aggression
+    driver_statistic  racecraft
+  DriverCharacteristicOverride_1  (racecraft_reaction_speed)
+    _metadata_  racecraft_reaction_speed
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.25:0.25,0.75:0.75,1:1,1:1,1:1
+    driver_characteristic  reaction_speed
+    driver_statistic  racecraft
+  DriverCharacteristicOverride_2  (awareness_control)
+    _metadata_  awareness_control
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.5:0.3,0.9:0.8,1:1,1:1,1:1
+    driver_characteristic  control
+    driver_statistic  awareness
+  DriverCharacteristicOverride_3  (awareness_mistakes)
+    _metadata_  awareness_mistakes
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.5:0.2,0.85:0.7,1:1,1:1,1:1
+    driver_characteristic  mistakes
+    driver_statistic  awareness
+  DriverCharacteristicOverride_4  (pace_speed_in)
+    _metadata_  pace_speed_in
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.6:0.3,0.9:0.75,1:1,1:1,1:1
+    driver_characteristic  speed_in
+    driver_statistic  pace
+  DriverCharacteristicOverride_5  (pace_speed_out)
+    _metadata_  pace_speed_out
+    distribution  @v2@minx:0,maxx:1,miny:0,maxy:1,0:0,0:0,0.6013193:0.3,0.9:0.75,1:1,1:1,1:1
+    driver_characteristic  speed_out
+    driver_statistic  pace

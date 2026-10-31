@@ -68,3 +68,18 @@ Decide whether a Verve-style driver-personality layer is possible on F1 25 via S
 - Confirmed from the RE notes that the per-car AI driver record is built from the driver row at session setup with no mode-specific path (F-25). Found a real v0.1 flaw: the flat pace curve and static overrides remove per-season driver development in careers (F-26, issue 21).
 - Designed the autonomous test loop around `swofty run --apply --direct`, a harness plugin (routes + `sessions::set_control` + exit on `session.end`), and the official UDP telemetry (F-27, HANDOFF §13, issue 24). The EA forum UDP spec post (12187347) links the PDFs; packet details were not fetched here, so the Overtake/Collision event claim comes from the F1 23/F1 24 specs and must be checked against the F1 25 PDF.
 - Added §12 gaps checklist and §14 other-improvement candidates; issues 21–24.
+
+## 2026-10-30 — session 2 (local dev session on the game PC): stock dump
+
+- Machine: Steam F1 25 build 25251167, exe sha256 matches the RE build; Swofty 1.6.11 (`swofty doctor`: no drift).
+  Read-only `swofty db get` only; the game was not launched.
+- Dumped driver rows, rating holders, the six override curves, all 84 `ai_driver_config` keys for four rows, the
+  2026 dataset census, one `ai_vehicle_config`, the f1_2025 parameter maps and Austria's difficulty table into
+  `docs/stock/` (README there summarises). New tools: `tools/dump_stock.ps1`, `tools/dump_ai_driver_config.ps1`.
+- Answered: Q-01 (stock rows carry curated characteristics, not -1; F-28), Q-03 static half (`mistakes` is a
+  skill; F-29), Q-11 (24 drivers have a `2026` dataset; F-30).
+- Corrected: F-02 (stock does set the fields), F-06 (race-start bound labels were swapped), catalogue types (15
+  "float" keys are curves; F-31). Found label mismatches that would break the v0.1 build (Antonelli row, Albon
+  stats; F-32). Pinned `compat.game_builds` to `25251167`.
+- Side note: the Microsoft Store-style Python on this PC cannot see files under `AppData\Roaming` (MSIX
+  redirection), so scripts that touch the repo must run with the repo outside that folder.

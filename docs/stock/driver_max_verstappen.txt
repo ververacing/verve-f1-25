@@ -1,0 +1,46 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.drivers.driver[_metadata_=max_verstappen]
+# resolved: entrants.drivers.driver_10
+_metadata_  max_verstappen
+audio_name  max_verstappen
+available  True
+car_number  33
+chance_to_use_number_1  100
+expression_label  max_verstappen
+f1_seasons_completed  11
+first_name  lng_max
+full_name  lng_max_verstappen
+garage_slot_preference  1
+head  max_verstappen
+initials  VER
+is_name_reversed  False
+is_using_number_1_in_first_season  False
+last_name  lng_verstappen
+last_name_standard
+  value:
+  meaning: Last name standard
+nationality  netherlands
+stat_id  9
+date_of_birth
+  day  30
+  month  September
+  year  1997
+driver_characteristics
+  aggression  1
+  control  0.96
+  mistakes  0.75
+  preferred_tracks  suzuka,austria,zandvoort,mexico,styria,catalunya
+  reaction_speed  0.85
+  speed_in  1
+  speed_out  0.99
+driver_strategy
+  fastest_strategy_base_selection_chance  0.45
+  fuel_load_max_modifier  0.0221
+  fuel_load_min_modifier  0
+  safety_car_pit_max_laps_early  5
+  safety_car_pit_min_lap  1
+  safety_car_pit_wear_max  0.3
+  safety_car_pit_wear_min  0.2
+  slowest_strategy_selection_time_limit  14
+  weather_change_max_time_percentage  0.5
+  weather_change_min_time_percentage  -0.1

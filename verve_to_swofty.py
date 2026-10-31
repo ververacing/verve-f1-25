@@ -178,7 +178,8 @@ def manifest(addon_id: str, name: str, author: str, version: str, n_drivers: int
         "license": "MIT",
         "category": "ai",
         "kind": ["database"],
-        "compat": {"game": "f1_25", "game_builds": [">=25251167"], "launcher": ">=1.5.13"},
+        # pinned to the build the stock values in docs/stock/ were dumped from; widen after re-dumping on a new build
+        "compat": {"game": "f1_25", "game_builds": ["25251167"], "launcher": ">=1.5.13"},
         "requires": [{"id": "swofty.core", "version": ">=0.2.13"}],
         "saves": {"affects": False},
         "operations": {"database": ["db/verve.json"]},

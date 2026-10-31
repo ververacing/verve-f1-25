@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated": "2026-10-30",
+  "generated": "2026-10-30 (updated with the stock dump)",
   "subject": "F1 25 AI modding via Swofty Launcher, for the Verve driver-personality port",
   "provenance": {
     "game_build": "F1_25.exe sha256 d873a1c8d2044cef2fd76c99c9d5a97649c5b815d055540995105f46619865ae (Steam), image base 0x140000000",
@@ -32,19 +32,22 @@
     },
     {
       "id": "F-02",
-      "claim": "Each driver row carries driver_characteristics.{aggression,control,mistakes,reaction_speed,speed_in,speed_out} override fields; a non-negative value overrides the derived characteristic. Stock sets none.",
-      "confidence": "decoded",
+      "claim": "Each driver row carries driver_characteristics.{aggression,control,mistakes,reaction_speed,speed_in,speed_out} fields. Whether the AI uses these row values or the rating-derived values (driver_characteristic_overrides curves) is UNKNOWN (Q-17).",
+      "confidence": "proven (fields exist, values dumped); unknown (precedence vs the rating curves)",
       "evidence": [
         "re/db/subsystems/ai.md inbox 2026-10-29: 'raw driver_characteristics +0xf0..+0x104 (reader 0x14065ab10), overrides +0x108..+0x11c (negative = none)'",
         "packages/core/src/activation/row_keys.txt.gz: @entrants.drivers.driver_N lists 7 driver_characteristics keys",
-        "addons/classicseasons/classic-seasons-2024/db/season.json fields list for entrants.drivers.driver includes all six plus preferred_tracks"
+        "addons/classicseasons/classic-seasons-2024/db/season.json fields list for entrants.drivers.driver includes all six plus preferred_tracks",
+        "docs/stock/driver_*.txt"
       ],
-      "implications": "v0.1 mechanism. Stock values not yet dumped (expected -1).",
+      "implications": "v0.1 writes these row fields. If the rating curves take precedence for drivers with a statistics holder (every 2025 grid driver has one), v0.1's row writes are no-ops there. Issue #7 decides.",
       "related_questions": [
         "Q-01",
-        "Q-04"
+        "Q-04",
+        "Q-17"
       ],
-      "status": "open"
+      "status": "corrected",
+      "correction": "2026-10-30 stock dump: stock DOES set them (the original claim 'stock sets none' and 'a non-negative value overrides the derived characteristic' are withdrawn). Every dumped driver row carries hand-tuned non-negative values (Verstappen aggression 1, control 0.96, mistakes 0.75, reaction 0.85, speed_in 1, speed_out 0.99; Bearman 0.65/0.765/0.65/0.65/0.68/0.78; Alonso 0.93/0.97/0.90/1.0/0.93/0.94). The RE note's 'raw +0xf0 / overrides +0x108 (negative = none)' fits either reading: row = raw base with the rating curves as the overrides, or the reverse. See F-28, Q-17."
     },
     {
       "id": "F-03",
@@ -66,14 +69,15 @@
       "confidence": "decoded",
       "evidence": [
         "addons/classicseasons/classic-seasons-2024/db/season.json fields block (the 84 names; 'every listed field must exist on the source row')",
-        "re/db/subsystems/ai.md inbox 2026-10-29: 'ai_driver_config parsed per driver (0x142463b40 -> 0x14065dc50 at 0x14246671e; default_driver copy 0x14249a4f0) but stock identical for all 197 drivers'"
+        "re/db/subsystems/ai.md inbox 2026-10-29: 'ai_driver_config parsed per driver (0x142463b40 -> 0x14065dc50 at 0x14246671e; default_driver copy 0x14249a4f0) but stock identical for all 197 drivers'",
+        "docs/stock/ai_driver_config.csv: all 84 keys identical for default_driver, max_verstappen, oliver_bearman, fernando_alonso"
       ],
       "implications": "This is the 'same decision every time' complaint and the v0.2 surface. Catalogued in docs/ai_driver_config_keys.csv.",
       "related_questions": [
         "Q-08",
         "Q-09"
       ],
-      "status": "open"
+      "status": "verified (4 rows)"
     },
     {
       "id": "F-05",
@@ -100,7 +104,8 @@
         "Q-02",
         "Q-03"
       ],
-      "status": "verified-static"
+      "status": "verified-static",
+      "correction": "Stock bounds from the dump: min_reaction_time lower/upper 0.04/0.28, max_reaction_time 0.24/0.42, min_bad_start 0.04/0.06, max_bad_start 0.28/0.42. The handoff's 'min = [0.28, 0.42], max = [0.04, 0.24]' had the labels swapped."
     },
     {
       "id": "F-07",
@@ -379,6 +384,77 @@
         "Q-10"
       ],
       "status": "open"
+    },
+    {
+      "id": "F-28",
+      "claim": "Stock driver_characteristics.* on driver rows are curated per driver and differ, often a lot, from the rating-curve output at season x=0 (row / curve): VER aggr 1.00/0.96, ctrl 0.96/0.74, mist 0.75/0.70, react 0.85/0.96, s_in 1.00/0.90, s_out 0.99/0.90; ALO 0.93/0.90, 0.97/0.69, 0.90/0.64, 1.00/0.90, 0.93/0.70, 0.94/0.70; BEA 0.65/0.84, 0.77/0.49, 0.65/0.41, 0.65/0.84, 0.68/0.49, 0.78/0.49. Which of the two the AI uses is UNKNOWN.",
+      "confidence": "proven (values); unknown (precedence)",
+      "evidence": [
+        "docs/stock/driver_max_verstappen.txt",
+        "docs/stock/stats_max_verstappen.txt",
+        "docs/stock/driver_characteristic_overrides.txt",
+        "the curve table is named driver_characteristic_OVERRIDES; RE note: live record holds raw +0xf0 (from the row) and overrides +0x108 (negative = none)"
+      ],
+      "implications": "Q-01 answered (stock is not -1). Precedence is Q-17 and the top open question: if the ratings win for drivers with a statistics holder, v0.1's row writes are no-ops for the whole 2025 grid and the generator must write rating curves instead (issue #7 decides; #6 depends on it).",
+      "related_questions": [
+        "Q-01",
+        "Q-17"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "F-29",
+      "claim": "The awareness_mistakes distribution is monotonic increasing (0:0, 0.5:0.2, 0.85:0.7, 1:1) and stock row values rank Alonso 0.90 > Verstappen 0.75 > Bearman 0.65, so 'mistakes' is mistake RESISTANCE (higher = fewer mistakes).",
+      "confidence": "decoded (static); runtime check pending",
+      "evidence": [
+        "docs/stock/driver_characteristic_overrides.txt DriverCharacteristicOverride_3",
+        "docs/stock/driver_*.txt"
+      ],
+      "implications": "Q-03 static half: the generator default (proneness) is backwards; switch to --mistakes-is-skill semantics. Issue 8 confirms in a race batch.",
+      "related_questions": [
+        "Q-03"
+      ],
+      "status": "verified-static"
+    },
+    {
+      "id": "F-30",
+      "claim": "24 DriverStatisticsHolder rows carry a '2026' StatisticsDataSet (game_setup_modes f1_26, seasons season_2026): the 2025 grid plus arvid_lindblad. 71 holders have only 'default'; 22 F2 holders have 'default|f2_2026'.",
+      "confidence": "proven",
+      "evidence": [
+        "docs/stock/statistics_datasets.csv",
+        "docs/stock/stats_max_verstappen.txt StatisticsDataSet_1"
+      ],
+      "implications": "Q-11 answered: the generator should write the pace rating to both 'default' and '2026' for those 24 drivers (issue 24).",
+      "related_questions": [
+        "Q-11"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-31",
+      "claim": "ai_driver_config.* keys are not in the launcher's name catalogue: `db get <row>.ai_driver_config` and `db search` report nothing, but the full leaf path resolves by hash. 15 keys typed 'float' in docs/ai_driver_config_keys.* are curves (@v2@...).",
+      "confidence": "proven",
+      "evidence": [
+        "docs/stock/ai_driver_config.csv (type column vs values)",
+        "docs/stock/README.md list of the 15"
+      ],
+      "implications": "v0.2 ops must address leaves by full path and write curve values for the 15 curve keys; tools/build_catalogue.py types need fixing.",
+      "related_questions": [
+        "Q-08"
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "F-32",
+      "claim": "Driver-row labels and statistics-holder labels differ for some drivers: holder alexander_albon vs row alex_albon; holders micheal_schumacher, aryton_senna, nilola_tsolov, john_benneet have no same-label row. The sample CSV's kimi_antonelli is not a row (the row is andrea-kimi_antonelli). 80 of 197 driver rows have no statistics holder.",
+      "confidence": "proven",
+      "evidence": [
+        "swofty db get entrants.drivers.driver (197 rows)",
+        "docs/stock/statistics_datasets.csv (117 holders)"
+      ],
+      "implications": "The v0.1 smoke build would fail on Antonelli (row select) and Albon (pace select). The crosswalk needs both a row label and a stats label per driver; the generator must skip the rating write for drivers without a holder.",
+      "related_questions": [],
+      "status": "verified"
     }
   ]
 }

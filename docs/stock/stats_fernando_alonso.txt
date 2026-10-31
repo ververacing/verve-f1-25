@@ -1,0 +1,71 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso]
+# resolved: driver_statistics.driver_statistics.DriverStatisticsHolder_10
+_StatisticsDataSet_instancecount_  2
+_metadata_  fernando_alonso
+driver  fernando_alonso
+StatisticsDataSet  [table, 2 rows]
+  StatisticsDataSet_0  (default)
+    _Statistic_instancecount_  5
+    _metadata_  default
+    game_setup_modes
+      value:
+      meaning: Labels of rows in game_setup.game_setup_modes.game_setup_mode_N
+    is_invalid  False
+    seasons
+      value:
+      meaning: Labels of rows in game_setup.seasons.season_N
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.99,0:0.99,0.1:0.99,1:0.99,1:0.99
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.9,0.5:0.88,1:0.7,1:0.7
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.81,0:0.81,0.5:0.76,1:0.66,1:0.66
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:0.84,1:0.76,1:0.76
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8534265,0:0.9290771,0.1283453:0.9503542,0.2012817:0.8014182,0.3850359:0.9267128,0.5476816:0.7281317,0.6971353:0.6761224,0.8835282:0.6855789,1:0.687943,1:0.4326239
+        info  focus
+  StatisticsDataSet_1  (2026)
+    _Statistic_instancecount_  5
+    _metadata_  2026
+    game_setup_modes  f1_26
+    is_invalid  False
+    seasons  season_2026
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9332631,0:0.99,0.1:0.99,1:0.99,1:0.99
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.87,0.5:0.88,1:0.7,1:0.7
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8336404,0:0.85,0.5:0.76,1:0.66,1:0.66
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8534517,0:0.91,0.6:0.84,1:0.76,1:0.76
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8534265,0:0.9,0.1283453:0.9503542,0.2012817:0.8014182,0.3850359:0.9267128,0.5476816:0.7281317,0.6971353:0.6761224,0.8835282:0.6855789,1:0.687943,1:0.4326239
+        info  focus

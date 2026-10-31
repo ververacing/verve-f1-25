@@ -1,0 +1,46 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.drivers.driver[_metadata_=fernando_alonso]
+# resolved: entrants.drivers.driver_4
+_metadata_  fernando_alonso
+audio_name  fernano_alonso
+available  True
+car_number  14
+chance_to_use_number_1  100
+expression_label  fernando_alonso
+f1_seasons_completed  22
+first_name  lng_fernando
+full_name  lng_fernando_alonso
+garage_slot_preference  1
+head  fernando_alonso
+initials  ALO
+is_name_reversed  False
+is_using_number_1_in_first_season  False
+last_name  lng_alonso
+last_name_standard
+  value:
+  meaning: Last name standard
+nationality  spain
+stat_id  3
+date_of_birth
+  day  29
+  month  July
+  year  1981
+driver_characteristics
+  aggression  0.93
+  control  0.97
+  mistakes  0.9
+  preferred_tracks  singapore,brazil,catalunya
+  reaction_speed  1.0
+  speed_in  0.93
+  speed_out  0.94
+driver_strategy
+  fastest_strategy_base_selection_chance  0.4
+  fuel_load_max_modifier  0.01985
+  fuel_load_min_modifier  0
+  safety_car_pit_max_laps_early  5
+  safety_car_pit_min_lap  1
+  safety_car_pit_wear_max  0.4
+  safety_car_pit_wear_min  0.25
+  slowest_strategy_selection_time_limit  15
+  weather_change_max_time_percentage  0.8
+  weather_change_min_time_percentage  0.5

@@ -1,0 +1,71 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: driver_statistics.driver_statistics.DriverStatisticsHolder[driver=max_verstappen]
+# resolved: driver_statistics.driver_statistics.DriverStatisticsHolder_1
+_StatisticsDataSet_instancecount_  2
+_metadata_  max_verstappen
+driver  max_verstappen
+StatisticsDataSet  [table, 2 rows]
+  StatisticsDataSet_0  (default)
+    _Statistic_instancecount_  5
+    _metadata_  default
+    game_setup_modes
+      value:
+      meaning: Labels of rows in game_setup.game_setup_modes.game_setup_mode_N
+    is_invalid  False
+    seasons
+      value:
+      meaning: Labels of rows in game_setup.seasons.season_N
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0.2:0.91,0.4:0.95,0.6:0.99,0.8:0.99,1:0.99
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0.2:0.9,0.4:0.92,0.6:0.89,0.8:0.88,1:0.87
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.5:0.8,1:0.75,1:0.75
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0:0.96,0.2:0.99,1:0.9,1:0.9
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.75,0.3:0.6,0.6:0.8,1:0.8
+        info  focus
+  StatisticsDataSet_1  (2026)
+    _Statistic_instancecount_  5
+    _metadata_  2026
+    game_setup_modes  f1_26
+    is_invalid  False
+    seasons  season_2026
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.88,0.2:0.91,0.4:0.95,0.6:0.99,0.8:0.99,1:0.99
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0.2:0.9,0.4:0.92,0.6:0.89,0.8:0.88,1:0.87
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.82,0.5:0.8,1:0.75,1:0.75
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0:0.97,0.2:0.99,1:0.9,1:0.9
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.75,0.3:0.6,0.6:0.8,1:0.8
+        info  focus

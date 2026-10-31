@@ -1,0 +1,48 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.drivers.driver[_metadata_=oliver_bearman]
+# resolved: entrants.drivers.driver_136
+_metadata_  oliver_bearman
+audio_name  oliver_bearman
+available  True
+car_number  87
+chance_to_use_number_1  50.0
+expression_label  oliver_bearman
+f1_seasons_completed  1
+first_name  lng_oliver
+full_name  lng_oliver_bearman
+garage_slot_preference  1
+head  oliver_bearman
+initials  BEA
+is_name_reversed  False
+is_using_number_1_in_first_season  False
+last_name  lng_bearman
+last_name_standard
+  value:
+  meaning: Last name standard
+nationality  britain
+stat_id  147
+date_of_birth
+  day  8
+  month  May
+  year  2005
+driver_characteristics
+  aggression  0.65
+  control  0.765
+  mistakes  0.65
+  preferred_tracks
+    value:
+    meaning: Labels of rows in tracks.Track_N
+  reaction_speed  0.65
+  speed_in  0.68
+  speed_out  0.78
+driver_strategy
+  fastest_strategy_base_selection_chance  0.35
+  fuel_load_max_modifier  0.05
+  fuel_load_min_modifier  0
+  safety_car_pit_max_laps_early  5
+  safety_car_pit_min_lap  1
+  safety_car_pit_wear_max  0.25
+  safety_car_pit_wear_min  0.25
+  slowest_strategy_selection_time_limit  10
+  weather_change_max_time_percentage  1
+  weather_change_min_time_percentage  -0.25

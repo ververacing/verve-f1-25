@@ -1,0 +1,71 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oliver_bearman]
+# resolved: driver_statistics.driver_statistics.DriverStatisticsHolder_14
+_StatisticsDataSet_instancecount_  2
+_metadata_  oliver_bearman
+driver  oliver_bearman
+StatisticsDataSet  [table, 2 rows]
+  StatisticsDataSet_0  (default)
+    _Statistic_instancecount_  5
+    _metadata_  default
+    game_setup_modes
+      value:
+      meaning: Labels of rows in game_setup.game_setup_modes.game_setup_mode_N
+    is_invalid  False
+    seasons
+      value:
+      meaning: Labels of rows in game_setup.seasons.season_N
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.52,0:0.52,1:0.72,1:0.72
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.84,0:0.84,0.6:0.97,1:0.91,1:0.91
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.65,0.6:0.9,1:0.82,1:0.82
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.73,0:0.73,0.6:0.9,1:0.82,1:0.82
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8560044,0.1841689:0.8285572,0.4:0.84,0.6:0.75,0.8:0.85,1:0.82
+        info  focus
+  StatisticsDataSet_1  (2026)
+    _Statistic_instancecount_  5
+    _metadata_  2026
+    game_setup_modes  f1_26
+    is_invalid  False
+    seasons  season_2026
+    weekend_formats
+      value:
+      meaning: List of weekend formats
+    Statistic  [table, 5 rows]
+      Statistic_0  (experience)
+        _metadata_  experience
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.5932852,0:0.72,1:0.72,1:0.72
+        info  experience
+      Statistic_1  (racecraft)
+        _metadata_  racecraft
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.84,0:0.88,0.6:0.97,1:0.91,1:0.91
+        info  racecraft
+      Statistic_2  (awareness)
+        _metadata_  awareness
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.7,0.6:0.9,1:0.82,1:0.82
+        info  awareness
+      Statistic_3  (pace)
+        _metadata_  pace
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.73,0:0.83,0.6:0.9,1:0.82,1:0.82
+        info  pace
+      Statistic_4  (focus)
+        _metadata_  focus
+        evolution  @v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8560044,0.1841689:0.8285572,0.4:0.84,0.6:0.75,0.8:0.85,1:0.82
+        info  focus
