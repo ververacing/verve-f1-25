@@ -126,7 +126,11 @@ by the game. Either benchmark mode or the offline launch doesn't emit telemetry.
 - **After aborting a run** (PAUSE, killed task), also check `%LOCALAPPDATA%\swofty-game.lock.d`. A killed
   `swofty test` leaves it behind (its `owner` file names the dead run), and the next run then fails at once with "the
   game was not free". There is no CLI command to clear it. If no `F1_25` or `swofty` process is running, delete the
-  folder. Seen 2026-10-30 after the B-0004 pause.
+  folder. Seen 2026-10-30 after the B-0004 pause. `tools/cleanup_test_profiles.ps1` now does this (only when no such
+  process is running), so the PAUSE checklist and every post-run cleanup cover it.
+- **Pre-flight** (after RESUME or after Tyler has played): `tools/preflight.ps1`. It checks that the build is still
+  25251167 and that doctor shows no drift. It also runs the cleanup above, and lists any `hardware_settings_config.xml`
+  lines that differ from the pre-UDP backup besides `<udp>`.
 
 ## Side effect seen
 
