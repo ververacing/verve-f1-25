@@ -558,6 +558,19 @@
       "implications": "None: row mistakes does not move the reaction draw. #10 profiles can set mistakes for racecraft reasons without changing start reaction; it moves only the bad-start draw (F-37, F-39).",
       "related_questions": ["Q-03", "Q-17"],
       "status": "rejected (B-0010)"
+    },
+    {
+      "id": "F-41",
+      "claim": "Benchmark is a procession: usable for race-start draws only. There is no overtaking, so lap times are train-limited. In stock benchmark races at Austria (3 laps x2, 10 laps requested), the cars cross every sector line in grid (team) order, 0-8, 19, 9-18, on every lap, with 10-15 of the 19 car-to-car gaps under 1 s. Faster cars stay behind slower ones (Ocon: 4th-best lap, runs 12th). Laps run 78-81 s, slower than the slowest point of the stock difficulty table (74.7 s). The game ends a benchmark 11 minutes after the start (8 laps at Austria). Extreme rows change neither order nor pace (B-0013c): Colapinto and Russell at aggression / speed_in / speed_out / control 1.0 stayed stuck 0.3-0.8 s behind, and Alonso at speed_in / speed_out 0.02 averaged 80.13 s vs 79.83 s stock.",
+      "confidence": "pre-registered criterion on #60 (no position change within 5 laps), met in both parts. Ordering evidence:\n- The LAPTIMES 'Added sector' crossing order. Its wall-clock arrival order equals its session-time order at 24/24 lines, its sector times are consistent with session times (0/478 mismatches), and each vehicle id keeps one driver name all race.\n- The broadcast timing tower in a third stock run (laps 1-3: Antonelli P8, Hamilton P9, Leclerc P10, Alonso P11, Ocon P12), identical to the log.\nRESULTS/V is explicitly excluded: it is pre-loaded (Lap stays 0, 'ePreLoaded'), not live. An empty OVERTAKES channel is not used as evidence.",
+      "evidence": [
+        "runs/2026-10-31-logchan-probe/summary.md (#59)",
+        "runs/2026-10-31-B-0013/summary.md, visual/*.jpg, visual/crossings_visual_run.csv (#60, #61)",
+        "tools/race_order.py"
+      ],
+      "implications": "Don't run pace or aggression batches in benchmark. Benchmark stays useful for race-start draws (F-39 work, from RaceStarts lines, unaffected), for the vehicle-to-driver map (LAPTIMES names every car) and for build checks. Whether benchmark ignores the racecraft rows, or only masks them behind the train, is open. Behavioural measurement needs a real race session, i.e. a save sandbox (career fixture).",
+      "related_questions": ["Q-02"],
+      "status": "decoded (observed), benchmark only"
     }
   ]
 }

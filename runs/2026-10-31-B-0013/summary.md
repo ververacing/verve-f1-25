@@ -47,6 +47,21 @@ The stock 10-lap run had none in 8 laps either. So behavioural tests need a Gran
   The maxed cars ran 0.3-0.8 s behind the car ahead every lap and never passed. Alonso at near-zero corner speed held
   his place and his pace.
 
+## Verification (Tyler asked whether overtakes are measured correctly)
+
+- **`RESULTS/V` is excluded.** It is not live: its Lap field stays 0 all race and its blocks are labelled
+  `ePreLoaded`. Its "0 changes" are not evidence. An empty `OVERTAKES` channel isn't evidence either.
+- **The `LAPTIMES` crossing order, checked independently on B-0013a:**
+  - The wall-clock arrival order of the "Added sector" lines equals the session-time order at 24 of 24 lines.
+  - Each Sector Time equals the difference between consecutive session times: 0 mismatches in 478.
+  - Every vehicle id keeps one driver name across all its lines. So even if the ids were position slots, a pass
+    would have changed a name, and none did.
+- **Ground truth from the screen** (`visual/`). A 3-lap stock benchmark (08:48, PASS) with `tools/window_frames.ps1`
+  every 3 s. The broadcast camera follows vehicle 19 (Leclerc, the player car, as B-0003 suspected). Its timing tower
+  on laps 1, 2 and 3 shows Antonelli P8, Hamilton P9, Leclerc P10, Alonso P11, Ocon P12, with sub-second gaps. That
+  is the log's order (vehicles 7, 8, 19, 9, 10 at 8th-12th; `visual/crossings_visual_run.csv`), unchanged every lap.
+  The log also shows 0 order changes for this race.
+
 ## Implications
 
 1. Per-driver lap times in benchmark measure the train, not driver pace. The pace / consistency batch (b) isn't
