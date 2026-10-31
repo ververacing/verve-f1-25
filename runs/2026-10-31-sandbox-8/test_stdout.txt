@@ -1,0 +1,45 @@
+ok {"phase":"splash"}
+  [fired] {"event":"fired","id":"game.boot"}
+ok
+ok
+ok
+ok
+ok
+ok
+ok {"home":true}
+ok {"tile":"career","route":"career"}
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok

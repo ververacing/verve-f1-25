@@ -1,0 +1,2 @@
+timed out: home: not within 60 s (the title: waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 29 press(es) of the virtual pad's a)
+  [fired] {"event":"fired","id":"game.boot"}

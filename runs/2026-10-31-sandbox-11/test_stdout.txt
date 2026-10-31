@@ -1,0 +1,14 @@
+ok {"phase":"splash"}
+  [fired] {"event":"fired","id":"game.boot"}
+ok
+ok
+ok
+ok
+ok
+ok
+timed out: home: not within 60 s (the title: waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 29 press(es) of the virtual pad's a)
+timed out: tile career: not within 60 s (no tile screen: no tile list has been built since the agent armed)
+timed out: at fe_career: not within 60 s
+timed out: tile driver_career: not within 60 s (no tile screen: no tile list has been built since the agent armed)
+timed out: at fe_career_dlc_select: not within 60 s
+timed out: tile career_default_content: not within 60 s (no tile screen: no tile list has been built since the agent armed)

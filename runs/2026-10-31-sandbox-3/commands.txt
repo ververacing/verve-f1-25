@@ -1,0 +1,6 @@
+title
+home
+tile career
+pad ls 8000
+pad ls 8000
+quit

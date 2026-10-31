@@ -246,6 +246,45 @@ Restore is only safe inside the emergency procedure below.
 4. One plain boot from Steam (no Swofty, no test, no pad input), with Tyler watching. If a corrupt-save dialog
    appears, close the game without answering it.
 
+## Save sandbox (career fixtures), since 2026-10-31
+
+Route tests stay off Tyler's real saves (ruling above). Real race sessions go through Swofty's save sandbox instead:
+a career fixture made from a **copy** of a backup (`swofty test fixture capture <name> --from <copy>`, never the live
+folder). The fixture store is `%LOCALAPPDATA%\Swofty\test-fixtures`, outside the repo; fixtures hold Tyler's data
+and are never committed or uploaded. `tools/sandbox_run.ps1` runs a `test run` suite or a `test shell --fixture`
+session from a command file, under the supervisor's conditions:
+- It hashes every file in `remote\` and Steam's per-file `remotecache.vdf` entries (size, sha, localtime) before
+  and after. Any change: exit 5, stop and tell Tyler. It never restores.
+- It kills the test and the game unless the sandbox is confirmed within 120 s: `test run` logs "the save sandbox is
+  required; saves go to ...test-runs\...\saves", and `test shell` prints "starting F1 25 in test mode (..., save
+  sandbox)" on stderr.
+
+Evidence that the sandbox catches writes: in shell 8 the game rewrote the sandbox's
+`test-runs\shell-...\saves\remote\savegame@profile#NXDSMWW.BWW` (519704 -> 519800 bytes), while Tyler's real
+`remote\` and Steam's records stayed identical. Every sandbox run so far: 22/22 entries unchanged.
+
+**Shell-mode rules**
+- **No blind `a` presses, in any test.** In shell 8, an `a` meant for the title landed on `fe_home`'s first tile
+  (`story`) and started Braking Point cutscenes, where "Skip cinematic?" defaults to No. Drive menus with
+  `tile <id>` and `wait screen=<id> [s]` only.
+- **The game alternates its intro video between launches.** Every other launch, `video_1` plays about 65 s before
+  `legal`. On the others it's skipped in under 1 s, and then the title ignores the virtual pad completely: `title`
+  never sets the boot sync point, and 29 presses do nothing. 7 of 7 shell sessions fit this pattern. A skipped intro
+  means quitting and relaunching.
+- `title` and `home` time out at 60 s, and the title appears about 50-65 s after launch, so start with
+  `wait screen=splash 180`.
+- A `pad <button> N` hold takes about 2N ms of wall time.
+
+Career wizard path (Driver Career), by screen id and tile id:
+1. `fe_home`: tile `career`.
+2. `fe_career` (tiles `driver_career`, `my_team_career`, `online_career`, `c_career`): `driver_career`.
+3. `fe_career_dlc_select` (tiles `career_default_content` = 2025, `career_dlc_content` = 2026): 2025.
+4. `career_wizard_experience_select` (Skip to F1 / Start in F2), with `career_wizard_summary`.
+5. `career_wizard_season_length_select` (Full / Custom season), then further screens (being mapped).
+
+The plan (supervisor): take control of the official Jack Doohan (#7 Alpine), so nobody is replaced. Exclude that
+car from every arm and field statistic.
+
 ## Time Trial by route (works since 2026-10-31)
 
 `harness/tests/udp_tt.test.json` reaches an AI-driven Time Trial session at Melbourne. The pad sequence, with a frame

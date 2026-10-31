@@ -1,0 +1,16 @@
+ok {"phase":"splash"}
+  [fired] {"event":"fired","id":"game.boot"}
+timed out: title: the title screen did not pass within 60 s (waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 29 press(es) of the virtual pad's a)
+timed out: home: not within 60 s (the title: waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 29 press(es) of the virtual pad's a)
+timed out: tile career: not within 60 s (no tile screen: no tile list has been built since the agent armed)
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok

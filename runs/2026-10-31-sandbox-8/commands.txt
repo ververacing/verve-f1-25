@@ -1,0 +1,45 @@
+wait screen=splash 180
+pad ls 15000
+pad a
+pad ls 3000
+pad a
+pad ls 3000
+pad a
+home
+tile career
+pad ls 6000
+pad a
+pad ls 6000
+pad a
+pad ls 6000
+pad a
+pad ls 6000
+pad a
+pad ls 6000
+pad a
+pad ls 6000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+pad a
+pad ls 5000
+quit
