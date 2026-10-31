@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "verve.b0013",
+  "name": "Verve test B-0013c (strong-arm overtaking probe)",
+  "version": "0.0.1",
+  "author": "TC Verve",
+  "description": "Test-only addon for race batch B-0013 part c (#60): vehicles 17 and 18 (Colapinto, Russell) at maximal row aggression / speed_in / speed_out / control, vehicle 9 (Alonso) at minimal speed_in / speed_out. Not for play.",
+  "license": "MIT",
+  "category": "ai",
+  "kind": ["database"],
+  "compat": { "game": "f1_25", "game_builds": ["25251167"], "launcher": ">=1.5.13" },
+  "requires": [{ "id": "swofty.core", "version": ">=0.2.13" }],
+  "saves": { "affects": false },
+  "operations": { "database": ["db/b0013.json"] }
+}
