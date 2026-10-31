@@ -26,10 +26,18 @@ hand-tuned values. The handoff expected "no override".
 | fernando_alonso | 0.93 | 0.97 | 0.90 | 1.0 | 0.93 | 0.94 |
 | oliver_bearman | 0.65 | 0.765 | 0.65 | 0.65 | 0.68 | 0.78 |
 
-These don't match what the rating curves would produce. Verstappen's default awareness of 0.85 on the
-`awareness_control` curve (0.5→0.3, 0.9→0.8) gives control ≈ 0.74, but his row says 0.96. So these fields are
-the stock personality, and the rating curves either feed them only where a row leaves them unset, or not at all.
-For Verve, the mapping anchor (0.5 = field average) has to be these row values, not the curves.
+These don't match what the rating curves would produce, often by a lot (row / curve at season x=0):
+
+| Driver | aggression | control | mistakes | reaction_speed | speed_in | speed_out |
+|---|---|---|---|---|---|---|
+| max_verstappen | 1.00 / 0.96 | 0.96 / 0.74 | 0.75 / 0.70 | 0.85 / 0.96 | 1.00 / 0.90 | 0.99 / 0.90 |
+| fernando_alonso | 0.93 / 0.90 | 0.97 / 0.69 | 0.90 / 0.64 | 1.00 / 0.90 | 0.93 / 0.70 | 0.94 / 0.70 |
+| oliver_bearman | 0.65 / 0.84 | 0.77 / 0.49 | 0.65 / 0.41 | 0.65 / 0.84 | 0.68 / 0.49 | 0.78 / 0.49 |
+
+**Which source the AI uses is unknown (Q-17).** The curve table is named `driver_characteristic_overrides`, and
+the RE note puts raw values (+0xf0, from the row) and overrides (+0x108, negative = none) in the live record, so
+the ratings may well override the row for every driver with a statistics holder, which is the whole 2025 grid.
+In that case v0.1's row writes would be no-ops for them. Issue #7 decides; #6 waits on it.
 
 **Q-03 (static half): `mistakes` is a skill (higher = fewer mistakes).** The `awareness_mistakes` curve rises
 steadily (0→0, 0.5→0.2, 0.85→0.7, 1→1), so a more aware driver gets a higher value. The row values agree:
