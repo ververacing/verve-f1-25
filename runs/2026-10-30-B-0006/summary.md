@@ -32,6 +32,22 @@ Per level (`levels.csv`; median of 6 samples relative to that start's stock-fiel
 | STATS | 0.65 | pierre_gasly (16) | 0.89 | 0.88 | −0.006 | 0.257 |
 | STATS | 0.99 | lance_stroll (3) | **0.60** | 0.81 | +0.013 | 0.280 |
 
+## Robustness: leave one driver out (supervisor review on #42, reproduced)
+
+One driver per level means each driver's own noise rides on the slope. ROW slope with one ROW driver dropped
+(dropped driver also left out of the field; STATS drivers out of the field as before):
+
+| Dropped | ROW slope |
+|---|---|
+| lando_norris (0.05) | −0.163 |
+| george_russell (0.35) | −0.102 |
+| esteban_ocon (0.65) | −0.118 |
+| **yuki_tsunoda (0.99)** | **−0.039** |
+
+The direction holds in all four, but without Tsunoda the slope shrinks by about two thirds, and the 0.35 level sits
+above 0.05. **The strength rests mostly on one car.** So the result counts as *supported* (pre-registered pass,
+z −4.6), with replication pending in B-0008 (two drivers per level, an untouched source uncorrelated with level).
+
 ## Reading
 
 - **Effect size.** The ROW slope (−0.109 s per unit of reaction_speed) matches F-06's formula with k ≈ 0.52: the mean
@@ -42,7 +58,8 @@ Per level (`levels.csv`; median of 6 samples relative to that start's stock-fiel
   slowest. The regression of their stock row on level is −0.36 per unit, so "row wins" predicts a STATS slope of about
   −0.109 × −0.36 = **+0.039**. Observed +0.068 ± 0.029, within ~1 SE. A stronger design would match stock rows across
   the STATS levels; this one wasn't built to, so the STATS slope reads as confounded, not as a rating effect.
-- **Q-17, in benchmark: the driver row's `driver_characteristics.reaction_speed` drives the start reaction; the
-  racecraft rating (through `racecraft_reaction_speed`) shows no effect of its own.** For #6 that means writing driver
-  rows, as v0.1 does, works in benchmark. Grand Prix and career are unconfirmed (harness gaps 2 and 3).
+- **Q-17, in benchmark: supported that the driver row's `driver_characteristics.reaction_speed` drives the start
+  reaction** (pre-registered pass; replication pending, B-0008). **No racecraft-rating effect detected** in B-0001 or
+  B-0006 (with the confound above), which is not the same as proven absent. #6 can proceed on the row plan without
+  waiting for B-0008. Grand Prix and career are unconfirmed (harness gaps 2 and 3).
 - Vehicle 19 again: 0.196, 0.115, 0.062, 0.083, 0.119, 0.122 s.
