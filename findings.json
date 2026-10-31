@@ -452,9 +452,10 @@
         "swofty db get entrants.drivers.driver (197 rows)",
         "docs/stock/statistics_datasets.csv (117 holders)"
       ],
-      "implications": "The v0.1 smoke build would fail on Antonelli (row select) and Albon (pace select). The crosswalk needs both a row label and a stats label per driver; the generator must skip the rating write for drivers without a holder.",
+      "implications": "The v0.1 smoke build would fail on Antonelli (row select). The generator must skip the rating write for drivers without a holder.",
       "related_questions": [],
-      "status": "verified"
+      "status": "corrected",
+      "correction": "2026-10-30 (#2 build): the holder labels above are their _metadata_ values, but DriverStatisticsHolder[driver=...] matches the holder's `driver` field, which equals the row label for all five (alexander_albon -> driver alex_albon, micheal_schumacher -> michael_schumacher, aryton_senna -> ayrton_senna, nilola_tsolov -> nikola_tsolov, john_benneet -> john_bennett). So no separate stats label is needed; only Antonelli's row label was wrong in the sample CSV. docs/stock/statistics_datasets.csv's 'driver' column is really _metadata_."
     }
   ]
 }

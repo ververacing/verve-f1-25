@@ -8,8 +8,9 @@ Usage:
 Input CSV columns: label,display,pace,aggression,risk,consistency[,preferred_tracks][,stats_label]
     label            the driver row's _metadata_ in entrants.drivers (max_verstappen, carlos_sainz-jr, ...)
     preferred_tracks optional, track labels separated by | (monaco|singapore)
-    stats_label      optional, the DriverStatisticsHolder's driver label when it differs from the row label
-                     (alex_albon's holder is alexander_albon; see findings F-32). "-" = no holder, skip the rating
+    stats_label      optional, the DriverStatisticsHolder's `driver` value when it differs from the row label (none
+                     do in stock: holders with a misspelt _metadata_, e.g. alexander_albon, still say driver=alex_albon;
+                     see F-32). "-" = the driver has no holder (80 of 197 rows), so skip the rating write
 
 Output: <out>/swofty.json and <out>/db/verve.json (database "set" ops), ready to zip and drop on the launcher.
 

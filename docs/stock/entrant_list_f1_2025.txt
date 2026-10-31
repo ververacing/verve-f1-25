@@ -1,0 +1,401 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-30
+# root: entrants.entrant_lists.entrant_list_15
+# resolved: entrants.entrant_lists.entrant_list_15
+_entrant_instancecount_  20
+_metadata_  f1_2025
+available  False
+display_name  lng_modern
+entrant_list_references
+  value:
+  meaning: Other lists whose entrants are read first and included
+fixed_garage_assignments
+  value:
+  meaning: Standings list that fixes the garage order
+leaderboard  f1
+previous_season_driver_standings  f1_drivers_2024
+previous_season_team_standings  f1_teams_2024
+restrict_custom_driver_numbers  False
+season  season_2025
+stat_id  49
+ui_path  f1_2023
+entrant  [table, 20 rows]
+  entrant_0  (mclaren_driver_01)
+    _metadata_  mclaren_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  oscar_piastri
+    team  mclaren
+    team_position  0
+    vehicle  mclaren_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_1  (mclaren_driver_02)
+    _metadata_  mclaren_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  lando_norris
+    team  mclaren
+    team_position  1
+    vehicle  mclaren_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_2  (ferrari_driver_01)
+    _metadata_  ferrari_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  charles_leclerc
+    team  ferrari
+    team_position  0
+    vehicle  ferrari_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_3  (ferrari_driver_02)
+    _metadata_  ferrari_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  lewis_hamilton
+    team  ferrari
+    team_position  1
+    vehicle  ferrari_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_4  (redbull_driver_01)
+    _metadata_  redbull_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  33
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  max_verstappen
+    team  redbull
+    team_position  0
+    vehicle  redbull_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_5  (redbull_driver_02)
+    _metadata_  redbull_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  yuki_tsunoda
+    team  redbull
+    team_position  1
+    vehicle  redbull_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_6  (mercedes_driver_01)
+    _metadata_  mercedes_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  george_russell
+    team  mercedes
+    team_position  0
+    vehicle  mercedes_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_7  (mercedes_driver_02)
+    _metadata_  mercedes_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  andrea-kimi_antonelli
+    team  mercedes
+    team_position  1
+    vehicle  mercedes_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_8  (astonmartin_driver_01)
+    _metadata_  astonmartin_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  lance_stroll
+    team  forceindia
+    team_position  0
+    vehicle  force_india_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_9  (astonmartin_driver_02)
+    _metadata_  astonmartin_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  fernando_alonso
+    team  forceindia
+    team_position  1
+    vehicle  force_india_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_10  (alpine_driver_01)
+    _metadata_  alpine_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  pierre_gasly
+    team  renault
+    team_position  0
+    vehicle  lotus_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_11  (alpine_driver_02)
+    _metadata_  alpine_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  franco_colapinto
+    team  renault
+    team_position  1
+    vehicle  lotus_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_12  (haas_driver_01)
+    _metadata_  haas_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  esteban_ocon
+    team  haas
+    team_position  0
+    vehicle  haas_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_13  (haas_driver_02)
+    _metadata_  haas_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  oliver_bearman
+    team  haas
+    team_position  1
+    vehicle  haas_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_14  (vcarb_driver_01)
+    _metadata_  vcarb_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  liam_lawson
+    team  tororosso
+    team_position  1
+    vehicle  toro_rosso_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_15  (vcarb_driver_02)
+    _metadata_  vcarb_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  isack_hadjar
+    team  tororosso
+    team_position  0
+    vehicle  toro_rosso_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_16  (williams_driver_01)
+    _metadata_  williams_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  alex_albon
+    team  williams
+    team_position  0
+    vehicle  williams_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_17  (williams_driver_02)
+    _metadata_  williams_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  carlos_sainz-jr
+    team  williams
+    team_position  1
+    vehicle  williams_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_18  (kick_driver_01)
+    _metadata_  kick_driver_01
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  nico_hulkenberg
+    team  sauber
+    team_position  0
+    vehicle  sauber_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)
+  entrant_19  (kick_driver_02)
+    _metadata_  kick_driver_02
+    badge_customisation
+      value:
+      meaning: Label of a row in entrants.drivers.driver_N
+    car_number  255
+    driver
+      value:
+      meaning: Label of the entrant's driver
+    driver_customisation
+      value:
+      meaning: Driver appearance preset
+    entrant_reference  gabriel_bortoleto
+    team  sauber
+    team_position  1
+    vehicle  sauber_2025
+    vehicle_customisation
+      value:
+      meaning: Livery preset of the car (empty on real-team entrants)

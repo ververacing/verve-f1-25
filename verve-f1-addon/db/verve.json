@@ -1029,7 +1029,7 @@
   },
   {
    "op": "set",
-   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alexander_albon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
    "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.944,0:0.944,1:0.944,1:0.944"
   },
