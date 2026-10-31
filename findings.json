@@ -530,6 +530,19 @@
       "implications": "The metric's scale and sign are known: higher = smaller bad-start value (= better start, if the bad-start value is the penalty its name says; behavioural check via UDP, #4). It is the drawn penalty, not an outcome. The bad-start bounds are a second per-driver race_start key family that works (after the reaction bounds, F-33), so #10 can set each AI driver's start-quality range directly; profiles should use ranges, since equal bounds pin every start. Reaction time: no effect detected. The nominal slope (-0.055 s per unit, z -3.6) is not robust: the stock reaction_speed rows predict about -0.012 of it, leave-one-driver-out slopes run -0.028 to -0.077, and without liam_lawson it is -0.028 (z -1.4). v0.2a: per-driver bad_start bounds are a direct, exact lever for start consistency, and the reaction bounds (F-33) for start sharpness; both are verified per driver.",
       "related_questions": ["Q-03", "Q-17"],
       "status": "verified (benchmark)"
+    },
+    {
+      "id": "F-39",
+      "claim": "Start model (stock field, 368 samples, 33 starts, B-0001/3/4/5/6/7/8, modified cars and Ferrari left out): both race-start draws move each min/max bound pair from its upper toward its lower bound by k * row skill. Reaction r ~ U[0.28 - 0.24*k*rs, 0.42 - 0.18*k*rs] (rs = row reaction_speed); bad start b ~ U[0.06 - 0.02*k*m, 0.42 - 0.14*k*m] (m = row mistakes, b = 1 - race_start_performance/100). One pooled k ~0.52 fits both: reaction 0.529 +- 0.015, bad start 0.520 +- 0.067 (intercepts fixed by the bounds). Bad-start edges and bin means match the model within ~0.005, and no sample lies outside either envelope.",
+      "confidence": "decoded (fit), benchmark only. The stock-field free OLS slope of b on m is -0.062 (SE 0.039, z -1.6): the same direction as B-0004 but not at 2 SE, and it was -0.112 (z -2.7) before B-0008's stock cars were added, so it depends on the driver pool (stock m spans only 0.51-0.90). Tagged-driver slopes agree with the pooled k: B-0006 0.52 and B-0008 0.56 (reaction); B-0004's gap is 1.1 SE above the model.",
+      "evidence": [
+        "runs/2026-10-30-start-model/summary.md, start_model_samples.csv, fit_output.txt",
+        "tools/fit_start_model.ps1",
+        "docs/stock/driver_rows_benchmark_austria.csv"
+      ],
+      "implications": "#6 and #10 get a quantitative model: E[reaction] and E[b] as functions of the row values and the bounds (each edge = upper bound - (upper - lower) * k * skill, with k ~0.52). Open: whether it is the SAME per-session k for both draws (corr over starts -0.23; bad-start k isn't identifiable per start), and whether b costs time at the start (#4). B-0009 (#45) tests the m-dependence directly with levels 0.02-0.98 and reports k from the tagged drivers against this fit.",
+      "related_questions": ["Q-03", "Q-17"],
+      "status": "decoded (fit), benchmark only"
     }
   ]
 }
