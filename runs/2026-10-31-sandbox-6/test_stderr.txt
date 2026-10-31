@@ -1,6 +1,6 @@
 [test] save sandbox: verified for this F1_25.exe by bindings.json (Ne_SaveSystem2Win_Start experimental, Ne_SaveSystem2Win_Mount experimental, Ne_SaveSystem2Win_WriteInfoXml experimental)
-[test] save sandbox C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-161440-1\saves: fixture tyler-profile-20261031 (4 file(s)) copied in
-[test] starting F1 25 in test mode (run folder C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-161440-1, save sandbox)
+[test] save sandbox %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261031-161440-1\saves: fixture tyler-profile-20261031 (4 file(s)) copied in
+[test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261031-161440-1, save sandbox)
 [test] test agent: hello (pid 28876, protocol 1)
 type a command (title, home, route <name>, tile <id>, read <path>, wait <event> [s], wait screen=<name> [s], pad <button>, capture [name], career load <slot|newest> [at <place>], advance <days>, save now, quit); end with Ctrl-D
 > > > > > > > > > > > > > > > > > > capture its saves with: swofty test fixture capture <name> --run shell-20261031-161440-1

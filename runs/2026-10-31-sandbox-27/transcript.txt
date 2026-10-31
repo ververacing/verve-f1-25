@@ -1,6 +1,6 @@
-﻿saves before: 22 entries
+saves before: 22 entries
 attempt 1 started 15:05:23
-sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-220523-1 ({"schema":1,"run":"shell-20261031-220523-1","state":"armed","pid":14068,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-220523-1\\saves\\remote","why":""})
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261031-220523-1 ({"schema":1,"run":"shell-20261031-220523-1","state":"armed","pid":14068,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-220523-1\\saves\\remote","why":""})
 15:07:03 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81469}
 intro played (splash after 81 s)
 15:07:23 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}
@@ -47,7 +47,7 @@ while: screen '|career_wizard_team_icons_select|#5f9ae18b|' left ^(?!.*(team|dri
 15:09:03 > status  =>  {"seq":42,"status":"ok","value":{"v":1,"pid":14068,"run":"shell-20261031-220523-1","ticks":72306,"phase":"|driver_career_confirm_selections|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
 15:09:04 > pad a  =>  {"seq":43,"status":"ok","ms":266}
 15:09:34 > status  =>  {"seq":44,"status":"ok","value":{"v":1,"pid":14068,"run":"shell-20261031-220523-1","ticks":89668,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
-control: waiting for steps in C:\Users\Tyler\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-27\control.txt
+control: waiting for steps in %USERPROFILE%\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-27\control.txt
 15:09:43 > status  =>  {"seq":45,"status":"ok","value":{"v":1,"pid":14068,"run":"shell-20261031-220523-1","ticks":96532,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
 15:10:03 > status  =>  {"seq":46,"status":"ok","value":{"v":1,"pid":14068,"run":"shell-20261031-220523-1","ticks":110356,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
 15:10:13 > status  =>  {"seq":47,"status":"ok","value":{"v":1,"pid":14068,"run":"shell-20261031-220523-1","ticks":117556,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}

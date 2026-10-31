@@ -1,6 +1,6 @@
-﻿saves before: 22 entries
+saves before: 22 entries
 attempt 1 started 13:49:40
-sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-204940-1 ({"schema":1,"run":"shell-20261031-204940-1","state":"armed","pid":20712,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-204940-1\\saves\\remote","why":""})
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261031-204940-1 ({"schema":1,"run":"shell-20261031-204940-1","state":"armed","pid":20712,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-204940-1\\saves\\remote","why":""})
 13:51:18 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":80703}
 intro played (splash after 81 s)
 13:51:38 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}

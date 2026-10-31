@@ -158,6 +158,11 @@ sides' team ids agree (exit 1 on any mismatch).
 - **Pre-flight** (after RESUME or after Tyler has played): `tools/preflight.ps1`. It checks that the build is still
   25251167 and that doctor shows no drift. It also runs the cleanup above, and lists any `hardware_settings_config.xml`
   lines that differ from the pre-UDP backup besides `<udp>`.
+- **Before committing run logs** (the repo is public): `tools/scrub_logs.ps1 runs/<id>`. It replaces the user
+  folder with `%USERPROFILE%`, the Steam account id with `<steamid>` and the 64-bit Steam id with `<steam64>`. The
+  tools find the save folder at run time (`tools/find_steam_app.ps1`), so no id is written in the repo. Docs write
+  the save folder as `Steam\userdata\<steamid>\3059520\remote`. Logs committed before 2026-10-31 16:00 were
+  scrubbed in place, with no history rewrite.
 
 ## Saves
 
@@ -193,7 +198,7 @@ after, restore the originals if anything changed. `tools/run_with_udp.ps1` does 
   - 2026-10-31 07:16: not toggled. No desktop control in this session, so I asked Tyler. Cloud was on, and udp-tt-2
     ran with the fallback (saves unchanged).
   - 2026-10-31 ~07:45: **OFF**, set by Tyler by hand for route testing. Game closed; saves matched the master backup
-    beforehand. Verified in `userdata\928649988\7\remote\sharedconfig.vdf`: `"3059520" { "cloudenabled" "0" }`.
+    beforehand. Verified in `userdata\<steamid>\7\remote\sharedconfig.vdf`: `"3059520" { "cloudenabled" "0" }`.
     Check that key to confirm the state before switching it back on.
 
 ### Incident 2026-10-31: "save data corrupted" after a guarded restore (route tests STOPPED)
@@ -302,10 +307,32 @@ Fixture runs to Team HQ, Tyler's 11 files and 11 Steam records checked before an
 | sandbox-31, -32 | `test run` | no: "no content tile continues a saved career" | unchanged |
 | sandbox-33 | shell: `career_stroll_continue.plan` | yes (frame: resume card, then HQ) | unchanged |
 
-The `test run` failures look like a race in swofty's career loader. It read `fe_career_dlc_select`'s tiles about
-60 ms after the screen appeared (in the pass, after about 500 ms), before the 2025 tile's route switched to
-"continue". Until that's fixed, `career_stroll_continue.plan` (shell, with a 3 s wait and guarded presses) is the
-reliable route to Team HQ.
+**Known Swofty issue: `test run` career loads fail at the content select (swofty 1.6.11).** Until it's fixed,
+`career_stroll_continue.plan` (shell: 3 s wait, then guarded presses) is the reliable route to Team HQ.
+
+| Run | `screen fe_career_dlc_select` | tiles listed | outcome |
+|---|---|---|---|
+| sandbox-30 | 15:28:12.294 | +64 ms | +535 ms: "the career_default_content content tile's action fired route solo_career_continue_driver", then team_hq |
+| sandbox-31 | 15:29:57.847 | +60 ms | +135 ms: error "no content tile continues a saved career (career_default_content routes to 'career_default_content'; ...)", game closed |
+| sandbox-32 | 15:31:41.538 | | same error |
+
+The boots (intro, title sync point, the sandbox reading the same 4 fixture files) are identical up to that screen.
+The game itself offers the continue: in sandbox-33, an `a` on the same tile 3 s after the screen appeared went to
+`career_continue_driver` with the Stroll career card. So the loader seems to decide from the tile's route before
+the game has switched it from "new career" to "continue".
+
+Draft report for Tyler to post on the Swofty Discord or GitHub if he wants (nothing private in it):
+
+> **`swofty test run` career env: "no content tile continues a saved career" when a saved career exists (1.6.11)**
+>
+> A suite with `"env": { "kind": "career", "fixture": "<fixture holding one Driver Career>", "at": "team_hq" }`
+> passed once and then failed 2 of 3 runs with the same fixture. Fails: "the batch did not start: error: career
+> load: the content select's continue action: no content tile continues a saved career (career_default_content
+> routes to 'career_default_content'; career_dlc_content routes to 'career_dlc_content')". In loader.log, the pass
+> fired `solo_career_continue_driver` 535 ms after `screen fe_career_dlc_select`. The fails errored about 135 ms after
+> it. Pressing A on `career_default_content` 3 s after the screen appears (`test shell`) always opens
+> `career_continue_driver`, so the save is there and the tile's route just isn't updated yet. Could the loader wait,
+> or retry for a few seconds, until a content tile routes to a continue action before giving up? Logs available.
 
 ## Time Trial by route (works since 2026-10-31)
 
@@ -322,7 +349,7 @@ of each screen, is in `runs/2026-10-31-udp-tt-3/summary.md` and `docs/time_trial
 
 ### Benchmark leaves them alone
 
-Tyler's F1 25 saves live in `C:\Program Files (x86)\Steam\userdata\928649988\3059520\remote` (10 files, Steam Cloud
+Tyler's F1 25 saves live in `C:\Program Files (x86)\Steam\userdata\<steamid>\3059520\remote` (10 files, Steam Cloud
 synced). Hashed with SHA-256 during B-0010 (2026-10-31 02:43) and again after its 20 starts (04:20): all 10 identical,
 newest file still 2026-10-30 22:37 (`runs/2026-10-31-B-0010/summary.md`). So benchmark tests don't read or write
 saves. Route tests (Time Trial, Grand Prix by route and pad) do run on these saves and stay on hold until Tyler decides

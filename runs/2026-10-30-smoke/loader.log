@@ -139,7 +139,7 @@
 [offline] module: DNSAPI.dll @ 0x7ffd8bcd0000
 [offline] module: f1op_hook.dll @ 0x7ffd5a5c0000
 [offline] module: swofty_core.dll @ 0x7ffccffb0000
-2026-10-30 18:17:13.831 [38420] [settings] C:\Program Files (x86)\Steam\steamapps\common\F1 25\swofty\settings.json: profile 'test-20261031-011702', 2 addon(s), 1 option(s), 7 command(s); requests file C:\Users\Tyler\AppData\Local\Swofty\state\requests\test-20261031-011702.json
+2026-10-30 18:17:13.831 [38420] [settings] C:\Program Files (x86)\Steam\steamapps\common\F1 25\swofty\settings.json: profile 'test-20261031-011702', 2 addon(s), 1 option(s), 7 command(s); requests file %USERPROFILE%\AppData\Local\Swofty\state\requests\test-20261031-011702.json
 [offline] module: rasadhlp.dll @ 0x7ffd775c0000
 [offline] module: fwpuclnt.dll @ 0x7ffd77790000
 2026-10-30 18:17:13.855 [38420] [core] bindings: 2 set(s) present, selected bindings.json by PE timestamp 1789118616
@@ -1844,7 +1844,7 @@
 2026-10-30 18:17:14.083 [38420] scan .xtls [41 80 C7 02 4C 89 F1 44 89 FA E8 ?? ?? ?? ?? 45 89 FC 45 8D 7C 24 01 4C 89 F1 44 89 FA E8] -> 1 hit at 0x141742fdc (base+0x1742fdc), the address cached for this exe
 2026-10-30 18:17:14.083 [38420] [core] F1 THE MOVIE home tile hidden
 2026-10-30 18:17:14.090 [38420] [gamelog] gate g_Ne_LogGate at 000000014604B4F0: opened 47 channel hash(es): VM, UI, SceneManager_Fail, UIRef, UICom, ENTRANTS_UI, UI_THUMBNAIL_SYSTEM, END_RACE_UI_SEQUENCER, TEXTURE_STREAMING_ERROR, UINodeTreeMessages, SunOverrideComponent, NeAssetGroupLoader_Verbose, RaceStarts, UI_latency, ACTOR_WARN, UI_INFO, UI_ATTACHER, UI_TRACK, UI_MESSAGE, RENDER_TO_TARGET_SUBMIT_FAIL_REASON, CUTSCENE_MANAGER_ERROR, NeUICrashDumpInfo, NeEadpErrorsDataService, OPTIONS-UI, WARN, FLOW, CANNED_EVENTS, NETWORK-UI, TOP_LEVEL_UI, NETWORK-UI/V, ART_WARN, AI_VARIATION, UI_ASSETS, UI_TOOLTIP_STACK, FLOW/V, MULTIPLE_WARNINGS_PENALTY_MESSAGE, EGO_ERP_LOADER, ACTOR_FAIL, UI_TEXTURE_LOADER, UI_FLOW, F1OS/ERROR, ART_WARN_LEVEL_2, VEHICLE_FAILSAFES, ACTOR_WARNING, ACTOR_ERROR_VERBOSE, UI_VISUAL_NAVIGATION, ACTOR_ERROR
-2026-10-30 18:17:14.091 [38420] [state] the core's state files are in C:\Users\Tyler\AppData\Local\Swofty\ (from swofty/state.json)
+2026-10-30 18:17:14.091 [38420] [state] the core's state files are in %USERPROFILE%\AppData\Local\Swofty\ (from swofty/state.json)
 2026-10-30 18:17:14.092 [38420] [tracks] no track records and no tracks made for 1.5, so the game database is not read: 39 venue(s) seeded with 25 stock track(s) providing them, the track base is empty
 2026-10-30 18:17:14.092 [38420] [apply] engine_sound boot: 0 new database key(s) planned; no addon records or layers
 2026-10-30 18:17:14.092 [38420] [apply] vehicle.package boot: 0 new database key(s) planned; no addon records or layers
@@ -2315,7 +2315,7 @@
 2026-10-30 18:17:14.444 [38420] [apply] track.venue boot: 0 applied, 0 put back, 0 refused
 2026-10-30 18:17:14.444 [38420] [apply] boot: 22 applier(s); 0 applied, 0 put back, 0 refused (profile default)
 2026-10-30 18:17:14.445 [38420] [registry] room: the game's own size was enough (older addons' edits 374; 1.6 records 0); 743,186 of 838,860 records used
-2026-10-30 18:17:14.445 [38420] [registry] room report written to C:\Users\Tyler\AppData\Local\Swofty\registry\room.json
+2026-10-30 18:17:14.445 [38420] [registry] room report written to %USERPROFILE%\AppData\Local\Swofty\registry\room.json
 [offline] module: gpapi.dll @ 0x7ffd8b130000
 [offline] module: WINNSI.DLL @ 0x7ffd86990000
 [offline] module: sl.common.dll @ 0x7ffd55cc0000
