@@ -194,6 +194,56 @@ after, restore the originals if anything changed. `tools/run_with_udp.ps1` does 
     beforehand. Verified in `userdata\928649988\7\remote\sharedconfig.vdf`: `"3059520" { "cloudenabled" "0" }`.
     Check that key to confirm the state before switching it back on.
 
+### Incident 2026-10-31: "save data corrupted" after a guarded restore (route tests STOPPED)
+
+**Timeline.**
+- 07:27-07:30, udp-tt-3: the Time Trial rewrote `savegame@profile#NXDSMWW.BWW` (521128 -> 519688 bytes) and its
+  416-byte header. The guard restored Tyler's byte-identical originals at 07:30:52.
+- 07:38, udp-tt-4 boot: F1 25 showed a "save data corrupted" dialog and wrote `corrupt_saves#<steamid>.zip` to
+  `remote\`. Tyler saw it on screen.
+- About 07:41: the test and the game were killed before any pad press could answer the dialog. Then `swofty restore`
+  (no drift), lock and test profile cleared. No game launch of any kind since.
+
+**Evidence** (snapshot `save-backups\20261031-074350-post-dialog\`, incl. `remotecache.vdf`; master untouched):
+- All 10 save files on disk are hash-identical to the master backup. The only addition is the zip.
+- The zip's `savegame@profile#NXDSMWW.BWW` is **519688 bytes, identical to the first 519688 bytes of the restored
+  521128-byte original**. Its header equals the original header. So the game read the restored file **truncated to the
+  size of its own last write**. `info.xml` lists 3 error codes (CBCB7BC4, 6522DF69, CF228F62).
+- 519688 is the size Steam recorded at the game's exit after tt-3. The game reads saves through Steam (the files live
+  in Steam's `remote\` folder), and Steam still had that size when tt-4 launched, because the restore happened behind
+  its back after it had recorded the write. After the 07:41 exit Steam rescanned: `remotecache.vdf` (07:42) now
+  records 521128 bytes and the sha1 of the disk file.
+- Nothing outside `remote\` changed between 07:20 and 07:45 except `hardware_settings_config.xml` / `_info.xml`
+  (rewritten at every launch; the config differs from the pre-UDP backup only in `<udp enabled>`). `3059520\local\`
+  is untouched since 2026-10-03.
+- Header diff (master vs the tt-3 write): bytes 0-63 are identical, bytes 64-415 all differ. That looks like a
+  digest or encrypted block over the data, not a plain timestamp, so a truncated read fails the check.
+
+**Cause:** restoring save files out of band while Steam's record of them is stale. The fresh-mtime step is not the
+cause: Steam's current record matches the disk files' mtimes. The guard checked file contents but not Steam's view
+of them.
+
+**Resolved 08:05.** Tyler restarted Steam (08:03) and booted F1 25 from Steam with no Swofty and no test.
+- It loaded cleanly: no dialog, his profile and progress as expected (Tyler, in chat).
+- The game wrote a fresh profile save (519704 bytes, 08:04:55), and no second corrupt zip appeared.
+- `remotecache.vdf` (08:05:06) matches every file in `remote\`: size, sha1, and localtime = mtime.
+- Snapshot of this state: `save-backups\20261031-080525-post-fix-boot`.
+- `corrupt_saves#<steamid>.zip` is left in `remote\`; deleting it is Tyler's call.
+- Never answer the corrupt-save dialog: it may reset the profile.
+
+**Ruling (supervisor, 2026-10-31): route tests stay off Tyler's real saves.** They come back only with a real save
+sandbox, so that `run.json` names sandboxed saves: a career fixture in Swofty's sandbox, or a route / `grand_prix`
+sandbox if Swofty adds one (Tyler can ask the Swofty Discord). `tools/saves_guard.ps1` stays as a check, but its
+Restore is only safe inside the emergency procedure below.
+
+**Emergency restore procedure** (only if a save in `remote\` has to be put back):
+1. F1 25 closed. Fully exit Steam (tray > Exit) and confirm no `steam.exe` is running.
+2. `saves_guard.ps1 -Action Restore -Backup <backup>`.
+3. Start Steam. Before any launch, check `remotecache.vdf` against the disk for every file in `remote\`: size,
+   sha1, and localtime = mtime. Log the table.
+4. One plain boot from Steam (no Swofty, no test, no pad input), with Tyler watching. If a corrupt-save dialog
+   appears, close the game without answering it.
+
 ## Time Trial by route (works since 2026-10-31)
 
 `harness/tests/udp_tt.test.json` reaches an AI-driven Time Trial session at Melbourne. The pad sequence, with a frame

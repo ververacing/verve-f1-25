@@ -19,7 +19,7 @@ lights-out event (LGOT): for each --launch-s offset t, the car's speed (CarTelem
 Layouts: F1 25 spec (EA forum 12187347). Each packet is checked against its expected size; an entry size that
 doesn't match is reported in sessions.csv and that packet type is skipped, never silently misread. Only leading
 fields that have kept their place since F1 23 are read. LapData's m_gridPosition / m_driverStatus are read in spec
-order, and the parser checks the reported swap (grid must be 1..22 for active cars; driver status 0..4) and records
+order, and the parser checks the reported swap (grid must be 1..cars for active cars; driver status 0..4) and records
 which order fits in sessions.csv (`lapdata_grid_order`).
 """
 from __future__ import annotations
@@ -32,10 +32,11 @@ from collections import defaultdict
 from pathlib import Path
 
 HEADER = struct.Struct("<HBBBBBQfIIBB")  # 29 bytes
-CARS = 22
+CARS = 22  # format 2025; per-session layouts below
 PACKET_NAMES = {0: "motion", 1: "session", 2: "lap_data", 3: "event", 4: "participants", 5: "car_setups",
                 6: "car_telemetry", 7: "car_status", 8: "final_classification", 9: "lobby_info", 10: "car_damage",
-                11: "session_history", 12: "tyre_sets", 13: "motion_ex", 14: "time_trial", 15: "lap_positions"}
+                11: "session_history", 12: "tyre_sets", 13: "motion_ex", 14: "time_trial", 15: "lap_positions",
+                16: "car_telemetry_2"}
 SESSION_TYPES = {0: "unknown", 1: "P1", 2: "P2", 3: "P3", 4: "short_practice", 5: "Q1", 6: "Q2", 7: "Q3",
                  8: "short_quali", 9: "one_shot_quali", 10: "sprint_shootout_1", 11: "sprint_shootout_2",
                  12: "sprint_shootout_3", 13: "short_sprint_shootout", 14: "one_shot_sprint_shootout", 15: "race",
@@ -52,6 +53,24 @@ TEL_LEAD = struct.Struct("<HfffBb")
 TEL_SIZE = 60
 # Participants entry: aiControlled, driverId, networkId, teamId, myTeam, raceNumber, nationality, name[32] lead.
 PART_LEAD = struct.Struct("<BBBBBBB32s")
+
+# Packet format 2026 (F1 25 2026 Season Pack, EA spec v1.2): every car array holds 24 entries; LapData's 57-byte
+# entry is unchanged; ParticipantData widens driverId / networkId / teamId to uint16 (60 bytes); CarTelemetryData
+# narrows engineTemperature to uint8 (59 bytes, leading fields unchanged); packet 16 is CarTelemetry2.
+LAYOUTS = {
+    2025: {"cars": 22, "tel_size": TEL_SIZE, "tel_trailer": 3, "part": PART_LEAD, "part_size": 57,
+           "unknown_driver": 255},
+    2026: {"cars": 24, "tel_size": 59, "tel_trailer": 3, "part": struct.Struct("<BHHHBBB32s"), "part_size": 60,
+           "unknown_driver": 65535},
+}
+
+
+def is_human(car: int, ai: int, driver_id: int, player: int, player2: int, unknown_driver: int) -> bool:
+    """A car whose name may be a player's own account name (public repo: never written out). The player's slot can
+    report aiControlled = 1 in benchmark and ai_drives_player runs, so the header's player indices count regardless,
+    and so does a driverId outside the game's driver list (the player's own slot reports the unknown id). networkId
+    can't tell: offline it is just the car index."""
+    return car == player or (player2 != 255 and car == player2) or ai == 0 or driver_id == unknown_driver
 
 
 def records(path: Path):
@@ -107,44 +126,51 @@ def parse(path: Path, launch_offsets: list[float]):
         s["version"] = f"{year}.{major}.{minor}"
         s["player"] = player
         s["counts"][pid] += 1
+        lay = LAYOUTS.get(fmt)
+        if lay is None:
+            s["bad_sizes"]["format"] = fmt
+            continue
+        n_cars = s["cars"] = lay["cars"]
         body = p[HEADER.size:]
         if pid == 1 and len(body) >= 9:
             s["laps"], s["type"], s["track"] = body[3], body[6], struct.unpack_from("<b", body, 7)[0]
         elif pid == 2:
-            need = CARS * LAP.size + 2
+            need = n_cars * LAP.size + 2
             if len(body) != need:
                 s["bad_sizes"]["lap_data"] = len(body)
                 continue
-            cars = [LAP.unpack_from(body, c * LAP.size) for c in range(CARS)]
+            cars = [LAP.unpack_from(body, c * LAP.size) for c in range(n_cars)]
             s["lap_frames"].append((stime, cars))
         elif pid == 3 and len(body) >= 4:
             code = body[:4].decode("ascii", "replace")
             s["events"].append((stime, t, code, event_fields(code, body[4:])))
         elif pid == 4 and s["participants"] is None and len(body) >= 1:
-            size = (len(body) - 1) // CARS
-            if size < PART_LEAD.size:
+            size = lay["part_size"]
+            if len(body) != 1 + n_cars * size:
                 s["bad_sizes"]["participants"] = len(body)
                 continue
             s["n_active"] = body[0]
             parts = []
-            for c in range(CARS):
-                ai, drv, net, team, myteam, num, nat, name = PART_LEAD.unpack_from(body, 1 + c * size)
+            for c in range(n_cars):
+                ai, drv, net, team, myteam, num, nat, name = lay["part"].unpack_from(body, 1 + c * size)
+                human = is_human(c, ai, drv, player, player2, lay["unknown_driver"])
                 parts.append({"ai": ai, "driver_id": drv, "team_id": team, "race_number": num,
-                              "name": name.split(b"\0", 1)[0].decode("utf-8", "replace")})
+                              "name": "player" if human else name.split(b"\0", 1)[0].decode("utf-8", "replace")})
             s["participants"] = parts
         elif pid == 6:
-            if len(body) < CARS * TEL_SIZE:
+            tel = lay["tel_size"]
+            if len(body) != n_cars * tel + lay["tel_trailer"]:
                 s["bad_sizes"]["car_telemetry"] = len(body)
                 continue
-            s["tel_frames"].append((stime, [TEL_LEAD.unpack_from(body, c * TEL_SIZE)[0] for c in range(CARS)]))
+            s["tel_frames"].append((stime, [TEL_LEAD.unpack_from(body, c * tel)[0] for c in range(n_cars)]))
         elif pid == 8 and len(body) >= 1:
-            size = (len(body) - 1) // CARS
+            size = (len(body) - 1) // n_cars
             if size not in (45, 46):
                 s["bad_sizes"]["final_classification"] = len(body)
                 continue
             best_off = 7 if size == 46 else 6
             fin = []
-            for c in range(CARS):
+            for c in range(n_cars):
                 o = 1 + c * size
                 fin.append({"position": body[o], "laps": body[o + 1], "grid": body[o + 2], "points": body[o + 3],
                             "pit_stops": body[o + 4], "result_status": body[o + 5],
@@ -159,13 +185,14 @@ def parse(path: Path, launch_offsets: list[float]):
 
 def check_grid_order(s: dict) -> None:
     """Votes on which of the two adjacent LapData bytes is the grid position (spec order vs the reported swap)."""
-    n = s["n_active"] or CARS
+    cars_max = s.get("cars", CARS)
+    n = s["n_active"] or cars_max
     for _, cars in s["lap_frames"][:50]:
         for c in cars[:n]:
             g, d = c[L_GRID], c[L_DSTATUS]
-            if 1 <= g <= CARS and d <= 4:
+            if 1 <= g <= cars_max and d <= 4:
                 s["grid_votes"][0] += 1
-            if 1 <= d <= CARS and g <= 4:
+            if 1 <= d <= cars_max and g <= 4:
                 s["grid_votes"][1] += 1
     a, b = s["grid_votes"]
     s["grid_order"] = "spec" if a >= b else "swapped"
@@ -231,7 +258,8 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
         w = csv.writer(f)
         w.writerow(head)
         for uid, s in sessions.items():
-            n = s["n_active"] or CARS
+            cars_max = s.get("cars", CARS)
+            n = s["n_active"] or cars_max
             ev = defaultdict(lambda: defaultdict(int))
             for _, _, code, fields in s["events"]:
                 if code == "OVTK":
@@ -244,8 +272,8 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                     ev[fields.get("vehicle")]["pen"] += 1
             first = s["lap_frames"][0][1] if s["lap_frames"] else None
             for c in range(n):
-                part = (s["participants"] or [{}] * CARS)[c]
-                fin = (s["final"] or [None] * CARS)[c]
+                part = (s["participants"] or [{}] * cars_max)[c]
+                fin = (s["final"] or [None] * cars_max)[c]
                 row = [uid, c, part.get("name", "NA"), part.get("team_id", "NA"), part.get("ai", "NA"),
                        part.get("race_number", "NA"),
                        fin["grid"] if fin else (grid_of(s, first[c]) if first else "NA"),

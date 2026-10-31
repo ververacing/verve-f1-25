@@ -27,7 +27,7 @@
         { "pad": { "press": "ls", "ms": 4000 } },
         { "pad": { "press": "a", "ms": 250 } },
         { "ai_drives_player": true },
-        { "sample": { "read": "car[player].gearbox.gear_index", "every_ms": 1000, "for_s": 240, "as": "gear" } }
+        { "sample": { "read": "car[player].gearbox.gear_index", "every_ms": 1000, "for_s": 150, "as": "gear" }, "timeout_s": 200 }
       ],
       "assert": [{ "series": "gear", "rises_by": 3 }, { "no_crash": true }]
     }
