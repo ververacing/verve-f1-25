@@ -1,0 +1,9 @@
+key,arm,source,level,driver,stock_row,stock_curve
+3,ROW_0.35,ROW,0.35,lance_stroll,0.6,0.81
+10,ROW_0.05,ROW,0.05,esteban_ocon,1,0.86
+2,ROW_0.99,ROW,0.99,oscar_piastri,0.73,0.92
+12,ROW_0.65,ROW,0.65,lando_norris,0.81,0.89
+15,ROW_0.05,ROW,0.05,oliver_bearman,0.65,0.84
+14,ROW_0.99,ROW,0.99,isack_hadjar,0.6,0.66
+13,ROW_0.65,ROW,0.65,nico_hulkenberg,0.8,0.86
+6,ROW_0.35,ROW,0.35,gabriel_bortoleto,0.7,0.76

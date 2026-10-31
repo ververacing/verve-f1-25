@@ -1,0 +1,53 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=esteban_ocon]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=oscar_piastri]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.99"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=oliver_bearman]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=isack_hadjar]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.99"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.35"
+                }
+            ],
+    "schema_version":  1
+}
