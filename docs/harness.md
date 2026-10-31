@@ -54,7 +54,9 @@ What the smoke run showed (Austria, 3 laps, 20 cars, clear):
 
 ## Gaps (re-scoped #24)
 
-1. **Vehicle id -> driver.** RaceStarts names cars by vehicle id only, and the session trace gives just each
+1. **Vehicle id -> driver.** *Closed for benchmark (2026-10-31):* the game's `LAPTIMES` channel names each car
+   (`v(16, Pierre GASLY)`), and also gives per-car lap and sector times. See `runs/2026-10-31-logchan-probe/summary.md`.
+   Original note: RaceStarts names cars by vehicle id only, and the session trace gives just each
    car's team. Teammates can't be told apart. Options: the game's UDP Participants packet (needs the in-game UDP
    telemetry setting on; #4), or arms that give both drivers of a team the same value.
 2. **Grand Prix sessions** with chosen difficulty and start rules: Swofty's `grand_prix` env when it ships, or
