@@ -1,0 +1,100 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=oliver_bearman]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=oliver_bearman]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=pierre_gasly]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=pierre_gasly]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.10"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.90"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "driver_characteristics.mistakes",
+                    "value":  "0.90"
+                }
+            ]
+}
