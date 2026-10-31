@@ -1,0 +1,5 @@
+key,arm,source,level
+5,ROW_high,ROW,0.95
+4,ROW_low,ROW,0.05
+6,STATS_high,STATS,0.95
+3,STATS_low,STATS,0.05
