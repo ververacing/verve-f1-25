@@ -98,7 +98,14 @@ win in benchmark, F-36), so every driver keeps the F1 25 baseline and Verve move
 | `driver_characteristics.speed_out` | 0.80 Pace + 0.20 Consistency | Corner curvature and exit |
 
 The PR table and `verve-f1-addon/table.csv` give each driver's stock and Verve values plus the F-39 start-model
-predictions (mean reaction 0.35 - 0.21 k rs, mean bad-start draw 0.24 - 0.08 k m, k = 0.52).
+predictions (mean reaction 0.35 - 0.21 k rs, mean bad-start draw 0.24 - 0.08 k m):
+
+- `pred_reaction_stock` / `_verve`: absolute mean reaction, k = 0.53. `pred_reaction_change`: Verve minus stock, same k.
+- `pred_bad_start_stock` / `_verve`: absolute mean bad-start draw from the level fit, k = 0.5.
+- `pred_bad_start_change`: Verve minus stock from the contrast slope, k = 0.8 (B-0009 0.70, B-0010 0.93).
+
+Contrasts and level fits give different k for written rows, and the form of the b dependence is still open (F-39,
+#55). So `pred_bad_start_change` is not `pred_bad_start_verve - pred_bad_start_stock`.
 
 ### Pace rating (so simulated sessions and the career UI agree)
 
