@@ -113,8 +113,8 @@ read the Participants packet with `tools/udp_participants.py`.
   speed, lap distance and position 1, 3 and 6 s after lights out (the behavioural side of F-38's bad-start draw);
 - `laps.csv` and `events.csv`.
 
-Python can't read files under `%APPDATA%` here, so the scripts and the raw recording live in
-`%LOCALAPPDATA%\verve-udp\<run>\`. `harness/tests/udp_tt.test.json` is the first in-game check: a Time Trial reached
+Python here (the WindowsApps alias) can't read files under `%APPDATA%` or the rest of `%LOCALAPPDATA%`, only under
+`%TEMP%`, so the scripts and the raw recording live in `%TEMP%\verve-udp\<run>\`. `harness/tests/udp_tt.test.json` is the first in-game check: a Time Trial reached
 by pad (Swofty's documented sequence) with the AI driving.
 
 **Benchmark runs send no UDP.** During B-0003's 5 starts the capture received 0 packets, with the setting on and kept

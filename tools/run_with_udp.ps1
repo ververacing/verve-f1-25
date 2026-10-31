@@ -7,9 +7,10 @@ Usage:
 Starts tools/udp_capture.py (127.0.0.1:20777) before the test, stops it with a stop file after the test ends,
 and runs tools/udp_parse.py on the recording into <Out>/udp/. The test report goes to <Out>/raw/ as usual.
 
-Python here can't open files under %APPDATA% (the app's sandbox), so the two scripts run from a copy in
-%LOCALAPPDATA%\verve-udp\, the recording is written there too, and the parsed CSVs are copied back into <Out>/udp/.
-The raw recording stays in %LOCALAPPDATA%\verve-udp\<run>\ (it can be large; nothing under runs/**/raw/ is committed).
+Python here (the WindowsApps alias) can't open files under %APPDATA% or the rest of %LOCALAPPDATA%, but can under
+%TEMP%. So the two scripts run from a copy in %TEMP%\verve-udp\, the recording is written there too, and the parsed
+CSVs are copied back into <Out>/udp/. The raw recording stays in %TEMP%\verve-udp\<run>\ (it can be large; nothing
+under runs/**/raw/ is committed).
 #>
 param(
     [Parameter(Mandatory)] [string] $Test,
@@ -20,7 +21,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $run = Get-Date -Format 'yyyyMMdd-HHmmss'
-$work = Join-Path $env:LOCALAPPDATA "verve-udp\$run"
+$work = Join-Path $env:TEMP "verve-udp\$run"
 New-Item -ItemType Directory -Force $work | Out-Null
 Copy-Item (Join-Path $PSScriptRoot 'udp_capture.py'), (Join-Path $PSScriptRoot 'udp_parse.py') $work -Force
 $bin = Join-Path $work 'udp.bin'; $stop = Join-Path $work 'stop.flag'; $log = Join-Path $work 'capture.log'
