@@ -118,8 +118,18 @@ Python here (the WindowsApps alias) can't read files under `%APPDATA%` or the re
 by pad (Swofty's documented sequence) with the AI driving.
 
 **Benchmark runs send no UDP.** During B-0003's 5 starts the capture received 0 packets, with the setting on and kept
-by the game. Either benchmark mode or the offline launch doesn't emit telemetry. A normal session (Time Trial by pad,
-`docs/std/testing.md`) is the next place to check (#4).
+by the game. **The offline, modded launch does send UDP:** the first `udp_tt` run (2026-10-31,
+`runs/2026-10-31-udp-tt/`) got 21 Event packets (`BUTN`, format 2026) in the menus. So it is benchmark mode that sends
+nothing. That run never reached a session: its pad presses on F1 World's Play cards (`solo_container`) came within a
+second of the screen opening and did nothing.
+
+**Route tests use the player's own saves.** Only the `career` environment runs in the save sandbox (from a fixture);
+a `route` env rejects a `fixture` key. So a Time Trial or Grand Prix reached by `route` + `pad` can write to Tyler's
+saves (records, F1 World progress, mid-session saves). Benchmark runs haven't written any. Don't run route tests that
+reach a session without Tyler's OK.
+
+`tools/udp_join.py` joins one start's RaceStarts draws to its UDP cars on vehicle id = car index, and checks that both
+sides' team ids agree (exit 1 on any mismatch).
 
 ## PC hygiene after every run
 

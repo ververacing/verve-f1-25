@@ -1,0 +1,2 @@
+session_uid,format,game_version,session_type,track_id,total_laps,n_active,player_car,lights_out_s,lapdata_grid_order,bad_sizes,packets
+0,2026,25.1.26,,,,,0,,spec,,event=21
