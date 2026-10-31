@@ -1,0 +1,2 @@
+"statistic","estimate","boot_se","z","passes_2se","starts","resamples"
+"slope_ROW","-0.1177","0.0173","-6.81","True","6","2000"

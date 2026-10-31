@@ -92,6 +92,10 @@ Each start's `loader.log` has one line `[assets] gamedb: N overwritten, M create
   value already equals stock: Piastri control 0.9, Hulkenberg control 0.84, Bortoleto reaction_speed 0.7,
   Gasly safety_car_pit_wear_max 0.35. All 229 driver-row and statistics edits (incl. the one seasonal list) are
   accounted for.
+- **But an equal write is not always dropped.** B-0010 (#51): 68 overwritten = 52 + all 16 ops, and `loader.log`
+  logs Sainz `reaction_speed 0.9 -> 0.9` as an overwrite. Which equal writes the build drops is unknown, so don't
+  predict the count from stock values: before trusting a batch, check start 1's `gamedb: overwrote` lines against
+  the addon's ops (one per op, plus the baseline), then run the analysis with that count.
 - **Isolation rule.** An experiment profile holds only swofty.core (+ the always-on teamsimplified.mods) plus that
   batch's own test addon. The sample `verve.driver-profiles` is uninstalled. `tools/racestarts_summary.ps1
   -ExpectOverwritten <52 + the batch's edit count>` fails the analysis if any start applied a different number of
@@ -152,6 +156,14 @@ sides' team ids agree (exit 1 on any mismatch).
 - **Pre-flight** (after RESUME or after Tyler has played): `tools/preflight.ps1`. It checks that the build is still
   25251167 and that doctor shows no drift. It also runs the cleanup above, and lists any `hardware_settings_config.xml`
   lines that differ from the pre-UDP backup besides `<udp>`.
+
+## Saves (benchmark leaves them alone)
+
+Tyler's F1 25 saves live in `C:\Program Files (x86)\Steam\userdata\928649988\3059520\remote` (10 files, Steam Cloud
+synced). Hashed with SHA-256 during B-0010 (2026-10-31 02:43) and again after its 20 starts (04:20): all 10 identical,
+newest file still 2026-10-30 22:37 (`runs/2026-10-31-B-0010/summary.md`). So benchmark tests don't read or write
+saves. Route tests (Time Trial, Grand Prix by route and pad) do run on these saves and stay on hold until Tyler decides
+how to protect them.
 
 ## Side effect seen
 

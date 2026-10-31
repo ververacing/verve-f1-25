@@ -1,0 +1,18 @@
+﻿starts 20, armed samples per start 8, resamples 2000, seed 1
+statistic,estimate,boot_se,z
+reaction_mistakes_main,0.0073,0.0070,1.05
+reaction_rs_main,-0.0858,0.0079,-10.90
+reaction_interaction,0.0067,0.0139,0.49
+reaction_cell_rs0.1_m0.1,0.0665,0.0093,7.18
+reaction_cell_rs0.1_m0.9,0.0705,0.0078,9.03
+reaction_cell_rs0.9_m0.1,-0.0226,0.0100,-2.25
+reaction_cell_rs0.9_m0.9,-0.0119,0.0089,-1.35
+b_mistakes_main,-0.0596,0.0110,-5.43
+b_rs_main,-0.0184,0.0140,-1.31
+b_interaction,0.0013,0.0301,0.04
+b_cell_rs0.1_m0.1,0.0380,0.0189,2.01
+b_cell_rs0.1_m0.9,-0.0222,0.0137,-1.62
+b_cell_rs0.9_m0.1,0.0189,0.0199,0.95
+b_cell_rs0.9_m0.9,-0.0400,0.0161,-2.49
+positive control: pass; mistakes on reaction: +0.0073 s, 2-SE interval [-0.0066, +0.0213]
+verdict: F-40 REJECTED (2-SE interval excludes -0.015 s)

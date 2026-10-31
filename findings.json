@@ -498,26 +498,28 @@
     {
       "id": "F-36",
       "claim": "In benchmark, the driver row's driver_characteristics.reaction_speed drives the AI race-start reaction and the racecraft rating does not: across four levels per source (per driver, 6 starts), the ROW slope is -0.109 s per unit (bootstrap SE 0.024, z -4.6) and the STATS slope is +0.068 (SE 0.029), positive, which is explained by the STATS drivers' untouched row values running against their levels (predicted +0.039 under row-wins).",
-      "confidence": "supported (pre-registered pass, z -4.6); replication pending (B-0008). Leave-one-driver-out ROW slopes -0.163 / -0.102 / -0.118 / -0.039 (dropping norris / russell / ocon / tsunoda): direction holds, strength rests mostly on tsunoda. No rating effect detected in B-0001 or B-0006 (confounded in B-0006), not proven absent.",
+      "confidence": "replicated (B-0008, #43): new assignment, two drivers per level, untouched racecraft uncorrelated with level (r -0.14): ROW slope -0.118 s per unit (SE 0.017, z -6.8), every leave-one-level-out slope negative (-0.100 to -0.141), k ~0.56. Original B-0006: pre-registered pass, z -4.6; leave-one-driver-out ROW slopes -0.163 / -0.102 / -0.118 / -0.039 (dropping norris / russell / ocon / tsunoda): direction holds, strength rests mostly on tsunoda. No rating effect detected in B-0001 or B-0006 (confounded in B-0006), not proven absent.",
       "evidence": [
         "runs/2026-10-30-B-0006/summary.md, slopes.csv, levels.csv (#39)",
+        "runs/2026-10-30-B-0008/summary.md, slope_reaction_time.csv (#43): replication, z -6.8, all leave-one-level-out slopes negative",
         "runs/2026-10-30-B-0001/summary.md (#30): same direction, inconclusive by its own rule",
         "F-37 / runs/2026-10-30-B-0004/summary.md (#35, #44): row wins for mistakes on race_start_performance; independent and supporting, but marginal (z 2.2-2.3)"
       ],
       "implications": "Q-17 answered for benchmark: row wins. Writing driver rows (v0.1's mechanism) works for reaction_speed, at least in benchmark; #6 keeps the row-based plan. The slope gives k ~0.52 (mean = 0.35 - 0.21*k*r), consistent with B-0003. Grand Prix and career still need checking (harness gaps 2-3), and other characteristics may differ (B-0004 tests mistakes).",
       "related_questions": ["Q-17", "Q-02"],
-      "status": "supported (benchmark only); replication pending (B-0008)"
+      "status": "verified (benchmark only; replicated in B-0008)"
     },
     {
       "id": "F-37",
       "claim": "B-0004: in benchmark, higher row driver_characteristics.mistakes -> higher race_start_performance (z 2.2-2.3, marginal), i.e. a lower bad-start draw b (F-38); mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4). The awareness rating shows no effect: ROW_high (Alpine 0.95) - ROW_low (Aston Martin 0.05) = +7.79 (bootstrap SE 3.39, z +2.30) vs STATS_high - STATS_low (awareness flat 0.95 vs 0.05) = +5.23 (SE 6.96, z +0.75), 5 fresh starts. Reaction time doesn't move for either source (z -0.50 / +1.21), as F-06 predicts. No CANNED_EVENTS lines were logged in benchmark starts.",
-      "confidence": "supported (pre-registered pass, marginal). Leave-one-start-out ROW gaps are all positive (+5.8 to +9.7), but z is 1.70 to 3.11, under 2 SE in two of five drops; per-start ROW gaps +6.2 / +21.2 / +16.4 / -1.4 / +0.2 (supervisor check on #44: two of five starts show no effect). Supervisor's independent bootstrap: SE 3.47, z 2.24.",
+      "confidence": "replicated (B-0009, #45): row-only dose-response, 8 drivers at 0.02 / 0.35 / 0.65 / 0.98, 30 starts: slope of b on level -0.059 per unit (bootstrap SE 0.014, z -4.3), every leave-one-level-out slope negative (z -1.9 to -4.8), driver-level t -3.3. Original B-0004: pre-registered pass, marginal. Leave-one-start-out ROW gaps are all positive (+5.8 to +9.7), but z is 1.70 to 3.11, under 2 SE in two of five drops; per-start ROW gaps +6.2 / +21.2 / +16.4 / -1.4 / +0.2 (supervisor check on #44: two of five starts show no effect). Supervisor's independent bootstrap: SE 3.47, z 2.24.",
       "evidence": [
-        "runs/2026-10-30-B-0004/summary.md, bootstrap_race_start_performance.csv, arms_relative.csv (#35, #44)"
+        "runs/2026-10-30-B-0004/summary.md, bootstrap_race_start_performance.csv, arms_relative.csv (#35, #44)",
+        "runs/2026-10-30-B-0009/summary.md, slope_race_start_performance.csv, slope_lolo_race_start_performance.csv (#45): replication, z -4.3"
       ],
       "implications": "A second, independent row-precedence result after F-36 (different characteristic, different metric). Q-03 runtime half: B-0007 (F-38) showed a higher race_start_performance is a lower bad-start draw, so 'mistakes = skill' (F-29) holds if bad_start is a penalty; the behavioural check is #4. B-0009 replicates it as a row-only dose-response.",
       "related_questions": ["Q-17", "Q-03"],
-      "status": "supported (benchmark only). Update after B-0007 (F-38): race_start_performance = 100 * (1 - drawn bad-start value), so the +7.8 gap means row mistakes 0.95 drew bad-start values about 0.078 lower than 0.05. mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4), which would match F-29."
+      "status": "verified (benchmark only; replicated in B-0009). Update after B-0007 (F-38): race_start_performance = 100 * (1 - drawn bad-start value), so the +7.8 gap means row mistakes 0.95 drew bad-start values about 0.078 lower than 0.05. mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4), which would match F-29."
     },
     {
       "id": "F-38",
@@ -529,6 +531,32 @@
       "implications": "The metric's scale and sign are known: higher = smaller bad-start value (= better start, if the bad-start value is the penalty its name says; behavioural check via UDP, #4). It is the drawn penalty, not an outcome. The bad-start bounds are a second per-driver race_start key family that works (after the reaction bounds, F-33), so #10 can set each AI driver's start-quality range directly; profiles should use ranges, since equal bounds pin every start. Reaction time: no effect detected. The nominal slope (-0.055 s per unit, z -3.6) is not robust: the stock reaction_speed rows predict about -0.012 of it, leave-one-driver-out slopes run -0.028 to -0.077, and without liam_lawson it is -0.028 (z -1.4). v0.2a: per-driver bad_start bounds are a direct, exact lever for start consistency, and the reaction bounds (F-33) for start sharpness; both are verified per driver.",
       "related_questions": ["Q-03", "Q-17"],
       "status": "verified (benchmark)"
+    },
+    {
+      "id": "F-39",
+      "claim": "Start model (stock field, 368 samples, 33 starts, B-0001/3/4/5/6/7/8, modified cars and Ferrari left out): both race-start draws move each min/max bound pair from its upper toward its lower bound by k * row skill. Reaction r ~ U[0.28 - 0.24*k*rs, 0.42 - 0.18*k*rs] (rs = row reaction_speed); bad start b ~ U[0.06 - 0.02*k*m, 0.42 - 0.14*k*m] (m = row mistakes, b = 1 - race_start_performance/100). One pooled k ~0.52 fits both: reaction 0.529 +- 0.015, bad start 0.520 +- 0.067 (intercepts fixed by the bounds). Bad-start edges and bin means match the model within ~0.005, and no sample lies outside either envelope.",
+      "confidence": "decoded (fit), benchmark only. The stock-field free OLS slope of b on m is -0.062 (SE 0.039, z -1.6): the same direction as B-0004 but not at 2 SE, and it was -0.112 (z -2.7) before B-0008's stock cars were added, so it depends on the driver pool (stock m spans only 0.51-0.90). Tagged-driver slopes agree with the pooled k: B-0006 0.52 and B-0008 0.56 (reaction); B-0004's gap is 1.1 SE above the model. B-0009 (#45, m = 0.02-0.98, 30 starts): tagged-driver bad-start k 0.70 +- 0.12 vs 0.60 +- 0.10 for the stock field of the same starts (difference z 0.7), so the bad-start form holds well outside the stock m range. B-0010 (#51, crossed rs x mistakes at 0.10 / 0.90, 20 starts) confirms both forms with no cross terms: rs moves reaction by -0.086 s (z -10.9; model -0.087 at k 0.52), mistakes doesn't move reaction (F-40 rejected), rs doesn't move b (z -1.3), no interaction. Its bad-start step is -0.060 +- 0.011 (model -0.033 at k 0.52), an implied k of 0.93 +- 0.17. Open point (supervisor, #54): b's k from written rows (0.70 in B-0009, 0.93 in B-0010) exceeds the stock-field fit (0.52), while reaction's agrees (tagged 0.52-0.56, field 0.53); form of the b dependence open (k_b nearer 1, or a different form; the stock m range 0.51-0.90 can't tell them apart).",
+      "evidence": [
+        "runs/2026-10-30-start-model/summary.md, start_model_samples.csv, fit_output.txt",
+        "tools/fit_start_model.ps1",
+        "docs/stock/driver_rows_benchmark_austria.csv",
+        "runs/2026-10-30-B-0009/summary.md, analysis/output.txt (#45): tagged-driver k, per-start k correlation"
+      ],
+      "implications": "#6 and #10 get a quantitative model: E[reaction] and E[b] as functions of the row values and the bounds (each edge = upper bound - (upper - lower) * k * skill, with k ~0.52). Same per-session k for both draws: no sign of it. In B-0009 (tagged levels make the bad-start k identifiable per start) the per-start k of the two draws correlate -0.36 over 30 starts, where one shared k would give at most about +0.17; the stock-field fit gave -0.23. Treat the two k as independent per start until shown otherwise. Reaction depends on reaction_speed only, b on mistakes only (B-0010). For predicting b from written rows, k ~0.5 understates the effect: B-0009 gives 0.70 +- 0.12, B-0010 0.93 +- 0.17. Generator E[b] predictions should use k_b ~0.8, with that caveat. Open: whether b costs time at the start (#4).",
+      "related_questions": ["Q-03", "Q-17"],
+      "status": "decoded (fit), benchmark only"
+    },
+    {
+      "id": "F-40",
+      "claim": "In benchmark, row driver_characteristics.mistakes also shortens the AI race-start reaction time, which F-39's reaction form (reaction_speed only) leaves out. B-0009 (8 drivers at mistakes 0.02-0.98, 30 starts): raw reaction slope -0.019 s per unit (bootstrap SE 0.006, z -3.0); after removing each car's predicted reaction from its reaction_speed row (0.35 - 0.21*k*rs, k per start), -0.029 s per unit (SE 0.006, z -4.7; driver level t -3.7). That is about a quarter of the reaction_speed effect (-0.118 s per unit, B-0008). It is not carried by the bad-start draw (stock field: corr(b, reaction residual) 0.05, 300 samples). The stock field points the same way: reaction residual on stock row mistakes -0.047 (naive SE 0.023).",
+      "confidence": "candidate, not pre-registered, fragile (one batch, benchmark only; B-0009 logged reaction as a control). Raw leave-one-level-out slopes -0.014 / -0.023 / -0.024 / -0.004 (dropping 0.02 / 0.35 / 0.65 / 0.98; supervisor check on #50): the raw effect leans on the 0.98 pair, because the 0.65 pair has the slowest stock reaction_speed rows. The rs-adjusted slopes hold (-0.024 to -0.031, z -1.9 to -4.5), but that adjustment is a post-hoc model over 8 drivers. B-0004 (z -0.5) and B-0007 (pinned b, not mistakes) could not have seen an effect this size. REJECTED by B-0010 (#51, pre-registered, crossed rs x mistakes at 0.10 / 0.90, 20 starts): mistakes main effect on reaction +0.007 s (bootstrap SE 0.007), 2-SE interval [-0.007, +0.021] excludes the -0.015 s test value; the positive control (rs main -0.086 s, z -10.9) passed. The B-0009 slope was the confound its leave-one-level-out check pointed at: the stock reaction_speed rows of the tagged drivers, not their mistakes.",
+      "evidence": [
+        "runs/2026-10-30-B-0009/summary.md, slope_reaction_time.csv, slope_lolo_reaction_time.csv, analysis/output.txt (#45, #50)",
+        "runs/2026-10-31-B-0010/summary.md, readout.txt, arms.csv (#51)"
+      ],
+      "implications": "None: row mistakes does not move the reaction draw. #10 profiles can set mistakes for racecraft reasons without changing start reaction; it moves only the bad-start draw (F-37, F-39).",
+      "related_questions": ["Q-03", "Q-17"],
+      "status": "rejected (B-0010)"
     }
   ]
 }

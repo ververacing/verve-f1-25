@@ -1,0 +1,26 @@
+# swofty 1.6.11 | stock values (no --addon) | dumped 2026-10-31 | entrants.drivers.driver[_metadata_=<label>].driver_characteristics
+label,aggression,control,mistakes,reaction_speed,speed_in,speed_out
+max_verstappen,1,0.96,0.75,0.85,1,0.99
+yuki_tsunoda,0.79,0.85,0.875,0.79,0.85,0.83
+lando_norris,0.83,0.93,0.8,0.81,0.96,0.93
+oscar_piastri,0.73,0.9,0.9,0.73,0.86,0.91
+charles_leclerc,0.92,0.92,0.75,0.8,0.9,0.91
+lewis_hamilton,0.88,0.9,0.9,0.9,0.9,0.93
+george_russell,0.85,0.88,0.85,0.9,0.95,0.96
+andrea-kimi_antonelli,0.7,0.76,0.6,0.77,0.79,0.83
+fernando_alonso,0.93,0.97,0.9,1.0,0.93,0.94
+lance_stroll,0.5,0.62,0.6,0.6,0.55,0.7
+pierre_gasly,0.85,0.77,0.7,0.89,0.87,0.82
+franco_colapinto,0.8,0.5,0.51,0.72,0.77,0.71
+jack_doohan,0.63,0.63,0.63,0.63,0.63,0.61
+esteban_ocon,0.85,0.78,0.7,1.0,0.87,0.79
+oliver_bearman,0.65,0.765,0.65,0.65,0.68,0.78
+liam_lawson,0.6,0.7,0.8,0.6,0.6,0.8
+isack_hadjar,0.6,0.7,0.6,0.6,0.75,0.68
+alex_albon,0.81,0.77,0.7,0.81,0.88,0.89
+carlos_sainz-jr,0.85,0.83,0.8,0.9,0.84,0.81
+nico_hulkenberg,0.8,0.84,0.9,0.8,0.82,0.83
+gabriel_bortoleto,0.7,0.75,0.7,0.7,0.75,0.78
+sergio_perez,0.8,0.81,0.85,0.8,0.83,0.85
+valtteri_bottas,0.6,0.82,0.85,0.8,0.81,0.83
+arvid_lindblad,0.7,0.7,0.5,0.75,0.75,0.72
