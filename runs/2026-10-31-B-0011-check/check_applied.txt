@@ -1,0 +1,2 @@
+﻿ops 184: 163 applied (136 value-checked, 27 curves written at the right key but their value isn't logged), 21 dropped as equal to stock (evolution 19, driver_characteristics.aggression 1, driver_characteristics.speed_in 1), 0 problem(s)
+loader total 215 overwritten; expected 52 + 163 = 215

@@ -1,0 +1,1109 @@
+{
+ "schema_version": 1,
+ "ops": [
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.aggression",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.control",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.7989"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.speed_in",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+   "field": "driver_characteristics.speed_out",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=max_verstappen].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0:0.96,0.2:0.99,1:0.9,1:0.9"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=max_verstappen].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,0:0.97,0.2:0.99,1:0.9,1:0.9"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8396"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.control",
+   "value": "0.9833"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.9709"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.9318"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.speed_in",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+   "field": "driver_characteristics.speed_out",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lewis_hamilton].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.94,0:0.94,0.3:0.93,1:0.81,1:0.81"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lewis_hamilton].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.94,0:0.96,0.3:0.93,1:0.81,1:0.81"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7896"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.control",
+   "value": "0.9793"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.8579"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7918"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.9752"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.9503"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lando_norris].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.9,0.6:0.95,1:0.86,1:0.86"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lando_norris].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.93,0.6:0.95,1:0.86,1:0.86"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.9146"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.control",
+   "value": "0.8603"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.6899"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.8028"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.9152"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.9103"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=charles_leclerc].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.9,0.3:0.98,0.8:0.9,1:0.89"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=charles_leclerc].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.93,0.3:0.98,0.8:0.9,1:0.89"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.6546"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.control",
+   "value": "0.9728"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.9799"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.6868"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8652"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.9273"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oscar_piastri].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:0.91,1:0.85,1:0.85"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oscar_piastri].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.91,0.6:0.91,1:0.85,1:0.85"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8496"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.control",
+   "value": "0.9033"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.8759"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.8958"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.9402"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=george_russell]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.9563"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=george_russell].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:0.93,1:0.87,1:0.87"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=george_russell].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.91,0.6:0.93,1:0.87,1:0.87"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.9246"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.control",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.9329"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.9552"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.9693"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.88,0:0.88,0.6:0.85,1:0.77,1:0.77"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.88,0:0.9365,0.6:0.8665,1:0.7865,1:0.7865"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7346"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.control",
+   "value": "0.6713"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.5019"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7948"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8002"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8223"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=andrea-kimi_antonelli].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:1,1:1,1:1"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=andrea-kimi_antonelli].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.96,0.6:1,1:1,1:1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8096"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.control",
+   "value": "0.8698"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.8439"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.8678"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8202"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8013"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.2:0.87,0.6:0.83,1:0.71"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.83,0.2:0.87,0.6:0.83,1:0.71"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.6346"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.control",
+   "value": "0.6653"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.5649"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.6108"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.7252"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.6533"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.6:0.82,1:0.79,1:0.79"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.85,0.6:0.82,1:0.79,1:0.79"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7346"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.control",
+   "value": "0.8138"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.7569"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7548"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8552"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8763"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.83,0:0.83,0.3:0.89,1:0.78,1:0.78"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.83,0:0.83,0.3:0.89,1:0.78,1:0.78"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8446"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.control",
+   "value": "0.7848"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.7189"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.8768"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8452"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8023"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.298417:0.884,1:0.76,1:0.76"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.84,0.298417:0.884,1:0.76,1:0.76"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8846"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.control",
+   "value": "0.7833"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.7059"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "1"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8452"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.7703"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=esteban_ocon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.84,0:0.84,0.4:0.86,1:0.77,1:0.77"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=esteban_ocon].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.84,0:0.83,0.4:0.86,1:0.77,1:0.77"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7596"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.control",
+   "value": "0.8708"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.9259"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7658"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.7952"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8173"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.77,0:0.77,0.4:0.75,1:0.65"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.77,0:0.8,0.4:0.75,1:0.65"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.4946"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.control",
+   "value": "0.5703"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.5499"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.5868"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.5252"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=lance_stroll]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.6703"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.76,0:0.76,0.6:0.74,1:0.72,1:0.72"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.76,0:0.9048,0.6:0.8748,1:0.8548,1:0.8548"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.6846"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.control",
+   "value": "0.7633"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.6509"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.6588"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.6502"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.7553"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oliver_bearman].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.73,0:0.73,0.6:0.9,1:0.82,1:0.82"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oliver_bearman].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.73,0:0.83,0.6:0.9,1:0.82,1:0.82"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7946"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.control",
+   "value": "0.7868"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.8279"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7888"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8102"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=sergio_perez]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8293"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=sergio_perez].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.82,0:0.83,0.2:0.86,1:0.68,1:0.98"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=sergio_perez].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.82,0:0.83,0.2:0.86,1:0.68,1:0.98"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.5596"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.control",
+   "value": "0.8853"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.9299"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7738"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8052"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=valtteri_bottas]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.8363"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=valtteri_bottas].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.86,0:0.86,0.2986808:0.8776,1:0.78,1:0.8"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=valtteri_bottas].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.86,0:0.9,0.2986808:0.8776,1:0.78,1:0.8"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.6746"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.control",
+   "value": "0.6868"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.7879"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.6328"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.5702"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.7733"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.4:0.88,1:0.81,1:0.81"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.81,0.4:0.88,1:0.81,1:0.81"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.6596"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.control",
+   "value": "0.7053"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.6549"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.6638"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.7202"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.7473"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=gabriel_bortoleto].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.76,0:0.76,0.6:0.88,1:0.9,1:0.9"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=gabriel_bortoleto].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.76,0:0.8,0.6:0.88,1:0.9,1:0.9"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.8346"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.control",
+   "value": "0.3708"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.3759"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7288"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.7402"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.6613"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=franco_colapinto].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.74,0:0.74,0.5:0.88,1:0.78,1:0.78"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=franco_colapinto].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.74,0:0.75,0.5:0.88,1:0.78,1:0.78"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7346"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.control",
+   "value": "0.6673"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.4639"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7628"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.7302"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=arvid_lindblad]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.6983"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=arvid_lindblad].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.72,0.6:0.82,1:0.8,1:0.8"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=arvid_lindblad].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.72,0.6:0.82,1:0.8,1:0.8"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.aggression",
+   "value": "0.7846"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.control",
+   "value": "0.7953"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.mistakes",
+   "value": "0.8199"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.reaction_speed",
+   "value": "0.7748"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.speed_in",
+   "value": "0.8202"
+  },
+  {
+   "op": "set",
+   "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+   "field": "driver_characteristics.speed_out",
+   "value": "0.7953"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=yuki_tsunoda].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.3:0.91,1:0.81,1:0.81"
+  },
+  {
+   "op": "set",
+   "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=yuki_tsunoda].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
+   "field": "evolution",
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.8,0.3:0.91,1:0.81,1:0.81"
+  }
+ ]
+}
