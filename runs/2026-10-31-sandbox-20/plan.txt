@@ -1,0 +1,37 @@
+# Driver Career wizard mapping, guarded. Nothing is saved.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+tile career
+wait screen=fe_career 60
+tile driver_career
+wait screen=fe_career_dlc_select 60
+# 2025 Career: the tile id doesn't advance this screen; one guarded A on the default highlight does
+@while \|fe_career_dlc_select\| 1 pad a
+# status reports only the top screen; in the wizard that is slice_gen_screen_title over career_wizard_*
+wait screen=slice_gen_screen_title 150
+# entry level (Skip to F1), season length (Full), settings (Recommended): defaults
+@while ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) 10 pad a
+# Add 11th team: default Official Teams Only
+@expect career_wizard_team_icons_select
+pad a
+@sleep 3
+# Add driver icons to market: default Official Drivers Only
+@expect career_wizard_classic_drivers
+pad a
+@sleep 4
+# Confirm Settings (breadcrumbs: Single Player Career, Driver, Skip to F1, Full Season, Recommended settings, Official Teams Only, Driver Icons Disabled)
+@expect career_wizard_confirm
+pad a
+@sleep 6
+# Driver type: default Official Driver ("Play as an official driver. Inherit their driver stats and accolade progress.")
+@expect driver_career_driver_type_select
+pad a
+@sleep 6
+status
+@sleep 8
+status
+quit

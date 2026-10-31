@@ -1,3 +1,18 @@
 ﻿saves before: 22 entries
-attempt 1 started 11:13:21
-sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-181321-1 ({"schema":1,"run":"shell-20261031-181321-1","state":"armed","pid":27004,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-181321-1\\saves\\remote","why":""})
+attempt 1 started 12:06:14
+sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-190614-1 ({"schema":1,"run":"shell-20261031-190614-1","state":"armed","pid":15596,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-190614-1\\saves\\remote","why":""})
+12:07:54 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81938}
+intro played (splash after 82 s)
+12:08:14 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}
+12:08:15 > pad ls  =>  {"seq":3,"status":"ok","ms":250}
+12:08:19 > pad ls 2000  =>  {"seq":4,"status":"ok","ms":4000}
+12:08:19 > pad ls  =>  {"seq":5,"status":"ok","ms":250}
+12:08:24 > home  =>  {"seq":6,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4828}
+12:08:25 > status  =>  {"seq":7,"status":"ok","value":{"v":1,"pid":15596,"run":"shell-20261031-190614-1","ticks":35332,"phase":"|fe_home|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:08:25 > tile career  =>  {"seq":8,"status":"ok","value":{"tile":"career","route":"career"},"ms":0}
+12:08:26 > wait screen=fe_career 60  =>  {"seq":9,"status":"ok","value":{"phase":"fe_career"},"ms":312}
+12:08:26 > status  =>  {"seq":10,"status":"ok","value":{"v":1,"pid":15596,"run":"shell-20261031-190614-1","ticks":35829,"phase":"|fe_career|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:08:26 > quit  =>  {"seq":11,"status":"ok","value":{"windows":1},"ms":0}
+run folder: shell-20261031-190614-1
+result: plan done
+saves unchanged (22 entries)

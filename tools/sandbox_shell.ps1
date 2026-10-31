@@ -79,9 +79,27 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     Log "sandbox: $($run.FullName) ($((Get-Content (Join-Path $run.FullName 'sandbox.json') -Raw).Trim()))"
     $results = Join-Path $run.FullName 'agent\results.jsonl'
 
+    $commands = Join-Path $run.FullName 'agent\commands.jsonl'
+    # The shell reads stdin in blocks (it only acts on a file or at EOF), so commands go straight to the agent's
+    # command file in the shell's own JSON form (seen in earlier runs' agent\commands.jsonl). The shell stays up
+    # with its stdin open and empty.
+    function ToJson([string] $cmd) {
+        $o = [ordered]@{ seq = $script:seq }
+        switch -Regex ($cmd) {
+            '^wait screen=(\S+)(?: (\d+))?$' { $o.cmd = 'at'; $o.args = @{ phase = $Matches[1] }; $o.timeout_ms = 1000 * [int]($(if ($Matches[2]) { $Matches[2] } else { 60 })); break }
+            '^pad (\S+)(?: (\d+))?$' { $o.cmd = 'pad'; $o.args = [ordered]@{ press = $Matches[1] }; if ($Matches[2]) { $o.args.ms = [int]$Matches[2] }; $o.timeout_ms = 60000; break }
+            '^tile (\S+)$' { $o.cmd = 'tile'; $o.args = @{ tile = $Matches[1] }; $o.timeout_ms = 60000; break }
+            '^save now$' { $o.cmd = 'save'; $o.args = @{ op = 'now' }; $o.timeout_ms = 120000; break }
+            '^@raw (.+)$' { return ($Matches[1] -replace '"seq":\s*\d+', "`"seq`":$script:seq") }
+            '^(home|title|status|quit)$' { $o.cmd = $Matches[1]; if ($Matches[1] -in 'home', 'title') { $o.timeout_ms = 60000 }; break }
+            default { throw "no JSON form for shell command '$cmd'" }
+        }
+        $o | ConvertTo-Json -Compress -Depth 4
+    }
     function Send([string] $cmd, [int] $timeoutS = 400) {
         $script:seq++
-        $p.StandardInput.WriteLine($cmd); $p.StandardInput.Flush()
+        $json = ToJson $cmd
+        [IO.File]::AppendAllText($commands, "$json`n", (New-Object Text.UTF8Encoding $false))
         $deadline = (Get-Date).AddSeconds($timeoutS)
         while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
             if (Test-Path $results) {
@@ -93,13 +111,15 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         Log "> $cmd  =>  NO RESULT"; return $null
     }
     function Screen {
+        # `status` reports the screen stack as value.phase, e.g. "|fe_career|#5f9ae18b|"
         $r = Send 'status' 30
-        if ($r -and $r.value) { $v = $r.value; foreach ($k in 'screen', 'top', 'screens') { if ($v.$k) { return ($v.$k | Select-Object -Last 1) } } }
+        if ($r -and $r.value -and $r.value.phase) { return [string]$r.value.phase }
         return ''
     }
 
     $first = Send $steps[0]
-    $ms = if ($first) { [int]$first.ms } else { 0 }
+    if (-not $first) { Log 'ABORT: the agent never answered the first command'; $result = 'no agent'; Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force; break }
+    $ms = [int]$first.ms
     if ($ms -lt $SkippedIntroS * 1000) {
         Log "intro skipped (splash after $([math]::Round($ms / 1000)) s); relaunching"
         Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force

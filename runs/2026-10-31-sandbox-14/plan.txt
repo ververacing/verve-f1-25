@@ -1,0 +1,21 @@
+# map the Driver Career wizard up to (not into) driver / team / name screens; nothing is saved
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+tile career
+wait screen=fe_career 60
+tile driver_career
+wait screen=fe_career_dlc_select 60
+# the 2025 tile id is accepted but doesn't advance; one guarded A on the highlighted (default) 2025 Career does
+@while \|fe_career_dlc_select\| 1 pad a
+wait screen=career_wizard_experience_select 150
+@sleep 3
+@while ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*career_wizard_ 40 pad a
+status
+@sleep 6
+status
+quit
+
