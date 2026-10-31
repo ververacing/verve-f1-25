@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "suite": "verve.b0006-dose-response",
+  "defaults": { "addons": ["verve.b0006"], "timeout_s": 900 },
+  "tests": [
+    { "id": "start_1", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] },
+    { "id": "start_2", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] },
+    { "id": "start_3", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] },
+    { "id": "start_4", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] },
+    { "id": "start_5", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] },
+    { "id": "start_6", "tags": ["B-0006"], "fresh": true,
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [{ "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 }, { "no_crash": true }] }
+  ]
+}
