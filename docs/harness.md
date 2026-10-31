@@ -123,6 +123,10 @@ by the game. Either benchmark mode or the offline launch doesn't emit telemetry.
   `tools/reinstall_addon.ps1 -Folder <addon>` clears the old copy and staging folder first;
   `-Id <id> -Uninstall` removes one (and drops it from every profile file when `swofty addons remove` hits the lock).
 - Close the Swofty Launcher window when it isn't needed (Tyler's OK, 2026-10-30).
+- **After aborting a run** (PAUSE, killed task), also check `%LOCALAPPDATA%\swofty-game.lock.d`. A killed
+  `swofty test` leaves it behind (its `owner` file names the dead run), and the next run then fails at once with "the
+  game was not free". There is no CLI command to clear it. If no `F1_25` or `swofty` process is running, delete the
+  folder. Seen 2026-10-30 after the B-0004 pause.
 
 ## Side effect seen
 

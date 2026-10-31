@@ -506,6 +506,17 @@
       "implications": "Q-17 answered for benchmark: row wins. Writing driver rows (v0.1's mechanism) works for reaction_speed, at least in benchmark; #6 keeps the row-based plan. The slope gives k ~0.52 (mean = 0.35 - 0.21*k*r), consistent with B-0003. Grand Prix and career still need checking (harness gaps 2-3), and other characteristics may differ (B-0004 tests mistakes).",
       "related_questions": ["Q-17", "Q-02"],
       "status": "supported (benchmark only); replication pending (B-0008)"
+    },
+    {
+      "id": "F-37",
+      "claim": "B-0004: in benchmark, the driver row's driver_characteristics.mistakes moves the AI race_start_performance and the awareness rating does not: ROW_high (Alpine 0.95) - ROW_low (Aston Martin 0.05) = +7.79 (bootstrap SE 3.39, z +2.30) vs STATS_high - STATS_low (awareness flat 0.95 vs 0.05) = +5.23 (SE 6.96, z +0.75), 5 fresh starts. Reaction time doesn't move for either source (z -0.50 / +1.21), as F-06 predicts. No CANNED_EVENTS lines were logged in benchmark starts.",
+      "confidence": "supported (pre-registered pass, marginal). Leave-one-start-out ROW gaps are all positive (+5.8 to +9.7), but z is 1.70 to 3.11, under 2 SE in two of five drops.",
+      "evidence": [
+        "runs/2026-10-30-B-0004/summary.md, bootstrap_race_start_performance.csv, arms_relative.csv (#35)"
+      ],
+      "implications": "Row precedence (F-36) replicates on a second characteristic and a second metric. Q-03 runtime half: if a higher race_start_performance is a better start, the high-mistakes row starting better confirms 'mistakes = skill' (F-29); the scale's sign is still open (#8).",
+      "related_questions": ["Q-17", "Q-03"],
+      "status": "supported (benchmark only)"
     }
   ]
 }
