@@ -1,0 +1,752 @@
+{
+    "schema":  1,
+    "suite":  "verve.b0010-rs-x-mistakes",
+    "defaults":  {
+                     "addons":  [
+                                    "verve.b0010"
+                                ],
+                     "timeout_s":  900
+                 },
+    "tests":  [
+                  {
+                      "id":  "start_1",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_2",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_3",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_4",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_5",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_6",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_7",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_8",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_9",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_10",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_11",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_12",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_13",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_14",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_15",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_16",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_17",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_18",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_19",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  },
+                  {
+                      "id":  "start_20",
+                      "tags":  [
+                                   "B-0010"
+                               ],
+                      "fresh":  true,
+                      "env":  {
+                                  "kind":  "benchmark",
+                                  "track":  "austria",
+                                  "laps":  3,
+                                  "cars":  20,
+                                  "weather":  "clear"
+                              },
+                      "steps":  [
+                                    {
+                                        "wait":  {
+                                                     "log":  "RaceStarts: Reaction Time for driver with vehicle id"
+                                                 },
+                                        "timeout_s":  240
+                                    },
+                                    {
+                                        "wait":  {
+                                                     "log":  "session trace StateSession Exiting \\(benchmark\\)"
+                                                 },
+                                        "timeout_s":  720
+                                    }
+                                ],
+                      "assert":  [
+                                     {
+                                         "log":  "RaceStarts: Reaction Time for driver with vehicle id",
+                                         "min":  20
+                                     },
+                                     {
+                                         "no_crash":  true
+                                     }
+                                 ]
+                  }
+              ]
+}
