@@ -1,0 +1,35 @@
+ok {"phase":"splash"}
+  [fired] {"event":"fired","id":"game.boot"}
+ok
+ok
+ok
+ok
+ok
+ok
+ok {"home":true,"notice_presses":1}
+ok {"tile":"career","route":"career"}
+ok {"phase":"fe_career"}
+ok {"tile":"driver_career","route":"career_dlc_select_driver"}
+  [fired] {"event":"fired","id":"career.starting"}
+ok {"phase":"fe_career_dlc_select"}
+ok {"tile":"career_default_content","route":"career_default_content"}
+timed out: at career_wizard_experience_select: not within 60 s
+ok
+ok
+  [fired] {"event":"fired","id":"career.starting"}
+timed out: at career_wizard_season_length_select: not within 60 s
+  [fired] {"event":"fired","id":"career.loaded"}
+  [fired] {"event":"fired","id":"career.created"}
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok
+ok

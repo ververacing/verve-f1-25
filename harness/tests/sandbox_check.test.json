@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "suite": "verve.sandbox-check",
+  "defaults": { "addons": [], "timeout_s": 900 },
+  "tests": [
+    {
+      "id": "career_fixture_team_hq",
+      "tags": ["sandbox"],
+      "env": { "kind": "career", "fixture": "stroll-career-20261031", "at": "team_hq" },
+      "steps": [
+        { "wait": { "log": "\\[test\\] screen driver_hq_panel" }, "timeout_s": 600 }
+      ],
+      "assert": [{ "no_crash": true }]
+    }
+  ]
+}

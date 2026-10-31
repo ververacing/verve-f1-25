@@ -1,0 +1,13 @@
+status
+status
+status
+status
+pad down
+@sleep 2
+pad down
+@sleep 2
+status
+pad a 3000
+status
+status
+status

@@ -1,0 +1,5 @@
+swofty test: 1 test in 1 game start
+  career stroll-career-20261031 at team_hq .. career_fixture_team_hq       pass   (5 s)
+      save sandbox C:\Users\Tyler\AppData\Local\Swofty\test-runs\20261031-222715-1\saves with fixture stroll-career-20261031
+      could not delete the batch profile test-20261031-222715-1: C:\Users\Tyler\AppData\Local\Swofty\cache/overlay\test-20261031-222715-1: The process cannot access the file because it is being used by another process. (os error 32)
+1 passed  ·  report: C:\Users\Tyler\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-30\raw/report.json, junit.xml

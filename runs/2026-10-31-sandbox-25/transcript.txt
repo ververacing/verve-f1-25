@@ -1,0 +1,60 @@
+﻿saves before: 22 entries
+attempt 1 started 13:49:40
+sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-204940-1 ({"schema":1,"run":"shell-20261031-204940-1","state":"armed","pid":20712,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-204940-1\\saves\\remote","why":""})
+13:51:18 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":80703}
+intro played (splash after 81 s)
+13:51:38 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}
+13:51:38 > pad ls  =>  {"seq":3,"status":"ok","ms":250}
+13:51:42 > pad ls 2000  =>  {"seq":4,"status":"ok","ms":4000}
+13:51:43 > pad ls  =>  {"seq":5,"status":"ok","ms":250}
+13:51:48 > home  =>  {"seq":6,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4828}
+13:51:48 > tile career  =>  {"seq":7,"status":"ok","value":{"tile":"career","route":"career"},"ms":0}
+13:51:49 > wait screen=fe_career 60  =>  {"seq":8,"status":"ok","value":{"phase":"fe_career"},"ms":672}
+13:51:49 > tile driver_career  =>  {"seq":9,"status":"ok","value":{"tile":"driver_career","route":"career_dlc_select_driver"},"ms":0}
+13:51:50 > wait screen=fe_career_dlc_select 60  =>  {"seq":10,"status":"ok","value":{"phase":"fe_career_dlc_select"},"ms":234}
+13:51:50 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":35987,"phase":"|fe_career_dlc_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:51:50 > pad a  =>  {"seq":12,"status":"ok","ms":250}
+13:51:55 > wait screen=slice_gen_screen_title 150  =>  {"seq":13,"status":"ok","value":{"phase":"slice_gen_screen_title"},"ms":0}
+13:51:55 > status  =>  {"seq":14,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":37716,"phase":"|slice_gen_screen_title|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:51:55 > pad a  =>  {"seq":15,"status":"ok","ms":250}
+13:52:00 > status  =>  {"seq":16,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":39655,"phase":"|career_wizard_season_length_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:00 > pad a  =>  {"seq":17,"status":"ok","ms":250}
+13:52:04 > status  =>  {"seq":18,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":41608,"phase":"|career_wizard_settings_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:05 > pad a  =>  {"seq":19,"status":"ok","ms":266}
+13:52:09 > status  =>  {"seq":20,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":43547,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+while: screen '|career_wizard_team_icons_select|#5f9ae18b|' left ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) after 3 press(es)
+13:52:09 > status  =>  {"seq":21,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":43687,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:10 > pad a  =>  {"seq":22,"status":"ok","ms":250}
+13:52:16 > status  =>  {"seq":23,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":46438,"phase":"|career_wizard_classic_drivers|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:16 > pad a  =>  {"seq":24,"status":"ok","ms":250}
+13:52:23 > status  =>  {"seq":25,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":49210,"phase":"|career_wizard_confirm|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:23 > pad a  =>  {"seq":26,"status":"ok","ms":250}
+13:52:31 > status  =>  {"seq":27,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":52759,"phase":"|driver_career_driver_type_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:31 > pad a  =>  {"seq":28,"status":"ok","ms":250}
+13:52:40 > status  =>  {"seq":29,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":56371,"phase":"|driver_career_driver_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:52:40 > pad right  =>  {"seq":30,"status":"ok","ms":250}
+13:52:42 > pad right  =>  {"seq":31,"status":"ok","ms":265}
+13:52:45 > pad right  =>  {"seq":32,"status":"ok","ms":250}
+13:52:47 > pad right  =>  {"seq":33,"status":"ok","ms":266}
+13:52:49 > pad right  =>  {"seq":34,"status":"ok","ms":250}
+13:52:52 > pad right  =>  {"seq":35,"status":"ok","ms":250}
+13:52:54 > pad right  =>  {"seq":36,"status":"ok","ms":265}
+13:52:57 > pad right  =>  {"seq":37,"status":"ok","ms":281}
+13:53:01 > status  =>  {"seq":38,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":65149,"phase":"|driver_career_driver_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:53:01 > pad a  =>  {"seq":39,"status":"ok","ms":250}
+13:53:10 > status  =>  {"seq":40,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":68747,"phase":"|driver_career_team_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:53:10 > pad a  =>  {"seq":41,"status":"ok","ms":250}
+13:53:18 > status  =>  {"seq":42,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":72359,"phase":"|driver_career_confirm_selections|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:53:19 > pad a  =>  {"seq":43,"status":"ok","ms":281}
+13:53:29 > status  =>  {"seq":44,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":75219,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:53:39 > status  =>  {"seq":45,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":82647,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:53:50 > status  =>  {"seq":46,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":90087,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:00 > status  =>  {"seq":47,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":97503,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:10 > status  =>  {"seq":48,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":104943,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:21 > status  =>  {"seq":49,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":112371,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:31 > status  =>  {"seq":50,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":119787,"phase":"|dummy_driver_hq_panel|#0d664b31|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:41 > status  =>  {"seq":51,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":127203,"phase":"|team_hq_driver_career_contracts_negotiation|#d648bc88|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:54:52 > status  =>  {"seq":52,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":134643,"phase":"|team_hq_driver_career_contracts_negotiation|#d648bc88|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:55:02 > status  =>  {"seq":53,"status":"ok","value":{"v":1,"pid":20712,"run":"shell-20261031-204940-1","ticks":142083,"phase":"|team_hq_driver_career_contracts_negotiation|#d648bc88|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+13:55:02 > quit  =>  {"seq":54,"status":"ok","value":{"windows":1},"ms":0}
+13:55:03 > quit  =>  {"seq":55,"status":"ok","value":{"windows":1},"ms":0}

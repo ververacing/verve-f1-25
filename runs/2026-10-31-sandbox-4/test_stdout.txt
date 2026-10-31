@@ -1,0 +1,7 @@
+ok {"phase":"splash"}
+  [fired] {"event":"fired","id":"game.boot"}
+ok {"title":"engaged","pad_presses":3}
+ok {"home":true,"notice_presses":2}
+ok {"tile":"career","route":"career"}
+ok
+ok

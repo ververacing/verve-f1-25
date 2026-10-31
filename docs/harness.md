@@ -246,6 +246,67 @@ Restore is only safe inside the emergency procedure below.
 4. One plain boot from Steam (no Swofty, no test, no pad input), with Tyler watching. If a corrupt-save dialog
    appears, close the game without answering it.
 
+## Save sandbox (career fixtures), since 2026-10-31
+
+Route tests stay off Tyler's real saves (ruling above). Real race sessions go through Swofty's save sandbox instead:
+a career fixture made from a **copy** of a backup (`swofty test fixture capture <name> --from <copy>`, never the live
+folder). The fixture store is `%LOCALAPPDATA%\Swofty\test-fixtures`, outside the repo; fixtures hold Tyler's data
+and are never committed or uploaded. `tools/sandbox_run.ps1` runs a `test run` suite or a `test shell --fixture`
+session from a command file, under the supervisor's conditions:
+- It hashes every file in `remote\` and Steam's per-file `remotecache.vdf` entries (size, sha, localtime) before
+  and after. Any change: exit 5, stop and tell Tyler. It never restores.
+- It kills the test and the game unless the sandbox is confirmed within 120 s: `test run` logs "the save sandbox is
+  required; saves go to ...test-runs\...\saves", and `test shell` prints "starting F1 25 in test mode (..., save
+  sandbox)" on stderr.
+
+Evidence that the sandbox catches writes: in shell 8 the game rewrote the sandbox's
+`test-runs\shell-...\saves\remote\savegame@profile#NXDSMWW.BWW` (519704 -> 519800 bytes), while Tyler's real
+`remote\` and Steam's records stayed identical. Every sandbox run so far: 22/22 entries unchanged.
+
+**Shell-mode rules**
+- **No blind `a` presses, in any test.** In shell 8, an `a` meant for the title landed on `fe_home`'s first tile
+  (`story`) and started Braking Point cutscenes, where "Skip cinematic?" defaults to No. Drive menus with
+  `tile <id>` and `wait screen=<id> [s]` only.
+- **The game alternates its intro video between launches.** Every other launch, `video_1` plays about 65 s before
+  `legal`. On the others it's skipped in under 1 s, and then the title ignores the virtual pad completely: `title`
+  never sets the boot sync point, and 29 presses do nothing. 7 of 7 shell sessions fit this pattern. A skipped intro
+  means quitting and relaunching.
+- `title` and `home` time out at 60 s, and the title appears about 50-65 s after launch, so start with
+  `wait screen=splash 180`.
+- A `pad <button> N` hold takes about 2N ms of wall time.
+
+**`tools/sandbox_shell.ps1`** drives a `test shell --fixture` session one step at a time from a plan file
+(`tile`, `wait screen=`, guarded `@while <screen> <n> pad a`, `@expect`, `@sleep`), under the same snapshot and
+sandbox checks, and relaunches on a skipped intro. `@control <idle s>` hands the session over to live steps
+appended to `<Out>/control.txt`, so a new screen can be mapped from frames (`tools/window_frames.ps1`) before it
+goes into a plan. `save now` is `{"cmd":"save","args":{"op":"now"}}` and answers `{"writes":2}`.
+
+Career wizard path (Driver Career) by screen id: `fe_home` (tile `career`), `fe_career` (tile `driver_career`),
+`fe_career_dlc_select` (2025 = default; the tile id doesn't advance it, a guarded `a` does), then
+`slice_gen_screen_title` over `career_wizard_*` (status shows only the top screen) through to
+`driver_career_confirm_selections`, an agent cutscene (`dummy_driver_hq_panel`, ~60 s), the contract terms
+(`team_hq_driver_career_contracts_negotiation`), and Team HQ (`driver_hq_panel`). The full plan, with every
+choice, is `harness/fixtures/career_stroll_create.plan`.
+
+**Career fixture `stroll-career-20261031` (captured 2026-10-31 from run sandbox-28).** The official Jack Doohan
+isn't in the 2025 driver list, so the player is the official Lance Stroll (#18, Aston Martin). Nobody is replaced,
+and the default contract is signed unchanged. That car is excluded from every arm and field statistic. Details and
+rebuild steps: `harness/fixtures/README.md`.
+
+Fixture runs to Team HQ, Tyler's 11 files and 11 Steam records checked before and after each:
+
+| Run | How | Reached Team HQ | Saves |
+|---|---|---|---|
+| sandbox-28 | shell: create the career, sign, `save now` (writes the sandbox) | yes | unchanged |
+| sandbox-30 | `test run` `sandbox_check.test.json` | yes (log: "career ready at team_hq") | unchanged |
+| sandbox-31, -32 | `test run` | no: "no content tile continues a saved career" | unchanged |
+| sandbox-33 | shell: `career_stroll_continue.plan` | yes (frame: resume card, then HQ) | unchanged |
+
+The `test run` failures look like a race in swofty's career loader. It read `fe_career_dlc_select`'s tiles about
+60 ms after the screen appeared (in the pass, after about 500 ms), before the 2025 tile's route switched to
+"continue". Until that's fixed, `career_stroll_continue.plan` (shell, with a 3 s wait and guarded presses) is the
+reliable route to Team HQ.
+
 ## Time Trial by route (works since 2026-10-31)
 
 `harness/tests/udp_tt.test.json` reaches an AI-driven Time Trial session at Melbourne. The pad sequence, with a frame

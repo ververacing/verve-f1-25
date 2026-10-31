@@ -9,3 +9,7 @@ runs/**/raw/
 Thumbs.db
 # Verve source fetched by tools/fetch_verve.ps1 (full roster; stays off the repo)
 .cache/
+
+# swofty test shell results (launcher logs) and save fixtures: never committed (fixtures hold Tyler's save data)
+swofty-test/
+test-fixtures/

@@ -1,0 +1,86 @@
+# Create the test Driver Career inside the save sandbox (tools/sandbox_shell.ps1 plan). Run from a fixture with no
+# career (tyler-profile-20261031). Supervisor's choices (#57 follow-up, 2026-10-31): Driver Career, 2025 season,
+# official driver LANCE STROLL (Aston Martin) as the player (Doohan isn't in the 2025 list), defaults elsewhere.
+# The player car is excluded from every arm and field statistic. Every `a` is checked against the screen id first.
+
+# boot: the game alternates its intro video; the controller relaunches when it was skipped
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+
+# main menu -> Career -> Driver Career
+tile career
+wait screen=fe_career 60
+tile driver_career
+wait screen=fe_career_dlc_select 60
+# 2025 Career (default highlight); the tile id is accepted but doesn't advance this screen, `a` does
+@while \|fe_career_dlc_select\| 1 pad a
+
+# wizard (status shows only the top screen; slice_gen_screen_title sits over career_wizard_*)
+wait screen=slice_gen_screen_title 150
+# Skip to F1 -> Full Season -> Recommended settings (short sessions, unlimited rewinds, manual starts, reduced damage)
+@while ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) 10 pad a
+# Add 11th team: Official Teams Only (default)
+@expect career_wizard_team_icons_select
+pad a
+@sleep 6
+# Add driver icons to market: Official Drivers Only (default)
+@expect career_wizard_classic_drivers
+pad a
+@sleep 6
+# Confirm Settings
+@expect career_wizard_confirm
+pad a
+@sleep 8
+
+# driver: Official Driver (default), then LANCE STROLL = 9th in the list, 8 x right from Piastri
+@expect driver_career_driver_type_select
+pad a
+@sleep 8
+@expect driver_career_driver_select
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 2
+pad right
+@sleep 4
+@expect driver_career_driver_select
+pad a
+@sleep 8
+
+# team: Aston Martin highlighted (Stroll's team) -> Continue
+@expect driver_career_team_select
+pad a
+@sleep 8
+# confirm selections (Stroll + Alonso at Aston Martin): creates the career in the sandbox
+@expect driver_career_confirm_selections
+pad a
+
+# Team HQ: agent cutscene (dummy_driver_hq_panel, ~60 s), then Aston Martin contract terms. Neutral choice
+# (supervisor, 2026-10-31): sign the default offer, target rating 78 (Stroll's current RTG), contract length
+# Season 1, no team change. Focus starts on the rating slider; SIGN CONTRACT is two down and needs `a` held.
+wait screen=team_hq_driver_career_contracts_negotiation 180
+@sleep 5
+@expect team_hq_driver_career_contracts_negotiation
+pad down
+@sleep 2
+pad down
+@sleep 2
+pad a 3000
+@sleep 6
+# "CONTRACT SIGNED!" keeps the same screen id; `a` = Continue
+@while team_hq_driver_career_contracts_negotiation 1 pad a
+@sleep 10

@@ -1,0 +1,32 @@
+# map the Driver Career wizard up to (not into) driver / team / name screens; nothing is saved
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+tile career
+wait screen=fe_career 60
+tile driver_career
+wait screen=fe_career_dlc_select 60
+# the 2025 tile id is accepted but doesn't advance; one guarded A on the highlighted (default) 2025 Career does
+@while \|fe_career_dlc_select\| 1 pad a
+# status reports only the top screen; in the wizard that is slice_gen_screen_title over career_wizard_*
+wait screen=slice_gen_screen_title 150
+@sleep 3
+@while ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) 40 pad a
+status
+@sleep 6
+status
+quit
+
+
+# career_wizard_team_icons_select = "Add 11th team"; default highlight is Official Teams Only (no Konnersport)
+@expect career_wizard_team_icons_select
+pad a
+@sleep 3
+@while ^(?!.*(team(?!_icons)|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) 20 pad a
+status
+@sleep 6
+status
+quit

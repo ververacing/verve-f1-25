@@ -1,0 +1,39 @@
+﻿saves before: 22 entries
+attempt 1 started 12:31:53
+sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-193153-1 ({"schema":1,"run":"shell-20261031-193153-1","state":"armed","pid":29972,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-193153-1\\saves\\remote","why":""})
+12:33:32 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81469}
+intro played (splash after 81 s)
+12:33:52 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}
+12:33:52 > pad ls  =>  {"seq":3,"status":"ok","ms":250}
+12:33:56 > pad ls 2000  =>  {"seq":4,"status":"ok","ms":4000}
+12:33:57 > pad ls  =>  {"seq":5,"status":"ok","ms":265}
+12:34:02 > home  =>  {"seq":6,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4813}
+12:34:02 > tile career  =>  {"seq":7,"status":"ok","value":{"tile":"career","route":"career"},"ms":0}
+12:34:03 > wait screen=fe_career 60  =>  {"seq":8,"status":"ok","value":{"phase":"fe_career"},"ms":641}
+12:34:03 > tile driver_career  =>  {"seq":9,"status":"ok","value":{"tile":"driver_career","route":"career_dlc_select_driver"},"ms":0}
+12:34:04 > wait screen=fe_career_dlc_select 60  =>  {"seq":10,"status":"ok","value":{"phase":"fe_career_dlc_select"},"ms":203}
+12:34:04 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":35993,"phase":"|fe_career_dlc_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:04 > pad a  =>  {"seq":12,"status":"ok","ms":250}
+12:34:09 > wait screen=slice_gen_screen_title 150  =>  {"seq":13,"status":"ok","value":{"phase":"slice_gen_screen_title"},"ms":0}
+12:34:12 > status  =>  {"seq":14,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":38982,"phase":"|slice_gen_screen_title|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:12 > pad a  =>  {"seq":15,"status":"ok","ms":250}
+12:34:17 > status  =>  {"seq":16,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":40907,"phase":"|career_wizard_season_length_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:17 > pad a  =>  {"seq":17,"status":"ok","ms":250}
+12:34:21 > status  =>  {"seq":18,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":42853,"phase":"|career_wizard_settings_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:22 > pad a  =>  {"seq":19,"status":"ok","ms":266}
+12:34:26 > status  =>  {"seq":20,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":44799,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+while: screen '|career_wizard_team_icons_select|#5f9ae18b|' left ^(?!.*(team|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) after 3 press(es)
+12:34:26 > status  =>  {"seq":21,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":44939,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:33 > status  =>  {"seq":22,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":47578,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:33 > quit  =>  {"seq":23,"status":"ok","value":{"windows":1},"ms":0}
+12:34:33 > status  =>  {"seq":24,"status":"ok","value":{"v":1,"pid":29972,"run":"shell-20261031-193153-1","ticks":47837,"phase":"|career_wizard_team_icons_select|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+12:34:34 > pad a  =>  {"seq":25,"status":"ok","ms":250}
+> status  =>  NO RESULT
+while: screen '' left ^(?!.*(team(?!_icons)|driver|name|appearance|nationality|number|helmet|livery)).*(career_wizard_|slice_gen_screen_title) after 0 press(es)
+> status  =>  NO RESULT
+> status  =>  NO RESULT
+> quit  =>  NO RESULT
+> quit  =>  NO RESULT
+run folder: shell-20261031-193153-1
+result: plan done
+saves unchanged (22 entries)

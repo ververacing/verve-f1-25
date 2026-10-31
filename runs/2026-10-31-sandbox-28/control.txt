@@ -1,0 +1,6 @@
+status
+save now
+# pad line
+save now
+# pad line
+@end

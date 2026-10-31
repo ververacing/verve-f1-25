@@ -1,0 +1,10 @@
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+status
+tile career
+wait screen=fe_career 60
+status

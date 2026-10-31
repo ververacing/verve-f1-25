@@ -1,0 +1,1 @@
+[test] save sandbox: verified for this F1_25.exe by bindings.json (Ne_SaveSystem2Win_Start experimental, Ne_SaveSystem2Win_Mount experimental, Ne_SaveSystem2Win_WriteInfoXml experimental)
