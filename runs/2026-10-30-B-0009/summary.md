@@ -71,7 +71,14 @@ smaller (the 0.65 pair has the lowest reaction_speed rows). It isn't carried by 
 field, b and the reaction residual are uncorrelated (r 0.05, 300 samples). The stock field points the same way:
 reaction residual on stock row mistakes −0.047 (naive SE 0.023).
 
-So F-39's reaction form (reaction_speed only) is incomplete. A row `mistakes` of 1 takes about 0.03 s off the
+**Leave one level out (supervisor check on #50).** The raw slope is fragile: −0.014 / −0.023 / −0.024 / **−0.004**
+dropping 0.02 / 0.35 / 0.65 / 0.98 (`slope_lolo_reaction_time.csv`). Without the 0.98 pair, the 0.65 pair becomes the
+top level, and it has the slowest stock reaction_speed rows (lawson 0.60, hulkenberg 0.80), which flattens the raw
+slope. The rs-adjusted slope holds: −0.024 / −0.031 / −0.031 / −0.028, z −1.9 / −4.3 / −4.5 / −2.3
+(`analysis/b0009_rt_lolo.py`). The adjustment is a post-hoc model over 8 drivers, so this stays a candidate; B-0010
+(crossed reaction_speed × mistakes, pre-registered) settles it.
+
+If it holds, F-39's reaction form (reaction_speed only) is incomplete. A row `mistakes` of 1 takes about 0.03 s off the
 reaction, a quarter of what reaction_speed does (−0.118 s per unit, B-0008). B-0004 and B-0007 didn't detect it
 (z −0.5, and B-0007 pinned b, not mistakes); this is the first batch with the power to. New finding F-40,
 **candidate**: one batch, benchmark only, and the form (an extra term in the reaction bounds, or a combined skill)
