@@ -1,0 +1,77 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.99"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=esteban_ocon]",
+                    "field":  "driver_characteristics.reaction_speed",
+                    "value":  "0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.99,0:0.99,1:0.99,1:0.99"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.99,0:0.99,1:0.99,1:0.99"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.35,0:0.35,1:0.35,1:0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.35,0:0.35,1:0.35,1:0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.65,1:0.65,1:0.65"
+                },
+                {
+                    "op":  "set",
+                    "select":  "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=racecraft]",
+                    "field":  "evolution",
+                    "value":  "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.65,0:0.65,1:0.65,1:0.65"
+                }
+            ],
+    "schema_version":  1
+}

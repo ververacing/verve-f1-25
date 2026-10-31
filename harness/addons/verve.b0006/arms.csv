@@ -1,0 +1,9 @@
+key,arm,source,level,driver,stock_row,stock_curve
+18,ROW_0.35,ROW,0.35,george_russell,0.9,0.92
+0,ROW_0.99,ROW,0.99,yuki_tsunoda,0.79,0.78
+12,ROW_0.05,ROW,0.05,lando_norris,0.81,0.89
+10,ROW_0.65,ROW,0.65,esteban_ocon,1,0.86
+3,STATS_0.99,STATS,0.99,lance_stroll,0.6,0.81
+13,STATS_0.35,STATS,0.35,nico_hulkenberg,0.8,0.86
+9,STATS_0.05,STATS,0.05,fernando_alonso,1,0.9
+16,STATS_0.65,STATS,0.65,pierre_gasly,0.89,0.88

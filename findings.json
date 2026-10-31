@@ -457,6 +457,43 @@
       "related_questions": [],
       "status": "corrected",
       "correction": "2026-10-30 (#2 build): the holder labels above are their _metadata_ values, but DriverStatisticsHolder[driver=...] matches the holder's `driver` field, which equals the row label for all five (alexander_albon -> driver alex_albon, micheal_schumacher -> michael_schumacher, aryton_senna -> ayrton_senna, nilola_tsolov -> nikola_tsolov, john_benneet -> john_bennett). So no separate stats label is needed; only Antonelli's row label was wrong in the sample CSV. docs/stock/statistics_datasets.csv's 'driver' column is really _metadata_."
+    },
+    {
+      "id": "F-33",
+      "claim": "ai_driver_config.race_start reaction bounds are read per driver from the driver row: with all four bounds set to 0.65 on one driver per team, exactly that driver's car reacted at 0.650000 in both benchmark starts (9 of 10 teams), and the untagged teammate stayed stock.",
+      "confidence": "proven (runtime, benchmark)",
+      "evidence": [
+        "runs/2026-10-30-B-0005/summary.md, racestarts_1.log, racestarts_2.log (#37)",
+        "harness/addons/verve.b0005 (40 ops, tags.csv)"
+      ],
+      "implications": "Per driver in benchmark, for the 9 AI-controlled cars that took the tag (vehicle 19 ignores it, F-34). The per-driver ai_driver_config route works for race_start: v0.2a (#10) is partly unblocked (the race_start reaction bounds work). Part of Q-08 is answered: these keys are per driver. Equal bounds pin the reaction exactly, which makes them a precise instrument. It also gives a vehicle id -> driver map for benchmark Austria (docs/stock/vehicle_map_benchmark_austria.csv).",
+      "related_questions": ["Q-08"],
+      "status": "verified (benchmark only, 9 AI cars)"
+    },
+    {
+      "id": "F-34",
+      "claim": "Benchmark vehicle 19 is Charles Leclerc's Ferrari and ignores ai_driver_config.race_start: tagged with 0.65 bounds it still started at 0.054 / 0.050 s, and it was the fastest starter in 5 of 7 stock starts. Most likely the player car (AI-driven in benchmark) on a different start path. Vehicle 8 is Lewis Hamilton.",
+      "confidence": "inferred (elimination from B-0005; the player-car part is a hypothesis)",
+      "evidence": [
+        "runs/2026-10-30-B-0005/summary.md (#37)",
+        "runs/2026-10-30-B-0003/summary.md (#33)",
+        "B-0005 start 2: vehicle 19 reacted at exactly 0.050000, a round number, as if clamped or a fixed launch (supervisor review on #40)"
+      ],
+      "implications": "Exclude vehicle 19 (and normally both Ferraris) from every arm and field statistic in benchmark batches. Optional later check (low priority): change the benchmark's player/driver key, if one exists, and see whether the 0.05 behaviour moves to another car.",
+      "related_questions": [],
+      "status": "open"
+    },
+    {
+      "id": "F-35",
+      "claim": "B-0001: the driver-row reaction_speed effect is in the predicted direction but about half its predicted size (Alpine row 0.05 -> +0.042 s vs +0.075 predicted at k = 0.5), and the racecraft rating showed no effect (Racing Bulls 0.99 vs Sauber 0.05: -0.039 s, wrong way for 'ratings win'). Two open explanations for the half-size effect: (a) k is below 0.5 in these sessions; (b) the start uses something besides the row value.",
+      "confidence": "open (runtime, benchmark; inconclusive by the pre-set rule)",
+      "evidence": [
+        "runs/2026-10-30-B-0001/summary.md (#30, #38)",
+        "supervisor review on #38 (bootstrap: ROW gap z ~2.3, STATS gap z ~-1.1)"
+      ],
+      "implications": "Q-17 leans 'row wins' in benchmark; B-0006 (#39, dose-response) is the follow-up.",
+      "related_questions": ["Q-17"],
+      "status": "open"
     }
   ]
 }
