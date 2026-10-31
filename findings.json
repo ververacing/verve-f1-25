@@ -493,7 +493,19 @@
       ],
       "implications": "Q-17 leans 'row wins' in benchmark; B-0006 (#39, dose-response) is the follow-up.",
       "related_questions": ["Q-17"],
-      "status": "open"
+      "status": "likely explained by F-36 (team-averaging noise; B-0006's per-driver slope matches k ~0.5)"
+    },
+    {
+      "id": "F-36",
+      "claim": "In benchmark, the driver row's driver_characteristics.reaction_speed drives the AI race-start reaction and the racecraft rating does not: across four levels per source (per driver, 6 starts), the ROW slope is -0.109 s per unit (bootstrap SE 0.024, z -4.6) and the STATS slope is +0.068 (SE 0.029), positive, which is explained by the STATS drivers' untouched row values running against their levels (predicted +0.039 under row-wins).",
+      "confidence": "supported (pre-registered pass, z -4.6); replication pending (B-0008). Leave-one-driver-out ROW slopes -0.163 / -0.102 / -0.118 / -0.039 (dropping norris / russell / ocon / tsunoda): direction holds, strength rests mostly on tsunoda. No rating effect detected in B-0001 or B-0006 (confounded in B-0006), not proven absent.",
+      "evidence": [
+        "runs/2026-10-30-B-0006/summary.md, slopes.csv, levels.csv (#39)",
+        "runs/2026-10-30-B-0001/summary.md (#30): same direction, inconclusive by its own rule"
+      ],
+      "implications": "Q-17 answered for benchmark: row wins. Writing driver rows (v0.1's mechanism) works for reaction_speed, at least in benchmark; #6 keeps the row-based plan. The slope gives k ~0.52 (mean = 0.35 - 0.21*k*r), consistent with B-0003. Grand Prix and career still need checking (harness gaps 2-3), and other characteristics may differ (B-0004 tests mistakes).",
+      "related_questions": ["Q-17", "Q-02"],
+      "status": "supported (benchmark only); replication pending (B-0008)"
     }
   ]
 }

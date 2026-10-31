@@ -28,6 +28,8 @@ param(
     [string] $Out = ''
 )
 $ErrorActionPreference = 'Stop'
+# `powershell -File ... -Exclude 8,19` passes one string "8,19"; split it
+$Exclude = @($Exclude | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 function Median([double[]] $v) { $s = $v | Sort-Object; $n = $s.Count; if ($n -eq 0) { return [double]::NaN }; if ($n % 2) { $s[($n - 1) / 2] } else { ($s[$n / 2 - 1] + $s[$n / 2]) / 2 } }
 function Slope([double[]] $x, [double[]] $y) {
     $mx = ($x | Measure-Object -Average).Average; $my = ($y | Measure-Object -Average).Average

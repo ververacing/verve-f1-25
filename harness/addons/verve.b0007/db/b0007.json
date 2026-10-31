@@ -1,0 +1,197 @@
+{
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=liam_lawson]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.01"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=alex_albon]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.15"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lando_norris]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.6"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_lower_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "ai_driver_config.race_start.min_bad_start_upper_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_lower_bound",
+                    "value":  "0.35"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=lance_stroll]",
+                    "field":  "ai_driver_config.race_start.max_bad_start_upper_bound",
+                    "value":  "0.35"
+                }
+            ],
+    "schema_version":  1
+}
