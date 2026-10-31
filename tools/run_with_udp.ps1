@@ -11,6 +11,10 @@ Python here (the WindowsApps alias) can't open files under %APPDATA% or the rest
 %TEMP%. So the two scripts run from a copy in %TEMP%\verve-udp\, the recording is written there too, and the parsed
 CSVs are copied back into <Out>/udp/. The raw recording stays in %TEMP%\verve-udp\<run>\ (it can be large; nothing
 under runs/**/raw/ is committed).
+
+Route tests run on Tyler's own saves, so the whole run is wrapped in tools/saves_guard.ps1: backup before, check
+after (<Out>/saves_changes.csv), restore if anything changed. A failed restore exits 4: stop all route tests and
+tell Tyler.
 #>
 param(
     [Parameter(Mandatory)] [string] $Test,
@@ -32,10 +36,19 @@ if ($cap.HasExited) { "capture failed to start:"; Get-Content "$log.err"; exit 1
 "capture pid $($cap.Id) -> $bin"
 
 New-Item -ItemType Directory -Force $Out | Out-Null
+$guard = Join-Path $PSScriptRoot 'saves_guard.ps1'
+$saves = powershell -NoProfile -File $guard -Action Backup -Label (Split-Path $Out -Leaf)
+if ($LASTEXITCODE -ne 0 -or -not $saves) { Stop-Process -Id $cap.Id -Force; "save backup failed; not running"; exit 1 }
+"saves backed up -> $saves"
 $raw = Join-Path (Resolve-Path $Out).Path 'raw'
 & $Swofty test run $Test --out $raw --wait 0
 $code = $LASTEXITCODE
 "test exit: $code"
+powershell -NoProfile -File $guard -Action Check -Backup $saves -Log $Out
+if ($LASTEXITCODE -ne 0) {
+    powershell -NoProfile -File $guard -Action Restore -Backup $saves -Log $Out
+    if ($LASTEXITCODE -ne 0) { "SAVE RESTORE FAILED: stop route tests and tell Tyler (backup: $saves)"; $code = 4 }
+}
 
 New-Item -ItemType File -Force $stop | Out-Null
 if (-not $cap.WaitForExit(15000)) { Stop-Process -Id $cap.Id -Force }

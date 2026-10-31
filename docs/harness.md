@@ -157,7 +157,28 @@ sides' team ids agree (exit 1 on any mismatch).
   25251167 and that doctor shows no drift. It also runs the cleanup above, and lists any `hardware_settings_config.xml`
   lines that differ from the pre-UDP backup besides `<udp>`.
 
-## Saves (benchmark leaves them alone)
+## Saves
+
+### Route tests: guarded (Tyler's OK, 2026-10-31)
+
+Time Trial and Grand Prix tests by route + pad run on Tyler's own saves (`loader.log`: "no save sandbox ... the game
+uses the player's own saves"). Tyler approved them on 2026-10-31 on these terms: back up before each one, compare
+after, restore the originals if anything changed. `tools/run_with_udp.ps1` does this with `tools/saves_guard.ps1`:
+
+- Before: copy of `remote\` to `%LOCALAPPDATA%\verve-f1-25\save-backups\<time>-<run>\` (outside the Steam tree,
+  never overwritten), copy verified by hash.
+- After: `<run>/saves_changes.csv` lists each changed, added or removed file with size and SHA-256 before and after,
+  and whether it was restored. Changed or added files are moved to `<backup>\written_by_test\`, the originals copied
+  back with their modified time set to now, and the hashes checked again.
+- A restore that doesn't come out clean exits 4: stop all route tests and tell Tyler.
+- **Master backup:** `save-backups\20261031-070733-master\`, taken before any route test with Tyler's approval;
+  identical to the post-B-0010 hashes. Never deleted.
+- **Steam Cloud** syncs `remote\` when the game exits, so a test's write can reach the cloud before the restore. The
+  fresh modified time makes the restored files the newer local copy. If a later launch shows a cloud-conflict
+  dialog, stop and tell Tyler rather than clicking through it. Turning Steam Cloud off for F1 25 during test runs
+  would close this hole; that's Tyler's setting and his call.
+
+### Benchmark leaves them alone
 
 Tyler's F1 25 saves live in `C:\Program Files (x86)\Steam\userdata\928649988\3059520\remote` (10 files, Steam Cloud
 synced). Hashed with SHA-256 during B-0010 (2026-10-31 02:43) and again after its 20 starts (04:20): all 10 identical,
