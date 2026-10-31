@@ -1,0 +1,25 @@
+verve_key,real_name,f1_25_label,stats_label,grid,verified,note
+f1_001,Max Verstappen,max_verstappen,max_verstappen,2025|2026,roster_names.csv,
+f1_002,Lewis Hamilton,lewis_hamilton,lewis_hamilton,2025|2026,roster_names.csv,
+f1_003,Lando Norris,lando_norris,lando_norris,2025|2026,roster_names.csv,
+f1_004,Charles Leclerc,charles_leclerc,charles_leclerc,2025|2026,roster_names.csv,
+f1_005,Oscar Piastri,oscar_piastri,oscar_piastri,2025|2026,roster_names.csv,
+f1_006,George Russell,george_russell,george_russell,2025|2026,roster_names.csv,
+f1_007,Fernando Alonso,fernando_alonso,fernando_alonso,2025|2026,roster_names.csv,
+f1_008,Kimi Antonelli,andrea-kimi_antonelli,andrea-kimi_antonelli,2025|2026,roster_names.csv,
+f1_009,Carlos Sainz Jr.,carlos_sainz-jr,carlos_sainz-jr,2025|2026,roster_names.csv,
+f1_010,Isack Hadjar,isack_hadjar,isack_hadjar,2025|2026,roster_names.csv,
+f1_011,Alexander Albon,alex_albon,alex_albon,2025|2026,roster_names.csv,stats holder _metadata_ is alexander_albon but its driver field is alex_albon (F-32)
+f1_012,Pierre Gasly,pierre_gasly,pierre_gasly,2025|2026,roster_names.csv,
+f1_013,Esteban Ocon,esteban_ocon,esteban_ocon,2025|2026,roster_names.csv,
+f1_014,Nico Hulkenberg,nico_hulkenberg,nico_hulkenberg,2025|2026,roster_names.csv,
+f1_015,Lance Stroll,lance_stroll,lance_stroll,2025|2026,roster_names.csv,
+f1_016,Oliver Bearman,oliver_bearman,oliver_bearman,2025|2026,roster_names.csv,
+f1_017,Sergio Perez,sergio_perez,sergio_perez,2026,roster_names.csv,
+f1_018,Valtteri Bottas,valtteri_bottas,valtteri_bottas,2026,roster_names.csv,
+f1_019,Liam Lawson,liam_lawson,liam_lawson,2025|2026,roster_names.csv,
+f1_020,Gabriel Bortoleto,gabriel_bortoleto,gabriel_bortoleto,2025|2026,roster_names.csv,
+f1_021,Franco Colapinto,franco_colapinto,franco_colapinto,2025|2026,roster_names.csv,
+f1_022,Arvid Lindblad,arvid_lindblad,arvid_lindblad,2026,roster_names.csv,
+f1_062,Yuki Tsunoda,yuki_tsunoda,yuki_tsunoda,2025,roster_names.csv,in Verve's F1-classic block (not on the 2026 grid)
+-,Jack Doohan,jack_doohan,jack_doohan,2025,n/a,MISSING: no Verve profile; left stock

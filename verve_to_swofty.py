@@ -1,63 +1,89 @@
 #!/usr/bin/env python3
-"""Verve profiles (Pace, Aggression, Risk, Consistency; each 0..1) -> Swofty Launcher data addon for F1 25.
+"""Verve driver profiles -> Swofty Launcher data addon for F1 25 (v0.2: #5 crosswalk, #6 recalibration).
 
 Usage:
-    python3 verve_to_swofty.py profiles.csv --out verve-f1-addon
-    python3 verve_to_swofty.py profiles.csv --out verve-f1-addon --mistakes-is-skill --no-strategy
+    powershell -File tools/fetch_verve.ps1           # once: Verve's drivers.lua at the pinned commit -> .cache/
+    python3 verve_to_swofty.py --out verve-f1-addon --print-table
 
-Input CSV columns: label,display,pace,aggression,risk,consistency[,preferred_tracks][,stats_label]
-    label            the driver row's _metadata_ in entrants.drivers (max_verstappen, carlos_sainz-jr, ...)
-    preferred_tracks optional, track labels separated by | (monaco|singapore)
-    stats_label      optional, the DriverStatisticsHolder's `driver` value when it differs from the row label (none
-                     do in stock: holders with a misspelt _metadata_, e.g. alexander_albon, still say driver=alex_albon;
-                     see F-32). "-" = the driver has no holder (80 of 197 rows), so skip the rating write
+Inputs:
+    Verve lib/drivers.lua at VERVE_COMMIT (checked by git blob hash, VERVE_BLOB): pace, aggr, risk, cons per profile,
+        each 0..1 with 0.5 = field average. Only the rows the crosswalk names are read.
+    data/crosswalk_f1.csv: verve_key -> real name, F1 25 driver-row label, statistics-holder label, grid. A row whose
+        verve_key is "-" is a grid driver with no Verve profile; it is reported and left stock.
+    docs/stock/driver_characteristics_grid.csv: each driver's stock row driver_characteristics (the anchor).
+    docs/stock/pace_curves_grid.csv: each holder's stock pace evolution curve, per dataset.
 
-Output: <out>/swofty.json and <out>/db/verve.json (database "set" ops), ready to zip and drop on the launcher.
+Every characteristic is the driver's own stock row value moved by Verve: value = stock + K * (signal - center),
+clamped to 0..1, where signal is a blend of Verve scalars (MAPPING) and center is that signal's grid mean (CENTER). Rows win over ratings in benchmark (F-36), so
+the row is what the AI reads; anchoring on it keeps every driver's F1 25 baseline and lets Verve move it.
+`mistakes` is a skill, higher = fewer mistakes (F-37, verified in benchmark), so its signal rises with consistency
+and falls with risk. Strategy stays stock: Verve has no strategy axis, and risk is not a strategy input.
 
-All weights live in MAPPING below so a tuning pass is a one-line change.
+The pace rating moves the stock curve, keeping its shape (season progression, #21): Verve pace sets the order and
+the written drivers' stock season-0 ratings are handed out in that order, so the grid keeps its stock spread;
+drivers within PACE_TOL (0.03) of each other in Verve pace form a group whose slots go out in stock order (Verve's
+pace is mostly a floor for drivers without a winning record, so inside a group the game's order is the better
+information; --tie-mode mean shares the slots' mean instead); each dataset's curve is shifted by target - its own season-0 value. A linear map would
+squash the field: Verve puts two drivers at 0.96-1.00 and most at 0.62-0.71. Simulated sessions read the ratings, so they follow Verve pace too.
+
+Output: <out>/swofty.json, <out>/db/verve.json and <out>/table.csv (stock vs Verve per driver, with the F-39
+start-model predictions).
 """
 from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent
+
 # --------------------------------------------------------------------------------------
-# Mapping weights. Every input scalar is 0..1; every characteristic is 0..1.
+# Pinned Verve source (#5)
+# --------------------------------------------------------------------------------------
+
+VERVE_COMMIT = "80d1798385ac4d62c20677a68ef508a4740dfd68"
+VERVE_BLOB = "22d6d2cf342904296162b758950d83f601d4954f"   # git blob sha of lib/drivers.lua at VERVE_COMMIT
+
+# --------------------------------------------------------------------------------------
+# Mapping (#6). Signals are blends of Verve scalars, each 0..1; inv_risk = 1 - risk.
 # --------------------------------------------------------------------------------------
 
 MAPPING = {
-    # driver_characteristics.<name>: linear blend of Verve scalars, then clamped to [0, 1]
-    "aggression":     {"aggression": 0.70, "risk": 0.30},
-    "control":        {"consistency": 1.00},
-    "reaction_speed": {"aggression": 0.60, "pace": 0.40},
-    "speed_in":       {"pace": 0.80, "risk": 0.20},
+    # driver_characteristics.<name>: signal weights
+    "aggression":     {"aggression": 1.00},                     # no risk input
+    "control":        {"consistency": 0.70, "inv_risk": 0.30},
+    "mistakes":       {"inv_risk": 0.60, "consistency": 0.40},  # a skill (F-37); risk = mistake proneness
+    "reaction_speed": {"aggression": 0.60, "pace": 0.40},       # Verve has no reaction axis
+    "speed_in":       {"pace": 1.00},                           # no risk input
     "speed_out":      {"pace": 0.80, "consistency": 0.20},
-    # "mistakes" is handled separately: see mistakes_value()
 }
+# gain: stock + GAIN * (signal - center). Kept at 0.5 on purpose. The predicted start spread is small (F-39: sd
+# 0.014 s reaction, 0.007 b over the grid) because the game's start draws are wide uniforms, not because the gain is
+# low; don't raise it to make starts look different. It gets tuned on behavioural metrics (pace, overtaking) once
+# UDP works, and later by the strength slider (#22).
+GAIN = 0.50
+# Verve pace values closer than this share a pace-rating slot (see rank_map)
+PACE_TOL = 0.03
+# center: "grid" = each signal's mean over the drivers written, so a grid-average driver keeps their stock row. Verve's
+# 0.5 is the average of its whole F1 bucket (classic and IndyCar drivers included); the modern grid sits well above it
+# (consistency ~0.79), so centering at 0.5 lifts nearly everyone and clamps 26 of 138 values at 1. --center 0.5 keeps
+# that behaviour for comparison.
+CENTER = "grid"
 
-# mistakes as a SKILL (higher = fewer mistakes): 0.60 Consistency + 0.40 (1 - Risk)
-# mistakes as PRONENESS (higher = more mistakes, the script default): 1 - the skill value
-MISTAKES_SKILL = {"consistency": 0.60, "inv_risk": 0.40}
-
-# pace rating band written to the driver's statistics (0..100 scale)
-RATING_FLOOR = 70.0
-RATING_CEILING = 99.0
-
-# driver_strategy: (field, lo, hi, scalar, direction). value = lo + (hi - lo) * s, or hi - (hi - lo) * s when inverted
-STRATEGY = [
-    ("driver_strategy.fastest_strategy_base_selection_chance", 0.15, 0.85, "risk", False),
-    ("driver_strategy.safety_car_pit_wear_min",                0.10, 0.35, "risk", True),
-    ("driver_strategy.safety_car_pit_wear_max",                0.20, 0.50, "risk", True),
-]
+# F-39 start model (benchmark), pooled k: E[reaction] = 0.35 - 0.21 k rs, E[b] = 0.24 - 0.08 k m
+START_K = 0.52
 
 DRIVER_ROW = "entrants.drivers.driver[_metadata_={label}]"
 PACE_STAT = (
     "driver_statistics.driver_statistics.DriverStatisticsHolder[driver={label}]"
     ".StatisticsDataSet[_metadata_={dataset}].Statistic[_metadata_=pace]"
 )
+LUA_ROW = re.compile(r"\{\s*key='(?P<key>[^']+)'.*?\bpace=(?P<pace>[\d.]+),\s*aggr=(?P<aggression>[\d.]+),"
+                     r"\s*risk=(?P<risk>[\d.]+),\s*cons=(?P<consistency>[\d.]+)")
 
 
 # --------------------------------------------------------------------------------------
@@ -74,20 +100,45 @@ def fmt(x: float) -> str:
 
 
 def blend(weights: dict[str, float], s: dict[str, float]) -> float:
-    total = sum(weights.values())
-    return clamp(sum(w * s[k] for k, w in weights.items()) / total)
+    return clamp(sum(w * s[k] for k, w in weights.items()) / sum(weights.values()))
 
 
-def mistakes_value(s: dict[str, float], as_skill: bool) -> float:
-    skill = blend(MISTAKES_SKILL, s)
-    return skill if as_skill else clamp(1.0 - skill)
+def git_blob_sha(data: bytes) -> str:
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
 
 
-def pace_curve(pace: float, floor: float, ceiling: float) -> str:
-    """Flat evolution curve at the rating, the shape Classic Seasons writes (y normalised to 0..1 over 0..100)."""
-    rating = floor + clamp(pace) * (ceiling - floor)
-    y = f"{rating / 100.0:.3f}"
-    return f"@v2@minx:0,maxx:10,miny:0,maxy:100,0:{y},0:{y},1:{y},1:{y}"
+def read_csv(path: Path) -> list[dict]:
+    with path.open(newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(line for line in f if not line.startswith("#")))
+
+
+def read_verve(path: Path, keys: set[str]) -> dict[str, dict[str, float]]:
+    data = path.read_bytes()
+    sha = git_blob_sha(data)
+    if sha != VERVE_BLOB:
+        sys.exit(f"{path}: blob {sha} is not Verve lib/drivers.lua at {VERVE_COMMIT[:7]} (expected {VERVE_BLOB}); "
+                 "run tools/fetch_verve.ps1")
+    found = {}
+    for m in LUA_ROW.finditer(data.decode("utf-8")):
+        if m["key"] in keys:
+            found[m["key"]] = {k: float(m[k]) for k in ("pace", "aggression", "risk", "consistency")}
+    missing = sorted(keys - set(found))
+    if missing:
+        sys.exit(f"crosswalk keys not in drivers.lua: {missing}")
+    return found
+
+
+def curve_points(evolution: str) -> tuple[str, list[tuple[str, float]]]:
+    """'@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.96,...' -> ('@v2@minx:0,...,maxy:100', [('0', 0.96), ...])."""
+    head, *pts = evolution.split(",")
+    meta = [head] + [p for p in pts if p.split(":")[0] in ("maxx", "miny", "maxy")]
+    points = [(p.split(":")[0], float(p.split(":")[1])) for p in pts if p.split(":")[0] not in ("maxx", "miny", "maxy")]
+    return ",".join(meta), points
+
+
+def shift_curve(evolution: str, delta: float) -> str:
+    meta, points = curve_points(evolution)
+    return meta + "," + ",".join(f"{x}:{clamp(y + delta):.4f}".rstrip("0").rstrip(".") for x, y in points)
 
 
 def set_op(select: str, field: str, value: str) -> dict:
@@ -95,79 +146,82 @@ def set_op(select: str, field: str, value: str) -> dict:
 
 
 # --------------------------------------------------------------------------------------
-# main
+# build
 # --------------------------------------------------------------------------------------
 
-def read_profiles(path: Path) -> list[dict]:
-    rows = []
-    with path.open(newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        needed = {"label", "pace", "aggression", "risk", "consistency"}
-        missing = needed - set(reader.fieldnames or [])
-        if missing:
-            sys.exit(f"CSV is missing columns: {sorted(missing)}")
-        for n, r in enumerate(reader, start=2):
-            label = (r.get("label") or "").strip()
-            if not label or label.startswith("#"):
-                continue
-            try:
-                s = {k: float(r[k]) for k in ("pace", "aggression", "risk", "consistency")}
-            except ValueError as e:
-                sys.exit(f"line {n} ({label}): bad number: {e}")
-            for k, v in s.items():
-                if not 0.0 <= v <= 1.0:
-                    sys.exit(f"line {n} ({label}): {k}={v} is outside 0..1")
-            s["inv_risk"] = 1.0 - s["risk"]
-            rows.append({
-                "label": label,
-                "stats_label": (r.get("stats_label") or "").strip() or label,
-                "display": (r.get("display") or label).strip(),
-                "scalars": s,
-                "preferred_tracks": [t.strip() for t in (r.get("preferred_tracks") or "").split("|") if t.strip()],
-            })
-    if not rows:
-        sys.exit("no profiles in the CSV")
-    labels = [r["label"] for r in rows]
-    dupes = sorted({l for l in labels if labels.count(l) > 1})
-    if dupes:
-        sys.exit(f"duplicate labels: {dupes}")
-    return rows
+def rank_map(values: dict[str, float], targets: list[float], tol: float, stock: dict[str, float],
+             tie_mode: str) -> dict[str, float]:
+    """Give the i-th lowest value the i-th lowest target. Going up from the lowest value, each group takes every
+    value within `tol` of the group's first: Verve can't tell those drivers apart. Inside a group, tie_mode "stock"
+    hands the group's slots out in stock order (Verve orders the groups, the game orders within them); "mean" gives
+    the whole group the mean of its slots (#52 review)."""
+    order = sorted(values, key=values.get)
+    targets = sorted(targets)
+    out, i = {}, 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and values[order[j + 1]] - values[order[i]] <= tol + 1e-9:
+            j += 1
+        group, slots = order[i:j + 1], targets[i:j + 1]
+        if tie_mode == "mean":
+            for k in group:
+                out[k] = sum(slots) / len(slots)
+        else:
+            for k, slot in zip(sorted(group, key=lambda d: (stock[d], d)), slots):
+                out[k] = slot
+        i = j + 1
+    return out
 
 
-def build_ops(profiles: list[dict], *, mistakes_is_skill: bool, strategy: bool, ratings: bool,
-              datasets: list[str], floor: float, ceiling: float) -> tuple[list[dict], list[dict]]:
-    ops: list[dict] = []
-    table: list[dict] = []
-    for p in profiles:
-        s = p["scalars"]
-        row = DRIVER_ROW.format(label=p["label"])
-        chars = {name: blend(w, s) for name, w in MAPPING.items()}
-        chars["mistakes"] = mistakes_value(s, mistakes_is_skill)
+def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dict, ratings: bool, center,
+          gain: float, pace_tol: float, tie_mode: str):
+    drivers = [c for c in crosswalk if c["verve_key"] != "-"]
+    scalars = {}
+    for c in drivers:
+        s = dict(verve[c["verve_key"]])
+        s["inv_risk"] = 1.0 - s["risk"]
+        scalars[c["f1_25_label"]] = s
+    signals = {label: {n: blend(w, s) for n, w in MAPPING.items()} for label, s in scalars.items()}
+    centers = {n: (sum(sig[n] for sig in signals.values()) / len(signals) if center == "grid" else float(center))
+               for n in MAPPING}
+    # pace rating: Verve pace decides the order, the grid's stock season-0 ratings keep their spread
+    stock_x0 = {c["f1_25_label"]: curve_points(pace_curves[(c["stats_label"], "default")])[1][0][1] for c in drivers}
+    targets = rank_map({label: s["pace"] for label, s in scalars.items()}, list(stock_x0.values()), pace_tol,
+                       stock_x0, tie_mode)
 
-        for name in ("aggression", "control", "mistakes", "reaction_speed", "speed_in", "speed_out"):
-            ops.append(set_op(row, f"driver_characteristics.{name}", fmt(chars[name])))
+    ops, table = [], []
+    for c in drivers:
+        label, s = c["f1_25_label"], scalars[c["f1_25_label"]]
+        stock = {k: float(v) for k, v in stock_rows[label].items() if k != "label"}
+        row = DRIVER_ROW.format(label=label)
+        out = {}
+        for name in MAPPING:
+            out[name] = clamp(stock[name] + gain * (signals[label][name] - centers[name]))
+            ops.append(set_op(row, f"driver_characteristics.{name}", fmt(out[name])))
 
-        if p["preferred_tracks"]:
-            ops.append(set_op(row, "driver_characteristics.preferred_tracks", ",".join(p["preferred_tracks"])))
+        target = targets[label]
+        if ratings:
+            for ds in ("default", "2026"):
+                evo = pace_curves.get((c["stats_label"], ds))
+                if evo:
+                    delta = target - curve_points(evo)[1][0][1]
+                    ops.append(set_op(PACE_STAT.format(label=c["stats_label"], dataset=ds), "evolution",
+                                      shift_curve(evo, delta)))
 
-        strat = {}
-        if strategy:
-            for field, lo, hi, key, inverted in STRATEGY:
-                v = hi - (hi - lo) * s[key] if inverted else lo + (hi - lo) * s[key]
-                strat[field.split(".")[-1]] = v
-                ops.append(set_op(row, field, fmt(v)))
-
-        rating = None
-        if ratings and p["stats_label"] != "-":
-            rating = floor + s["pace"] * (ceiling - floor)
-            for ds in datasets:
-                ops.append(set_op(PACE_STAT.format(label=p["stats_label"], dataset=ds), "evolution",
-                                  pace_curve(s["pace"], floor, ceiling)))
-
-        table.append({"label": p["label"], "display": p["display"], **{k: round(v, 3) for k, v in chars.items()},
-                      "pace_rating": None if rating is None else round(rating, 1),
-                      **{k: round(v, 3) for k, v in strat.items()}})
-    return ops, table
+        rt = lambda rs: 0.35 - 0.21 * START_K * rs
+        bad = lambda m: 0.24 - 0.08 * START_K * m
+        table.append({
+            "label": label, "real_name": c["real_name"], "verve_key": c["verve_key"], "grid": c["grid"],
+            **{f"verve_{k}": s[k] for k in ("pace", "aggression", "risk", "consistency")},
+            **{f"{n}_stock": stock[n] for n in MAPPING}, **{f"{n}_verve": round(out[n], 4) for n in MAPPING},
+            "pace_rating_stock": round(100 * stock_x0[label], 1), "pace_rating_verve": round(100 * target, 1),
+            "pred_reaction_stock": round(rt(stock["reaction_speed"]), 4),
+            "pred_reaction_verve": round(rt(out["reaction_speed"]), 4),
+            "pred_bad_start_stock": round(bad(stock["mistakes"]), 4),
+            "pred_bad_start_verve": round(bad(out["mistakes"]), 4),
+        })
+    missing = [c for c in crosswalk if c["verve_key"] == "-"]
+    return ops, table, missing, centers
 
 
 def manifest(addon_id: str, name: str, author: str, version: str, n_drivers: int) -> dict:
@@ -177,8 +231,8 @@ def manifest(addon_id: str, name: str, author: str, version: str, n_drivers: int
         "name": name,
         "version": version,
         "author": author,
-        "description": f"Verve driver personalities for {n_drivers} drivers: aggression, control, mistakes, "
-                       "reaction, entry and exit speed, pace rating and pit strategy, from real-driver data.",
+        "description": f"Verve driver personalities for {n_drivers} F1 drivers: aggression, control, mistakes, "
+                       "reaction, entry and exit speed, and pace rating, moved from each driver's stock values.",
         "license": "MIT",
         "category": "ai",
         "kind": ["database"],
@@ -192,33 +246,39 @@ def manifest(addon_id: str, name: str, author: str, version: str, n_drivers: int
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("csv", type=Path)
-    ap.add_argument("--out", type=Path, default=Path("verve-f1-addon"))
+    ap.add_argument("--verve-lua", type=Path, default=ROOT / ".cache" / "verve" / VERVE_COMMIT / "drivers.lua")
+    ap.add_argument("--crosswalk", type=Path, default=ROOT / "data" / "crosswalk_f1.csv")
+    ap.add_argument("--stock-rows", type=Path, default=ROOT / "docs" / "stock" / "driver_characteristics_grid.csv")
+    ap.add_argument("--stock-pace", type=Path, default=ROOT / "docs" / "stock" / "pace_curves_grid.csv")
+    ap.add_argument("--out", type=Path, default=ROOT / "verve-f1-addon")
     ap.add_argument("--addon-id", default="verve.driver-profiles")
     ap.add_argument("--name", default="Verve Driver Profiles")
     ap.add_argument("--author", default="TC Verve")
-    ap.add_argument("--version", default="0.1.0")
-    ap.add_argument("--mistakes-is-skill", action="store_true",
-                    help="treat driver_characteristics.mistakes as mistake resistance (higher = fewer mistakes)")
-    ap.add_argument("--no-strategy", action="store_true", help="leave driver_strategy.* stock")
-    ap.add_argument("--no-ratings", action="store_true", help="leave the pace rating stock")
-    ap.add_argument("--datasets", default="default",
-                    help="comma-separated StatisticsDataSet labels to write the pace rating into (default: default)")
-    ap.add_argument("--rating-floor", type=float, default=RATING_FLOOR)
-    ap.add_argument("--rating-ceiling", type=float, default=RATING_CEILING)
-    ap.add_argument("--print-table", action="store_true", help="print the resolved values per driver")
+    ap.add_argument("--version", default="0.2.0")
+    ap.add_argument("--no-ratings", action="store_true", help="leave the pace rating curves stock")
+    ap.add_argument("--center", default=CENTER, help='"grid" (default) or a number; 0.5 = the literal #6 spec')
+    ap.add_argument("--gain", type=float, default=GAIN, help="stock + gain * (signal - center)")
+    ap.add_argument("--pace-tol", type=float, default=PACE_TOL,
+                    help="Verve pace values this close form one group; 0 = pure rank map")
+    ap.add_argument("--tie-mode", choices=("stock", "mean"), default="stock",
+                    help="inside a group: stock order on the group's slots (default), or the slots' mean")
+    ap.add_argument("--print-table", action="store_true", help="print stock vs Verve per driver")
     args = ap.parse_args()
 
-    profiles = read_profiles(args.csv)
-    ops, table = build_ops(
-        profiles,
-        mistakes_is_skill=args.mistakes_is_skill,
-        strategy=not args.no_strategy,
-        ratings=not args.no_ratings,
-        datasets=[d.strip() for d in args.datasets.split(",") if d.strip()],
-        floor=args.rating_floor,
-        ceiling=args.rating_ceiling,
-    )
+    crosswalk = read_csv(args.crosswalk)
+    verve = read_verve(args.verve_lua, {c["verve_key"] for c in crosswalk if c["verve_key"] != "-"})
+    stock_rows = {r["label"]: r for r in read_csv(args.stock_rows)}
+    pace_curves = {(r["stats_label"], r["dataset"]): r["evolution"] for r in read_csv(args.stock_pace)
+                   if r["evolution"] != "NA"}
+    for c in crosswalk:
+        if c["verve_key"] != "-" and c["f1_25_label"] not in stock_rows:
+            sys.exit(f"{c['f1_25_label']}: no stock row in {args.stock_rows}")
+        if c["verve_key"] != "-" and (c["stats_label"], "default") not in pace_curves:
+            sys.exit(f"{c['stats_label']}: no stock pace curve in {args.stock_pace}")
+
+    ops, table, missing, centers = build(crosswalk, verve, stock_rows, pace_curves, ratings=not args.no_ratings,
+                                         center=args.center, gain=args.gain, pace_tol=args.pace_tol,
+                                         tie_mode=args.tie_mode)
 
     out = args.out
     (out / "db").mkdir(parents=True, exist_ok=True)
@@ -226,13 +286,24 @@ def main() -> None:
     (out / "db" / "verve.json").write_text(
         json.dumps({"schema_version": 1, "ops": ops}, indent=1) + "\n", encoding="utf-8", newline="\n")
     (out / "swofty.json").write_text(
-        json.dumps(manifest(args.addon_id, args.name, args.author, args.version, len(profiles)), indent=1) + "\n",
+        json.dumps(manifest(args.addon_id, args.name, args.author, args.version, len(table)), indent=1) + "\n",
         encoding="utf-8", newline="\n")
+    with (out / "table.csv").open("w", newline="\n", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(table[0].keys()), lineterminator="\n")
+        w.writeheader()
+        w.writerows(table)
 
-    print(f"{len(profiles)} drivers, {len(ops)} ops -> {out}/db/verve.json, manifest -> {out}/swofty.json")
-    print(f"mistakes written as {'SKILL (higher = fewer)' if args.mistakes_is_skill else 'PRONENESS (higher = more)'}")
+    print(f"{len(table)} drivers, {len(ops)} ops -> {out}/db/verve.json; table -> {out}/table.csv")
+    print(f"Verve source: ververacing/verve lib/drivers.lua @ {VERVE_COMMIT[:7]}")
+    print("signal centers: " + ", ".join(f"{n} {v:.3f}" for n, v in centers.items()))
+    for c in missing:
+        print(f"no Verve profile (left stock): {c['real_name']} ({c['f1_25_label']}, grid {c['grid']})")
+    clamped = sum(1 for r in table for n in MAPPING if r[f"{n}_verve"] in (0.0, 1.0) and r[f"{n}_stock"] not in (0.0, 1.0))
+    print(f"values clamped at 0 or 1: {clamped} of {len(table) * len(MAPPING)}")
     if args.print_table:
-        cols = list(table[0].keys())
+        cols = ["label"] + [c for n in MAPPING for c in (f"{n}_stock", f"{n}_verve")] + [
+            "pace_rating_stock", "pace_rating_verve", "pred_reaction_stock", "pred_reaction_verve",
+            "pred_bad_start_stock", "pred_bad_start_verve"]
         widths = {c: max(len(c), *(len(str(r[c])) for r in table)) for c in cols}
         print("  ".join(c.ljust(widths[c]) for c in cols))
         for r in table:
