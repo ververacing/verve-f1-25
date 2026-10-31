@@ -68,7 +68,7 @@ MAPPING = {
 GAIN = 0.50
 # Verve pace values closer than this share a pace-rating slot (see rank_map)
 PACE_TOL = 0.03
-# center: "grid" = each signal's mean over the drivers written, so a grid-average driver keeps his stock row. Verve's
+# center: "grid" = each signal's mean over the drivers written, so a grid-average driver keeps their stock row. Verve's
 # 0.5 is the average of its whole F1 bucket (classic and IndyCar drivers included); the modern grid sits well above it
 # (consistency ~0.79), so centering at 0.5 lifts nearly everyone and clamps 26 of 138 values at 1. --center 0.5 keeps
 # that behaviour for comparison.
