@@ -1,6 +1,6 @@
-﻿saves before: 22 entries
+saves before: 22 entries
 attempt 1 started 15:14:31
-sandbox: C:\Users\Tyler\AppData\Local\Swofty\test-runs\shell-20261031-221431-1 ({"schema":1,"run":"shell-20261031-221431-1","state":"armed","pid":29352,"remote":"C:\\Users\\Tyler\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-221431-1\\saves\\remote","why":""})
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261031-221431-1 ({"schema":1,"run":"shell-20261031-221431-1","state":"armed","pid":29352,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261031-221431-1\\saves\\remote","why":""})
 15:16:11 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81422}
 intro played (splash after 81 s)
 15:16:32 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":20000}
@@ -54,7 +54,7 @@ while: screen '|career_wizard_team_icons_select|#5f9ae18b|' left ^(?!.*(team|dri
 15:19:52 > status  =>  {"seq":49,"status":"ok","value":{"v":1,"pid":29352,"run":"shell-20261031-221431-1","ticks":138911,"phase":"|team_hq_driver_career_contracts_negotiation|#d648bc88|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
 15:19:52 > pad a  =>  {"seq":50,"status":"ok","ms":297}
 15:20:07 > status  =>  {"seq":51,"status":"ok","value":{"v":1,"pid":29352,"run":"shell-20261031-221431-1","ticks":147116,"phase":"|dummy_driver_hq_panel|#1c0d95d7|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
-control: waiting for steps in C:\Users\Tyler\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-28\control.txt
+control: waiting for steps in %USERPROFILE%\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-28\control.txt
 15:20:14 > status  =>  {"seq":52,"status":"ok","value":{"v":1,"pid":29352,"run":"shell-20261031-221431-1","ticks":151300,"phase":"|driver_hq_panel|StateTeamHQUpdate|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
 15:23:36 > save now  =>  {"seq":53,"status":"ok","value":{"writes":2},"ms":140}
 control: ended

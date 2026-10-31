@@ -1,4 +1,4 @@
 swofty test: 1 test in 1 game start
   career stroll-career-20261031 at team_hq .. career_fixture_team_hq       not run the game was not free
-error: the game lock C:\Users\Tyler\AppData\Local\swofty-game.lock.d is held by "swofty-test shell-20261031-221431 shell 22:14"
-0 passed, 1 not run  ·  report: C:\Users\Tyler\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-29\raw/report.json, junit.xml
+error: the game lock %USERPROFILE%\AppData\Local\swofty-game.lock.d is held by "swofty-test shell-20261031-221431 shell 22:14"
+0 passed, 1 not run  ·  report: %USERPROFILE%\AppData\Roaming\Claude\scratch-workspaces\953599c1-7235-48c7-9423-57559d951ad9\5c755a7b-d463-4a9c-baca-a0ab768f2c4a\scratch-2026-10-30-78641a\verve-f1-25\runs\2026-10-31-sandbox-29\raw/report.json, junit.xml

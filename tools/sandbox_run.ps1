@@ -23,9 +23,10 @@ param(
     [int] $ConfirmS = 120,
     [int] $IntroTries = 3,
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $SteamApp = 'C:\Program Files (x86)\Steam\userdata\928649988\3059520'
+    [string] $SteamApp = ''   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
 )
 $ErrorActionPreference = 'Stop'
+if (-not $SteamApp) { $SteamApp = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') }
 
 function Snapshot {
     # every file in remote\ (size, mtime, sha256), plus Steam's record of each file in remotecache.vdf (size, sha,

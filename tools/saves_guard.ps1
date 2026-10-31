@@ -23,10 +23,11 @@ param(
     [string] $Label = 'route',
     [string] $Backup,
     [string] $Log,
-    [string] $Saves = 'C:\Program Files (x86)\Steam\userdata\928649988\3059520\remote',
+    [string] $Saves = '',   # <Steam>\userdata\<steamid>\3059520\remote; found by tools/find_steam_app.ps1 when empty
     [string] $Root = "$env:LOCALAPPDATA\verve-f1-25\save-backups"
 )
 $ErrorActionPreference = 'Stop'
+if (-not $Saves) { $Saves = Join-Path (& (Join-Path $PSScriptRoot 'find_steam_app.ps1')) 'remote' }
 
 function Hashes([string] $dir) {
     $h = @{}

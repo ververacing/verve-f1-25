@@ -46,5 +46,5 @@ overwrite list was checked by hand.
 
 ## Saves
 
-Tyler's save folder (`Steam\userdata\928649988\3059520\remote`, 10 files) hashed mid-run (02:43) and after the run:
+Tyler's save folder (`Steam\userdata\<steamid>\3059520\remote`, 10 files) hashed mid-run (02:43) and after the run:
 all 10 SHA-256 identical, newest file still 2026-10-30 22:37. Benchmark doesn't touch saves.

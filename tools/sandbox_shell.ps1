@@ -31,9 +31,10 @@ param(
     [int] $IntroTries = 3,
     [int] $SkippedIntroS = 40,
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $SteamApp = 'C:\Program Files (x86)\Steam\userdata\928649988\3059520'
+    [string] $SteamApp = ''   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
 )
 $ErrorActionPreference = 'Stop'
+if (-not $SteamApp) { $SteamApp = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') }
 New-Item -ItemType Directory -Force $Out | Out-Null
 $Out = (Resolve-Path $Out).Path
 $transcript = Join-Path $Out 'transcript.txt'
