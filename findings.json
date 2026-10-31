@@ -510,14 +510,25 @@
     },
     {
       "id": "F-37",
-      "claim": "B-0004: in benchmark, higher row driver_characteristics.mistakes -> higher race_start_performance (z 2.2-2.3, marginal); mistakes = skill IF higher performance = better start (B-0007). The awareness rating shows no effect: ROW_high (Alpine 0.95) - ROW_low (Aston Martin 0.05) = +7.79 (bootstrap SE 3.39, z +2.30) vs STATS_high - STATS_low (awareness flat 0.95 vs 0.05) = +5.23 (SE 6.96, z +0.75), 5 fresh starts. Reaction time doesn't move for either source (z -0.50 / +1.21), as F-06 predicts. No CANNED_EVENTS lines were logged in benchmark starts.",
+      "claim": "B-0004: in benchmark, higher row driver_characteristics.mistakes -> higher race_start_performance (z 2.2-2.3, marginal), i.e. a lower bad-start draw b (F-38); mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4). The awareness rating shows no effect: ROW_high (Alpine 0.95) - ROW_low (Aston Martin 0.05) = +7.79 (bootstrap SE 3.39, z +2.30) vs STATS_high - STATS_low (awareness flat 0.95 vs 0.05) = +5.23 (SE 6.96, z +0.75), 5 fresh starts. Reaction time doesn't move for either source (z -0.50 / +1.21), as F-06 predicts. No CANNED_EVENTS lines were logged in benchmark starts.",
       "confidence": "supported (pre-registered pass, marginal). Leave-one-start-out ROW gaps are all positive (+5.8 to +9.7), but z is 1.70 to 3.11, under 2 SE in two of five drops; per-start ROW gaps +6.2 / +21.2 / +16.4 / -1.4 / +0.2 (supervisor check on #44: two of five starts show no effect). Supervisor's independent bootstrap: SE 3.47, z 2.24.",
       "evidence": [
         "runs/2026-10-30-B-0004/summary.md, bootstrap_race_start_performance.csv, arms_relative.csv (#35, #44)"
       ],
-      "implications": "A second, independent row-precedence result after F-36 (different characteristic, different metric). Q-03 runtime half: 'mistakes = skill' (F-29) holds only if a higher race_start_performance is a better start; B-0007 (#41) measures that sign, and this finding gets updated then. B-0009 replicates it as a row-only dose-response.",
+      "implications": "A second, independent row-precedence result after F-36 (different characteristic, different metric). Q-03 runtime half: B-0007 (F-38) showed a higher race_start_performance is a lower bad-start draw, so 'mistakes = skill' (F-29) holds if bad_start is a penalty; the behavioural check is #4. B-0009 replicates it as a row-only dose-response.",
       "related_questions": ["Q-17", "Q-03"],
-      "status": "supported (benchmark only)"
+      "status": "supported (benchmark only). Update after B-0007 (F-38): race_start_performance = 100 * (1 - drawn bad-start value), so the +7.8 gap means row mistakes 0.95 drew bad-start values about 0.078 lower than 0.05. mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4), which would match F-29."
+    },
+    {
+      "id": "F-38",
+      "claim": "race_start_performance = 100*(1 - b), where b is the per-start bad-start draw. Pinning all four bad_start bounds pins b exactly. So the logged metric is an INPUT draw (from ai_driver_config.race_start's min/max_bad_start_lower/upper), not an outcome; whether b costs time at the start is behavioural and stays open until #4 (UDP: position or speed after the launch). With all four bounds equal to b the value is exactly 100 * (1 - b) on every start: 0.01 -> 99, 0.15 -> 85, 0.35 -> 65, 0.60 -> 40 (8 drivers, 4 starts, no variation). Stock cars score 60-95, i.e. bad-start values of about 0.05-0.40, within the stock bounds (0.04 / 0.06 min, 0.28 / 0.42 max).",
+      "confidence": "verified (runtime, benchmark; exact)",
+      "evidence": [
+        "runs/2026-10-30-B-0007/summary.md, summary.csv, slope_race_start_performance.csv (#41)"
+      ],
+      "implications": "The metric's scale and sign are known: higher = smaller bad-start value (= better start, if the bad-start value is the penalty its name says; behavioural check via UDP, #4). It is the drawn penalty, not an outcome. The bad-start bounds are a second per-driver race_start key family that works (after the reaction bounds, F-33), so #10 can set each AI driver's start-quality range directly; profiles should use ranges, since equal bounds pin every start. Reaction time: no effect detected. The nominal slope (-0.055 s per unit, z -3.6) is not robust: the stock reaction_speed rows predict about -0.012 of it, leave-one-driver-out slopes run -0.028 to -0.077, and without liam_lawson it is -0.028 (z -1.4). v0.2a: per-driver bad_start bounds are a direct, exact lever for start consistency, and the reaction bounds (F-33) for start sharpness; both are verified per driver.",
+      "related_questions": ["Q-03", "Q-17"],
+      "status": "verified (benchmark)"
     }
   ]
 }
