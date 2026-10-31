@@ -74,8 +74,12 @@ PACE_TOL = 0.03
 # that behaviour for comparison.
 CENTER = "grid"
 
-# F-39 start model (benchmark), pooled k: E[reaction] = 0.35 - 0.21 k rs, E[b] = 0.24 - 0.08 k m
-START_K = 0.52
+# F-39 start model (benchmark): E[reaction] = 0.35 - 0.21 k rs, E[b] = 0.24 - 0.08 k m. Contrasts and level fits give
+# different k for written rows (supervisor ruling, #55), so absolute predictions use the level fit and the change vs
+# stock (the difference between drivers) uses the contrast slope. Reaction: 0.53 for both until the form of k is known.
+REACTION_K = 0.53
+BAD_START_K_LEVEL = 0.5     # pooled level fit: stock field 0.52, B-0011 written rows 0.48
+BAD_START_K_CHANGE = 0.8    # contrasts between written levels: B-0009 0.70, B-0010 0.93 (dE[b]/dm ~ -0.064)
 
 DRIVER_ROW = "entrants.drivers.driver[_metadata_={label}]"
 PACE_STAT = (
@@ -208,8 +212,8 @@ def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dic
                     ops.append(set_op(PACE_STAT.format(label=c["stats_label"], dataset=ds), "evolution",
                                       shift_curve(evo, delta)))
 
-        rt = lambda rs: 0.35 - 0.21 * START_K * rs
-        bad = lambda m: 0.24 - 0.08 * START_K * m
+        rt = lambda rs: 0.35 - 0.21 * REACTION_K * rs
+        bad = lambda m: 0.24 - 0.08 * BAD_START_K_LEVEL * m
         table.append({
             "label": label, "real_name": c["real_name"], "verve_key": c["verve_key"], "grid": c["grid"],
             **{f"verve_{k}": s[k] for k in ("pace", "aggression", "risk", "consistency")},
@@ -217,8 +221,10 @@ def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dic
             "pace_rating_stock": round(100 * stock_x0[label], 1), "pace_rating_verve": round(100 * target, 1),
             "pred_reaction_stock": round(rt(stock["reaction_speed"]), 4),
             "pred_reaction_verve": round(rt(out["reaction_speed"]), 4),
+            "pred_reaction_change": round(-0.21 * REACTION_K * (out["reaction_speed"] - stock["reaction_speed"]), 4),
             "pred_bad_start_stock": round(bad(stock["mistakes"]), 4),
             "pred_bad_start_verve": round(bad(out["mistakes"]), 4),
+            "pred_bad_start_change": round(-0.08 * BAD_START_K_CHANGE * (out["mistakes"] - stock["mistakes"]), 4),
         })
     missing = [c for c in crosswalk if c["verve_key"] == "-"]
     return ops, table, missing, centers
@@ -303,7 +309,7 @@ def main() -> None:
     if args.print_table:
         cols = ["label"] + [c for n in MAPPING for c in (f"{n}_stock", f"{n}_verve")] + [
             "pace_rating_stock", "pace_rating_verve", "pred_reaction_stock", "pred_reaction_verve",
-            "pred_bad_start_stock", "pred_bad_start_verve"]
+            "pred_reaction_change", "pred_bad_start_stock", "pred_bad_start_verve", "pred_bad_start_change"]
         widths = {c: max(len(c), *(len(str(r[c])) for r in table)) for c in cols}
         print("  ".join(c.ljust(widths[c]) for c in cols))
         for r in table:

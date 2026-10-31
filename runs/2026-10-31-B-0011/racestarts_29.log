@@ -1,0 +1,43 @@
+2026-10-31 06:57:35.150 [30148] [gamelog] game log to loader.log: on (level warn, from environment), channels 'default,RaceStarts:info,AI_VARIATION:info,CANNED_EVENTS:info', 100 line(s)/s, 100 repeat(s) per format, cap 20000 line(s)
+2026-10-31 06:57:48.186 [40208] [era] session trace StateLoadSession Entering (benchmark): entrants 20 (teams 2,3,8,4,3,2,9,0,1,4,7,6,8,9,6,7,5,5,0,1), list f1_2025 (20 cars) of setup mode f1; participants: game manager 0, game module - (next -); session vehicles -
+2026-10-31 06:58:02.415 [ 2616] [game] RaceStarts: Reaction Time for driver with vehicle id 6: 0.280921
+2026-10-31 06:58:02.415 [17188] [game] RaceStarts: Reaction Time for driver with vehicle id 11: 0.223511
+2026-10-31 06:58:02.415 [ 3680] [game] RaceStarts: Reaction Time for driver with vehicle id 0: 0.245109
+2026-10-31 06:58:02.415 [ 9480] [game] RaceStarts: Reaction Time for driver with vehicle id 5: 0.154922
+2026-10-31 06:58:02.415 [10604] [game] RaceStarts: Reaction Time for driver with vehicle id 8: 0.263972
+2026-10-31 06:58:02.415 [22928] [game] RaceStarts: Reaction Time for driver with vehicle id 3: 0.343233
+2026-10-31 06:58:02.415 [20272] [game] RaceStarts: Reaction Time for driver with vehicle id 7: 0.339895
+2026-10-31 06:58:02.415 [39212] [game] RaceStarts: Reaction Time for driver with vehicle id 2: 0.296424
+2026-10-31 06:58:02.415 [40208] [game] RaceStarts: Reaction Time for driver with vehicle id 1: 0.203355
+2026-10-31 06:58:02.415 [22872] [game] RaceStarts: Reaction Time for driver with vehicle id 9: 0.260083
+2026-10-31 06:58:02.415 [24228] [game] RaceStarts: Reaction Time for driver with vehicle id 4: 0.309403
+2026-10-31 06:58:02.415 [22460] [game] RaceStarts: Reaction Time for driver with vehicle id 10: 0.177440
+2026-10-31 06:58:02.415 [17188] [game] RaceStarts: Race Start performance for driver with vehicle id 11: 79.588432
+2026-10-31 06:58:02.415 [ 2616] [game] RaceStarts: Race Start performance for driver with vehicle id 6: 83.652229
+2026-10-31 06:58:02.415 [ 9480] [game] RaceStarts: Race Start performance for driver with vehicle id 5: 86.387978
+2026-10-31 06:58:02.415 [ 3680] [game] RaceStarts: Race Start performance for driver with vehicle id 0: 92.627190
+2026-10-31 06:58:02.415 [22928] [game] RaceStarts: Race Start performance for driver with vehicle id 3: 72.362625
+2026-10-31 06:58:02.415 [22872] [game] RaceStarts: Race Start performance for driver with vehicle id 9: 81.701187
+2026-10-31 06:58:02.415 [10604] [game] RaceStarts: Race Start performance for driver with vehicle id 8: 73.572350
+2026-10-31 06:58:02.415 [39212] [game] RaceStarts: Race Start performance for driver with vehicle id 2: 72.144836
+2026-10-31 06:58:02.415 [20272] [game] RaceStarts: Race Start performance for driver with vehicle id 7: 73.897209
+2026-10-31 06:58:02.415 [40208] [game] RaceStarts: Race Start performance for driver with vehicle id 1: 78.693214
+2026-10-31 06:58:02.415 [24228] [game] RaceStarts: Race Start performance for driver with vehicle id 4: 85.885735
+2026-10-31 06:58:02.415 [22460] [game] RaceStarts: Race Start performance for driver with vehicle id 10: 86.139885
+2026-10-31 06:58:02.415 [ 2616] [game] RaceStarts: Reaction Time for driver with vehicle id 13: 0.265085
+2026-10-31 06:58:02.415 [17188] [game] RaceStarts: Reaction Time for driver with vehicle id 14: 0.212796
+2026-10-31 06:58:02.415 [ 3680] [game] RaceStarts: Reaction Time for driver with vehicle id 12: 0.298774
+2026-10-31 06:58:02.415 [17188] [game] RaceStarts: Race Start performance for driver with vehicle id 14: 89.518394
+2026-10-31 06:58:02.415 [ 2616] [game] RaceStarts: Race Start performance for driver with vehicle id 13: 77.874474
+2026-10-31 06:58:02.415 [ 9480] [game] RaceStarts: Reaction Time for driver with vehicle id 17: 0.249820
+2026-10-31 06:58:02.415 [40208] [game] RaceStarts: Reaction Time for driver with vehicle id 15: 0.323667
+2026-10-31 06:58:02.415 [22928] [game] RaceStarts: Reaction Time for driver with vehicle id 18: 0.329344
+2026-10-31 06:58:02.415 [39212] [game] RaceStarts: Reaction Time for driver with vehicle id 16: 0.247994
+2026-10-31 06:58:02.415 [ 3680] [game] RaceStarts: Race Start performance for driver with vehicle id 12: 78.678345
+2026-10-31 06:58:02.415 [24228] [game] RaceStarts: Reaction Time for driver with vehicle id 19: 0.074790
+2026-10-31 06:58:02.415 [ 9480] [game] RaceStarts: Race Start performance for driver with vehicle id 17: 93.231346
+2026-10-31 06:58:02.415 [40208] [game] RaceStarts: Race Start performance for driver with vehicle id 15: 80.186287
+2026-10-31 06:58:02.415 [22928] [game] RaceStarts: Race Start performance for driver with vehicle id 18: 67.884460
+2026-10-31 06:58:02.415 [39212] [game] RaceStarts: Race Start performance for driver with vehicle id 16: 68.867889
+2026-10-31 06:58:02.415 [24228] [game] RaceStarts: Race Start performance for driver with vehicle id 19: 82.373741
+2026-10-31 07:02:21.514 [22928] [era] session trace StateSession Exiting (benchmark): entrants 20 (teams 2,3,8,4,3,2,9,0,1,4,7,6,8,9,6,7,5,5,0,1), list f1_2025 (20 cars) of setup mode f1; participants: game manager 21, game module - (next -); session vehicles -
