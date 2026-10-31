@@ -64,7 +64,7 @@ slower car.
 
 ## The mapping (v0.2: #5, #6)
 
-Verve scalars in (Pace, Aggression, Risk, Consistency, each 0 to 1), F1 25 fields out. Weights, `K` and the center
+Verve scalars in (Pace, Aggression, Risk, Consistency, each 0 to 1), F1 25 fields out. Weights, the gain, the center and the pace tolerance
 live at the top of `verve_to_swofty.py`.
 
 **Source.** Verve's own profiles, read from `ververacing/verve` `lib/drivers.lua` at a pinned commit
@@ -74,12 +74,18 @@ gitignored `.cache/`. Grid drivers with no Verve profile are listed in the cross
 (today: Jack Doohan).
 
 **Anchor.** Every characteristic starts from the driver's own stock row value (`docs/stock/driver_characteristics_grid.csv`)
-and Verve moves it: value = stock + K x (signal - center), clamped to 0 to 1, with K = 0.5 and center = that
-signal's mean over the grid being written. The row is what the AI reads (rows win in benchmark, F-36), so every
-driver keeps the F1 25 baseline and Verve moves it from there. Verve's 0.5 is the average of its whole F1 bucket,
-classic and IndyCar drivers included, and the modern grid sits well above it, so centering at 0.5 would lift nearly
-everyone (26 of 138 values clamped at 1; `--center 0.5`).
+and Verve moves it: value = stock + gain x (signal - center), clamped to 0 to 1. The row is what the AI reads (rows
+win in benchmark, F-36), so every driver keeps the F1 25 baseline and Verve moves it from there.
 
+- **center = each signal's mean over the grid being written** (default). That keeps the stock field's average, so
+  Verve changes the spread between drivers, not the overall level: the stock rows are already calibrated to the
+  2025/26 field. Verve's own 0.5 is the average of its whole F1 bucket, classic and IndyCar drivers included, and
+  the modern grid sits well above it, so centering at 0.5 would lift nearly everyone (26 of 138 values clamped at 1).
+  `--center 0.5` reproduces that literal #6 spec.
+- **gain = 0.5** (`--gain`). The predicted start spread is small (sd 0.014 s reaction, 0.007 bad start over the
+  grid) because the game's start draws are wide uniforms, not because the gain is low, so don't raise it to make
+  starts look different. The gain gets tuned on behavioural metrics (pace, overtaking) once UDP works, and later by
+  the strength slider (#22).
 ### Driver characteristics (the core of it)
 
 | F1 25 field | Signal | Why |
@@ -98,11 +104,12 @@ predictions (mean reaction 0.35 - 0.21 k rs, mean bad-start draw 0.24 - 0.08 k m
 
 Simulated and skipped sessions use baked lap times plus the **ratings**, not the physics, so the `pace` rating
 follows Verve Pace. Verve Pace sets the order and the grid's stock season-0 pace ratings
-(`docs/stock/pace_curves_grid.csv`) are handed out in that order, ties sharing the mean, so the grid keeps its stock
-spread. Each driver's stock `evolution` curve is then shifted by (target - its season-0 value), keeping its shape
-and so its season progression (#21), in both the `default` and `2026` datasets. A linear map would squash the field:
-Verve puts two drivers at 0.96 to 1.00 and most at 0.62 to 0.71.
-
+(`docs/stock/pace_curves_grid.csv`) are handed out in that order, so the grid keeps its stock spread. Drivers within
+0.03 of each other in Verve Pace (`--pace-tol`) share the mean of their slots, so differences below Verve's
+resolution can't move anyone: today Verve puts 14 drivers at 0.62 to 0.64, and they share one rating. Each driver's
+stock `evolution` curve is then shifted by (target - its season-0 value), keeping its shape and so its season
+progression (#21), in both the `default` and `2026` datasets. The ratings don't drive the live AI's start draws
+(F-36); they show in simulated sessions, career sims and the UI.
 ### Strategy
 
 Left stock. Verve has no strategy axis, and risk is not a strategy input (#6).

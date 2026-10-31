@@ -137,13 +137,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lando_norris].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.89,0:0.89,0.6:0.94,1:0.85,1:0.85"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.8875,0.6:0.9375,1:0.8475,1:0.8475"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lando_norris].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.89,0:0.92,0.6:0.94,1:0.85,1:0.85"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.9175,0.6:0.9375,1:0.8475,1:0.8475"
   },
   {
    "op": "set",
@@ -185,13 +185,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=charles_leclerc].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.89,0:0.89,0.3:0.97,0.8:0.89,1:0.88"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.8875,0.3:0.9675,0.8:0.8875,1:0.8775"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=charles_leclerc].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.89,0:0.92,0.3:0.97,0.8:0.89,1:0.88"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.9175,0.3:0.9675,0.8:0.8875,1:0.8775"
   },
   {
    "op": "set",
@@ -233,13 +233,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oscar_piastri].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:0.91,1:0.85,1:0.85"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.8667,0.6:0.9067,1:0.8467,1:0.8467"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oscar_piastri].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.91,0.6:0.91,1:0.85,1:0.85"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.9067,0.6:0.9067,1:0.8467,1:0.8467"
   },
   {
    "op": "set",
@@ -281,13 +281,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=george_russell].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.86,0:0.86,0.6:0.92,1:0.86,1:0.86"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.8667,0.6:0.9267,1:0.8667,1:0.8667"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=george_russell].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.86,0:0.9,0.6:0.92,1:0.86,1:0.86"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.9067,0.6:0.9267,1:0.8667,1:0.8667"
   },
   {
    "op": "set",
@@ -329,13 +329,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.9,0.6:0.87,1:0.79,1:0.79"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.8875,0.6:0.8575,1:0.7775,1:0.7775"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=fernando_alonso].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.9,0:0.9565,0.6:0.8865,1:0.8065,1:0.8065"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.944,0.6:0.874,1:0.794,1:0.794"
   },
   {
    "op": "set",
@@ -377,13 +377,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=andrea-kimi_antonelli].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.6:1,1:1,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.8875,0.6:1,1:1,1:1"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=andrea-kimi_antonelli].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.96,0.6:1,1:1,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8875,0:0.9775,0.6:1,1:1,1:1"
   },
   {
    "op": "set",
@@ -425,13 +425,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.85,0.2:0.87,0.6:0.83,1:0.71"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.2:0.8071,0.6:0.7671,1:0.6471"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=carlos_sainz-jr].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.83,0.2:0.87,0.6:0.83,1:0.71"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7671,0.2:0.8071,0.6:0.7671,1:0.6471"
   },
   {
    "op": "set",
@@ -473,13 +473,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.6:0.9117,1:0.8817,1:0.8817"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.6:0.8871,1:0.8571,1:0.8571"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=isack_hadjar].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.9417,0.6:0.9117,1:0.8817,1:0.8817"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.9171,0.6:0.8871,1:0.8571,1:0.8571"
   },
   {
    "op": "set",
@@ -521,13 +521,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.3:0.8717,1:0.7617,1:0.7617"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.3:0.8471,1:0.7371,1:0.7371"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=alex_albon].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.3:0.8717,1:0.7617,1:0.7617"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.3:0.8471,1:0.7371,1:0.7371"
   },
   {
    "op": "set",
@@ -569,13 +569,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.298417:0.8457,1:0.7217,1:0.7217"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.298417:0.8211,1:0.6971,1:0.6971"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=pierre_gasly].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8017,0.298417:0.8457,1:0.7217,1:0.7217"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7771,0.298417:0.8211,1:0.6971,1:0.6971"
   },
   {
    "op": "set",
@@ -617,13 +617,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=esteban_ocon].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.4:0.8317,1:0.7417,1:0.7417"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.4:0.8071,1:0.7171,1:0.7171"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=esteban_ocon].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8017,0.4:0.8317,1:0.7417,1:0.7417"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7771,0.4:0.8071,1:0.7171,1:0.7171"
   },
   {
    "op": "set",
@@ -665,13 +665,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.4:0.7917,1:0.6917"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.4:0.7671,1:0.6671"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=nico_hulkenberg].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8417,0.4:0.7917,1:0.6917"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.8171,0.4:0.7671,1:0.6671"
   },
   {
    "op": "set",
@@ -713,13 +713,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.8117,0.6:0.7917,1:0.7717,1:0.7717"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.6:0.7671,1:0.7471,1:0.7471"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=lance_stroll].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8117,0:0.9564,0.6:0.9264,1:0.9064,1:0.9064"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.9319,0.6:0.9019,1:0.8819,1:0.8819"
   },
   {
    "op": "set",
@@ -761,13 +761,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oliver_bearman].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.6:0.89,1:0.81,1:0.81"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.6:0.9571,1:0.8771,1:0.8771"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=oliver_bearman].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.82,0.6:0.89,1:0.81,1:0.81"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.8871,0.6:0.9571,1:0.8771,1:0.8771"
   },
   {
    "op": "set",
@@ -809,13 +809,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=sergio_perez].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.86,0.2:0.89,1:0.71,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7971,0.2:0.8271,1:0.6471,1:0.9471"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=sergio_perez].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.86,0.2:0.89,1:0.71,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7971,0.2:0.8271,1:0.6471,1:0.9471"
   },
   {
    "op": "set",
@@ -857,13 +857,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=valtteri_bottas].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.87,0.2986808:0.8876,1:0.79,1:0.81"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.8667,0.2986808:0.8843,1:0.7867,1:0.8067"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=valtteri_bottas].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.87,0:0.91,0.2986808:0.8876,1:0.79,1:0.81"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.8667,0:0.9067,0.2986808:0.8843,1:0.7867,1:0.8067"
   },
   {
    "op": "set",
@@ -905,13 +905,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.4:0.75,1:0.68,1:0.68"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.4:0.8171,1:0.7471,1:0.7471"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=liam_lawson].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.68,0.4:0.75,1:0.68,1:0.68"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7471,0.4:0.8171,1:0.7471,1:0.7471"
   },
   {
    "op": "set",
@@ -953,13 +953,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=gabriel_bortoleto].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.6:0.84,1:0.86,1:0.86"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.6:0.9071,1:0.9271,1:0.9271"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=gabriel_bortoleto].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.76,0.6:0.84,1:0.86,1:0.86"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.8271,0.6:0.9071,1:0.9271,1:0.9271"
   },
   {
    "op": "set",
@@ -1001,13 +1001,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=franco_colapinto].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.5:0.86,1:0.76,1:0.76"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.5:0.9271,1:0.8271,1:0.8271"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=franco_colapinto].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.73,0.5:0.86,1:0.76,1:0.76"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7971,0.5:0.9271,1:0.8271,1:0.8271"
   },
   {
    "op": "set",
@@ -1049,13 +1049,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=arvid_lindblad].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.92,0.6:1,1:1,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.8571,0.6:0.9571,1:0.9371,1:0.9371"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=arvid_lindblad].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.85,0:0.92,0.6:1,1:1,1:1"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.8571,0.6:0.9571,1:0.9371,1:0.9371"
   },
   {
    "op": "set",
@@ -1097,13 +1097,13 @@
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=yuki_tsunoda].StatisticsDataSet[_metadata_=default].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.72,0.3:0.78,1:0.68,1:0.68"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7871,0.3:0.8471,1:0.7471,1:0.7471"
   },
   {
    "op": "set",
    "select": "driver_statistics.driver_statistics.DriverStatisticsHolder[driver=yuki_tsunoda].StatisticsDataSet[_metadata_=2026].Statistic[_metadata_=pace]",
    "field": "evolution",
-   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.72,0:0.67,0.3:0.78,1:0.68,1:0.68"
+   "value": "@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.7871,0:0.7371,0.3:0.8471,1:0.7471,1:0.7471"
   }
  ]
 }

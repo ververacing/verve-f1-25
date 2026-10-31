@@ -20,8 +20,8 @@ the row is what the AI reads; anchoring on it keeps every driver's F1 25 baselin
 and falls with risk. Strategy stays stock: Verve has no strategy axis, and risk is not a strategy input.
 
 The pace rating moves the stock curve, keeping its shape (season progression, #21): Verve pace sets the order and
-the written drivers' stock season-0 ratings are handed out in that order (ties share the mean), so the grid's stock
-spread is kept exactly; each dataset's curve is shifted by target - its own season-0 value. A linear map would
+the written drivers' stock season-0 ratings are handed out in that order, so the grid keeps its stock spread;
+drivers within PACE_TOL (0.03) of each other in Verve pace share the mean of their slots; each dataset's curve is shifted by target - its own season-0 value. A linear map would
 squash the field: Verve puts two drivers at 0.96-1.00 and most at 0.62-0.71. Simulated sessions read the ratings, so they follow Verve pace too.
 
 Output: <out>/swofty.json, <out>/db/verve.json and <out>/table.csv (stock vs Verve per driver, with the F-39
@@ -59,7 +59,13 @@ MAPPING = {
     "speed_in":       {"pace": 1.00},                           # no risk input
     "speed_out":      {"pace": 0.80, "consistency": 0.20},
 }
-K = {name: 0.50 for name in MAPPING}   # stock + K * (signal - center)
+# gain: stock + GAIN * (signal - center). Kept at 0.5 on purpose. The predicted start spread is small (F-39: sd
+# 0.014 s reaction, 0.007 b over the grid) because the game's start draws are wide uniforms, not because the gain is
+# low; don't raise it to make starts look different. It gets tuned on behavioural metrics (pace, overtaking) once
+# UDP works, and later by the strength slider (#22).
+GAIN = 0.50
+# Verve pace values closer than this share a pace-rating slot (see rank_map)
+PACE_TOL = 0.03
 # center: "grid" = each signal's mean over the drivers written, so a grid-average driver keeps his stock row. Verve's
 # 0.5 is the average of its whole F1 bucket (classic and IndyCar drivers included); the modern grid sits well above it
 # (consistency ~0.79), so centering at 0.5 lifts nearly everyone and clamps 26 of 138 values at 1. --center 0.5 keeps
@@ -141,14 +147,16 @@ def set_op(select: str, field: str, value: str) -> dict:
 # build
 # --------------------------------------------------------------------------------------
 
-def rank_map(values: dict[str, float], targets: list[float]) -> dict[str, float]:
-    """Give the i-th lowest value the i-th lowest target; tied values share the mean of their targets."""
+def rank_map(values: dict[str, float], targets: list[float], tol: float) -> dict[str, float]:
+    """Give the i-th lowest value the i-th lowest target. Near-ties share the mean of their targets: going up from
+    the lowest value, each group takes every value within `tol` of the group's first, so differences smaller than
+    Verve's resolution can't move a driver far (#52 review)."""
     order = sorted(values, key=values.get)
     targets = sorted(targets)
     out, i = {}, 0
     while i < len(order):
         j = i
-        while j + 1 < len(order) and values[order[j + 1]] == values[order[i]]:
+        while j + 1 < len(order) and values[order[j + 1]] - values[order[i]] <= tol + 1e-9:
             j += 1
         mean = sum(targets[i:j + 1]) / (j + 1 - i)
         for k in order[i:j + 1]:
@@ -157,7 +165,8 @@ def rank_map(values: dict[str, float], targets: list[float]) -> dict[str, float]
     return out
 
 
-def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dict, ratings: bool, center):
+def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dict, ratings: bool, center,
+          gain: float, pace_tol: float):
     drivers = [c for c in crosswalk if c["verve_key"] != "-"]
     scalars = {}
     for c in drivers:
@@ -169,7 +178,7 @@ def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dic
                for n in MAPPING}
     # pace rating: Verve pace decides the order, the grid's stock season-0 ratings keep their spread
     stock_x0 = {c["f1_25_label"]: curve_points(pace_curves[(c["stats_label"], "default")])[1][0][1] for c in drivers}
-    targets = rank_map({label: s["pace"] for label, s in scalars.items()}, list(stock_x0.values()))
+    targets = rank_map({label: s["pace"] for label, s in scalars.items()}, list(stock_x0.values()), pace_tol)
 
     ops, table = [], []
     for c in drivers:
@@ -178,7 +187,7 @@ def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dic
         row = DRIVER_ROW.format(label=label)
         out = {}
         for name in MAPPING:
-            out[name] = clamp(stock[name] + K[name] * (signals[label][name] - centers[name]))
+            out[name] = clamp(stock[name] + gain * (signals[label][name] - centers[name]))
             ops.append(set_op(row, f"driver_characteristics.{name}", fmt(out[name])))
 
         target = targets[label]
@@ -238,7 +247,10 @@ def main() -> None:
     ap.add_argument("--author", default="TC Verve")
     ap.add_argument("--version", default="0.2.0")
     ap.add_argument("--no-ratings", action="store_true", help="leave the pace rating curves stock")
-    ap.add_argument("--center", default=CENTER, help='"grid" (default) or a number, e.g. 0.5')
+    ap.add_argument("--center", default=CENTER, help='"grid" (default) or a number; 0.5 = the literal #6 spec')
+    ap.add_argument("--gain", type=float, default=GAIN, help="stock + gain * (signal - center)")
+    ap.add_argument("--pace-tol", type=float, default=PACE_TOL,
+                    help="Verve pace values this close share a pace-rating slot; 0 = pure rank map")
     ap.add_argument("--print-table", action="store_true", help="print stock vs Verve per driver")
     args = ap.parse_args()
 
@@ -254,7 +266,7 @@ def main() -> None:
             sys.exit(f"{c['stats_label']}: no stock pace curve in {args.stock_pace}")
 
     ops, table, missing, centers = build(crosswalk, verve, stock_rows, pace_curves, ratings=not args.no_ratings,
-                                         center=args.center)
+                                         center=args.center, gain=args.gain, pace_tol=args.pace_tol)
 
     out = args.out
     (out / "db").mkdir(parents=True, exist_ok=True)
