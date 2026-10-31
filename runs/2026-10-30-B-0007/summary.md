@@ -55,8 +55,11 @@ up:
   row 0.60, median +0.062 s slower than the field) halves the slope, to −0.028 (z −1.4). With only 4 starts the SE is
   unstable: dropping Norris gives z −15.5, which is a bootstrap artefact.
 
-So this batch doesn't show that the bad-start bounds move reaction time. B-0009's reaction control (#45) will check it
-again.
+**Recorded as no effect detected** (supervisor review on #46). B-0009's reaction control (#45) will check it again.
+
+Supervisor's note on the mechanism (#46): `race_start_performance = 100*(1 - b)`, where b is the per-start bad-start
+draw, and pinning all four bounds pins b exactly. Whether b costs time at the start is behavioural and stays open until
+#4. Until then, "mistakes = skill" holds only if bad_start is a penalty.
 
 ## Files
 
