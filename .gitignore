@@ -7,3 +7,5 @@ runs/**/raw/
 *.bin
 .DS_Store
 Thumbs.db
+# Verve source fetched by tools/fetch_verve.ps1 (full roster; stays off the repo)
+.cache/
