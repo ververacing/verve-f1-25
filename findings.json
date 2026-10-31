@@ -517,7 +517,18 @@
       ],
       "implications": "A second, independent row-precedence result after F-36 (different characteristic, different metric). Q-03 runtime half: 'mistakes = skill' (F-29) holds only if a higher race_start_performance is a better start; B-0007 (#41) measures that sign, and this finding gets updated then. B-0009 replicates it as a row-only dose-response.",
       "related_questions": ["Q-17", "Q-03"],
-      "status": "supported (benchmark only)"
+      "status": "supported (benchmark only). Update after B-0007 (F-38): race_start_performance = 100 * (1 - drawn bad-start value), so the +7.8 gap means row mistakes 0.95 drew bad-start values about 0.078 lower than 0.05. If the bad-start value is a penalty (its name), mistakes = skill, which matches F-29."
+    },
+    {
+      "id": "F-38",
+      "claim": "race_start_performance in the RaceStarts log is 100 * (1 - the start's drawn bad-start value), set by ai_driver_config.race_start's four bad-start bounds (min/max_bad_start_lower/upper). With all four bounds equal to b, the value is pinned at exactly 100 * (1 - b) on every start: 0.01 -> 99, 0.15 -> 85, 0.35 -> 65, 0.60 -> 40 (8 drivers, 4 starts, no variation). Stock cars score 60-95, i.e. bad-start values of about 0.05-0.40, within the stock bounds (0.04 / 0.06 min, 0.28 / 0.42 max).",
+      "confidence": "verified (runtime, benchmark; exact)",
+      "evidence": [
+        "runs/2026-10-30-B-0007/summary.md, summary.csv, slope_race_start_performance.csv (#41)"
+      ],
+      "implications": "The metric's scale and sign are known: higher = smaller bad-start value (= better start, if the bad-start value is the penalty its name says; behavioural check via UDP, #4). It is the drawn penalty, not an outcome. The bad-start bounds are a second per-driver race_start key family that works (after the reaction bounds, F-33), so #10 can set each AI driver's start-quality range directly; profiles should use ranges, since equal bounds pin every start. The reaction-time slope seen in this batch (-0.055 s per unit, z -3.6) is not robust: partly the stock reaction_speed row, and it halves without liam_lawson (z -1.4).",
+      "related_questions": ["Q-03", "Q-17"],
+      "status": "verified (benchmark)"
     }
   ]
 }
