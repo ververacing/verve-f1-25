@@ -5,9 +5,11 @@ Usage:
     python3 verve_to_swofty.py profiles.csv --out verve-f1-addon
     python3 verve_to_swofty.py profiles.csv --out verve-f1-addon --mistakes-is-skill --no-strategy
 
-Input CSV columns: label,display,pace,aggression,risk,consistency[,preferred_tracks]
+Input CSV columns: label,display,pace,aggression,risk,consistency[,preferred_tracks][,stats_label]
     label            the driver row's _metadata_ in entrants.drivers (max_verstappen, carlos_sainz-jr, ...)
     preferred_tracks optional, track labels separated by | (monaco|singapore)
+    stats_label      optional, the DriverStatisticsHolder's driver label when it differs from the row label
+                     (alex_albon's holder is alexander_albon; see findings F-32). "-" = no holder, skip the rating
 
 Output: <out>/swofty.json and <out>/db/verve.json (database "set" ops), ready to zip and drop on the launcher.
 
@@ -117,6 +119,7 @@ def read_profiles(path: Path) -> list[dict]:
             s["inv_risk"] = 1.0 - s["risk"]
             rows.append({
                 "label": label,
+                "stats_label": (r.get("stats_label") or "").strip() or label,
                 "display": (r.get("display") or label).strip(),
                 "scalars": s,
                 "preferred_tracks": [t.strip() for t in (r.get("preferred_tracks") or "").split("|") if t.strip()],
@@ -154,10 +157,10 @@ def build_ops(profiles: list[dict], *, mistakes_is_skill: bool, strategy: bool, 
                 ops.append(set_op(row, field, fmt(v)))
 
         rating = None
-        if ratings:
+        if ratings and p["stats_label"] != "-":
             rating = floor + s["pace"] * (ceiling - floor)
             for ds in datasets:
-                ops.append(set_op(PACE_STAT.format(label=p["label"], dataset=ds), "evolution",
+                ops.append(set_op(PACE_STAT.format(label=p["stats_label"], dataset=ds), "evolution",
                                   pace_curve(s["pace"], floor, ceiling)))
 
         table.append({"label": p["label"], "display": p["display"], **{k: round(v, 3) for k, v in chars.items()},
@@ -218,11 +221,12 @@ def main() -> None:
 
     out = args.out
     (out / "db").mkdir(parents=True, exist_ok=True)
+    # newline="\n": LF on every OS, so a Windows run doesn't rewrite every line in git
     (out / "db" / "verve.json").write_text(
-        json.dumps({"schema_version": 1, "ops": ops}, indent=1) + "\n", encoding="utf-8")
+        json.dumps({"schema_version": 1, "ops": ops}, indent=1) + "\n", encoding="utf-8", newline="\n")
     (out / "swofty.json").write_text(
         json.dumps(manifest(args.addon_id, args.name, args.author, args.version, len(profiles)), indent=1) + "\n",
-        encoding="utf-8")
+        encoding="utf-8", newline="\n")
 
     print(f"{len(profiles)} drivers, {len(ops)} ops -> {out}/db/verve.json, manifest -> {out}/swofty.json")
     print(f"mistakes written as {'SKILL (higher = fewer)' if args.mistakes_is_skill else 'PRONENESS (higher = more)'}")
