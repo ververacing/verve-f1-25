@@ -110,9 +110,30 @@ yourTelemetry="restricted" onlineNames="off" />`. Only `enabled` changed; the or
 `hardware_settings_config.pre-udp.xml`. Record with `tools/udp_capture.py` (raw packets with wall-clock times) and
 read the Participants packet with `tools/udp_participants.py`.
 
+**Capturing with a test (#4).** `tools/run_with_udp.ps1 -Test <file> -Out runs/<id>` runs the capture next to
+`swofty test run` and parses the result with `tools/udp_parse.py` into `runs/<id>/udp/`:
+- `sessions.csv`: session type, track, packet counts per id, and any packet whose size doesn't match the F1 25 spec;
+- `cars.csv`: participant, grid, final position, laps, best lap, pit stops, overtakes, collisions, penalties, plus
+  speed, lap distance and position 1, 3 and 6 s after lights out (the behavioural side of F-38's bad-start draw);
+- `laps.csv` and `events.csv`.
+
+Python here (the WindowsApps alias) can't read files under `%APPDATA%` or the rest of `%LOCALAPPDATA%`, only under
+`%TEMP%`, so the scripts and the raw recording live in `%TEMP%\verve-udp\<run>\`. `harness/tests/udp_tt.test.json` is the first in-game check: a Time Trial reached
+by pad (Swofty's documented sequence) with the AI driving.
+
 **Benchmark runs send no UDP.** During B-0003's 5 starts the capture received 0 packets, with the setting on and kept
-by the game. Either benchmark mode or the offline launch doesn't emit telemetry. A normal session (Time Trial by pad,
-`docs/std/testing.md`) is the next place to check (#4).
+by the game. **The offline, modded launch does send UDP:** the first `udp_tt` run (2026-10-31,
+`runs/2026-10-31-udp-tt/`) got 21 Event packets (`BUTN`, format 2026) in the menus. So it is benchmark mode that sends
+nothing. That run never reached a session: its pad presses on F1 World's Play cards (`solo_container`) came within a
+second of the screen opening and did nothing.
+
+**Route tests use the player's own saves.** Only the `career` environment runs in the save sandbox (from a fixture);
+a `route` env rejects a `fixture` key. So a Time Trial or Grand Prix reached by `route` + `pad` can write to Tyler's
+saves (records, F1 World progress, mid-session saves). Benchmark runs haven't written any. Don't run route tests that
+reach a session without Tyler's OK.
+
+`tools/udp_join.py` joins one start's RaceStarts draws to its UDP cars on vehicle id = car index, and checks that both
+sides' team ids agree (exit 1 on any mismatch).
 
 ## PC hygiene after every run
 
@@ -136,7 +157,57 @@ by the game. Either benchmark mode or the offline launch doesn't emit telemetry.
   25251167 and that doctor shows no drift. It also runs the cleanup above, and lists any `hardware_settings_config.xml`
   lines that differ from the pre-UDP backup besides `<udp>`.
 
-## Saves (benchmark leaves them alone)
+## Saves
+
+### Route tests: guarded (Tyler's OK, 2026-10-31)
+
+Time Trial and Grand Prix tests by route + pad run on Tyler's own saves (`loader.log`: "no save sandbox ... the game
+uses the player's own saves"). Tyler approved them on 2026-10-31 on these terms: back up before each one, compare
+after, restore the originals if anything changed. `tools/run_with_udp.ps1` does this with `tools/saves_guard.ps1`:
+
+- Before: copy of `remote\` to `%LOCALAPPDATA%\verve-f1-25\save-backups\<time>-<run>\` (outside the Steam tree,
+  never overwritten), copy verified by hash.
+- After: `<run>/saves_changes.csv` lists each changed, added or removed file with size and SHA-256 before and after,
+  and whether it was restored. Changed or added files are moved to `<backup>\written_by_test\`, the originals copied
+  back with their modified time set to now, and the hashes checked again.
+- A restore that doesn't come out clean exits 4: stop all route tests and tell Tyler.
+- **Master backup:** `save-backups\20261031-070733-master\`, taken before any route test with Tyler's approval;
+  identical to the post-B-0010 hashes. Never deleted.
+- **Steam Cloud** syncs `remote\` when the game exits, so a test's write can reach the cloud before the restore. The
+  fresh modified time makes the restored files the newer local copy. If a later launch shows a cloud-conflict
+  dialog, stop and tell Tyler rather than clicking through it.
+- **Steam Cloud toggle (Tyler confirmed, 2026-10-31):** "Keep game saves in the Steam Cloud" for F1 25 may be
+  switched off for route testing, which closes that hole. The rules:
+  - Toggle it only with F1 25 closed.
+  - Switch it off before the first guarded route run of a session.
+  - Before switching it back on, `saves_guard.ps1 -Action Check` must pass against the master backup or the last
+    verified restore, so a bad local save is never what gets synced.
+  - Switch it back on whenever route testing stops, and on PAUSE before reporting PAUSED (say so in that message).
+  - Log every toggle below with time, on/off and why.
+  It's a Steam UI setting (Library > F1 25 > Properties > General), and Steam rewrites its config files while it runs,
+  so it needs desktop control or Tyler's hand. Until it's off, runs use the fresh-mtime fallback above.
+
+  Toggle log:
+  - 2026-10-31 07:16: not toggled. No desktop control in this session, so I asked Tyler. Cloud was on, and udp-tt-2
+    ran with the fallback (saves unchanged).
+  - 2026-10-31 ~07:45: **OFF**, set by Tyler by hand for route testing. Game closed; saves matched the master backup
+    beforehand. Verified in `userdata\928649988\7\remote\sharedconfig.vdf`: `"3059520" { "cloudenabled" "0" }`.
+    Check that key to confirm the state before switching it back on.
+
+## Time Trial by route (works since 2026-10-31)
+
+`harness/tests/udp_tt.test.json` reaches an AI-driven Time Trial session at Melbourne. The pad sequence, with a frame
+of each screen, is in `runs/2026-10-31-udp-tt-3/summary.md` and `docs/time_trial_route/`. Points that cost runs:
+
+- `play` opens either `solo_container` or `f1_world_activity_container` (F1 World's offline cards), depending on the
+  run, so wait on a log regex that takes either.
+- There's no pause step: `wait` takes only event, log or screen, and `sample` fails outside a session. Hold `ls` (does
+  nothing on these menus) as the pause; a hold of N ms takes about 2N ms of wall time.
+- `capture` doesn't work yet; `tools/window_frames.ps1` saves the game window every few seconds (PrintWindow) to
+  see what the menus show.
+- A Time Trial rewrites `savegame@profile` even without a completed lap, so the save guard restores it every run.
+
+### Benchmark leaves them alone
 
 Tyler's F1 25 saves live in `C:\Program Files (x86)\Steam\userdata\928649988\3059520\remote` (10 files, Steam Cloud
 synced). Hashed with SHA-256 during B-0010 (2026-10-31 02:43) and again after its 20 starts (04:20): all 10 identical,

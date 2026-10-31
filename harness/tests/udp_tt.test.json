@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "suite": "verve.udp-time-trial",
+  "defaults": { "addons": [], "timeout_s": 900 },
+  "tests": [
+    {
+      "id": "time_trial_udp",
+      "tags": ["udp", "#4"],
+      "fresh": true,
+      "env": { "kind": "route", "routes": ["f1_world", "play"] },
+      "steps": [
+        { "wait": { "log": "\\[test\\] screen (solo_container|f1_world_activity_container)" }, "timeout_s": 60 },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "right" } },
+        { "pad": { "press": "ls", "ms": 3000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "wait": { "log": "\\[test\\] screen track_select" }, "timeout_s": 60 },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "wait": { "event": "session.start" }, "timeout_s": 150 },
+        { "pad": { "press": "ls", "ms": 8000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 4000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "ai_drives_player": true },
+        { "sample": { "read": "car[player].gearbox.gear_index", "every_ms": 1000, "for_s": 240, "as": "gear" } }
+      ],
+      "assert": [{ "series": "gear", "rises_by": 3 }, { "no_crash": true }]
+    }
+  ]
+}
