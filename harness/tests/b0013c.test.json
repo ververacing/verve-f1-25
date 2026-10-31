@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "suite": "verve.b0013c",
+  "defaults": {
+    "addons": ["verve.b0013"]
+  },
+  "tests": [
+    {
+      "id": "benchmark_austria_5_laps_strong_arm",
+      "tags": ["B-0013", "procession", "strong-arm"],
+      "env": { "kind": "benchmark", "track": "austria", "laps": 5, "cars": 20, "weather": "clear" },
+      "timeout_s": 1200,
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 900 }
+      ],
+      "assert": [
+        { "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 },
+        { "log": "LAPTIMES/V: Reporting NEW LAP TIME", "min": 100 },
+        { "no_crash": true }
+      ]
+    }
+  ]
+}

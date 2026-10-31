@@ -1,0 +1,65 @@
+{
+    "schema_version":  1,
+    "ops":  [
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.aggression",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.speed_in",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.speed_out",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=franco_colapinto]",
+                    "field":  "driver_characteristics.control",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "driver_characteristics.aggression",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "driver_characteristics.speed_in",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "driver_characteristics.speed_out",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=george_russell]",
+                    "field":  "driver_characteristics.control",
+                    "value":  "1.0"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=fernando_alonso]",
+                    "field":  "driver_characteristics.speed_in",
+                    "value":  "0.02"
+                },
+                {
+                    "op":  "set",
+                    "select":  "entrants.drivers.driver[_metadata_=fernando_alonso]",
+                    "field":  "driver_characteristics.speed_out",
+                    "value":  "0.02"
+                }
+            ]
+}
