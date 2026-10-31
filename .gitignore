@@ -13,3 +13,9 @@ Thumbs.db
 # swofty test shell results (launcher logs) and save fixtures: never committed (fixtures hold Tyler's save data)
 swofty-test/
 test-fixtures/
+
+# game window captures (tools/window_frames.ps1): menu frames show the player's gamertag. Hand-picked, checked
+# frames go in harness/fixtures/frames/ instead.
+runs/**/*.png
+runs/**/frames/
+runs/**/hires*/
