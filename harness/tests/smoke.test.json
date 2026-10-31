@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "suite": "verve.harness-smoke",
+  "defaults": {
+    "addons": []
+  },
+  "tests": [
+    {
+      "id": "benchmark_austria_3_laps",
+      "tags": ["smoke"],
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "timeout_s": 900,
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [
+        { "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 },
+        { "log": "RaceStarts: Race Start performance for driver with vehicle id", "min": 20 },
+        { "no_crash": true }
+      ]
+    }
+  ]
+}
