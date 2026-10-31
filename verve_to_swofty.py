@@ -21,7 +21,9 @@ and falls with risk. Strategy stays stock: Verve has no strategy axis, and risk 
 
 The pace rating moves the stock curve, keeping its shape (season progression, #21): Verve pace sets the order and
 the written drivers' stock season-0 ratings are handed out in that order, so the grid keeps its stock spread;
-drivers within PACE_TOL (0.03) of each other in Verve pace share the mean of their slots; each dataset's curve is shifted by target - its own season-0 value. A linear map would
+drivers within PACE_TOL (0.03) of each other in Verve pace form a group whose slots go out in stock order (Verve's
+pace is mostly a floor for drivers without a winning record, so inside a group the game's order is the better
+information; --tie-mode mean shares the slots' mean instead); each dataset's curve is shifted by target - its own season-0 value. A linear map would
 squash the field: Verve puts two drivers at 0.96-1.00 and most at 0.62-0.71. Simulated sessions read the ratings, so they follow Verve pace too.
 
 Output: <out>/swofty.json, <out>/db/verve.json and <out>/table.csv (stock vs Verve per driver, with the F-39
@@ -147,10 +149,12 @@ def set_op(select: str, field: str, value: str) -> dict:
 # build
 # --------------------------------------------------------------------------------------
 
-def rank_map(values: dict[str, float], targets: list[float], tol: float) -> dict[str, float]:
-    """Give the i-th lowest value the i-th lowest target. Near-ties share the mean of their targets: going up from
-    the lowest value, each group takes every value within `tol` of the group's first, so differences smaller than
-    Verve's resolution can't move a driver far (#52 review)."""
+def rank_map(values: dict[str, float], targets: list[float], tol: float, stock: dict[str, float],
+             tie_mode: str) -> dict[str, float]:
+    """Give the i-th lowest value the i-th lowest target. Going up from the lowest value, each group takes every
+    value within `tol` of the group's first: Verve can't tell those drivers apart. Inside a group, tie_mode "stock"
+    hands the group's slots out in stock order (Verve orders the groups, the game orders within them); "mean" gives
+    the whole group the mean of its slots (#52 review)."""
     order = sorted(values, key=values.get)
     targets = sorted(targets)
     out, i = {}, 0
@@ -158,15 +162,19 @@ def rank_map(values: dict[str, float], targets: list[float], tol: float) -> dict
         j = i
         while j + 1 < len(order) and values[order[j + 1]] - values[order[i]] <= tol + 1e-9:
             j += 1
-        mean = sum(targets[i:j + 1]) / (j + 1 - i)
-        for k in order[i:j + 1]:
-            out[k] = mean
+        group, slots = order[i:j + 1], targets[i:j + 1]
+        if tie_mode == "mean":
+            for k in group:
+                out[k] = sum(slots) / len(slots)
+        else:
+            for k, slot in zip(sorted(group, key=lambda d: (stock[d], d)), slots):
+                out[k] = slot
         i = j + 1
     return out
 
 
 def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dict, ratings: bool, center,
-          gain: float, pace_tol: float):
+          gain: float, pace_tol: float, tie_mode: str):
     drivers = [c for c in crosswalk if c["verve_key"] != "-"]
     scalars = {}
     for c in drivers:
@@ -178,7 +186,8 @@ def build(crosswalk: list[dict], verve: dict, stock_rows: dict, pace_curves: dic
                for n in MAPPING}
     # pace rating: Verve pace decides the order, the grid's stock season-0 ratings keep their spread
     stock_x0 = {c["f1_25_label"]: curve_points(pace_curves[(c["stats_label"], "default")])[1][0][1] for c in drivers}
-    targets = rank_map({label: s["pace"] for label, s in scalars.items()}, list(stock_x0.values()), pace_tol)
+    targets = rank_map({label: s["pace"] for label, s in scalars.items()}, list(stock_x0.values()), pace_tol,
+                       stock_x0, tie_mode)
 
     ops, table = [], []
     for c in drivers:
@@ -250,7 +259,9 @@ def main() -> None:
     ap.add_argument("--center", default=CENTER, help='"grid" (default) or a number; 0.5 = the literal #6 spec')
     ap.add_argument("--gain", type=float, default=GAIN, help="stock + gain * (signal - center)")
     ap.add_argument("--pace-tol", type=float, default=PACE_TOL,
-                    help="Verve pace values this close share a pace-rating slot; 0 = pure rank map")
+                    help="Verve pace values this close form one group; 0 = pure rank map")
+    ap.add_argument("--tie-mode", choices=("stock", "mean"), default="stock",
+                    help="inside a group: stock order on the group's slots (default), or the slots' mean")
     ap.add_argument("--print-table", action="store_true", help="print stock vs Verve per driver")
     args = ap.parse_args()
 
@@ -266,7 +277,8 @@ def main() -> None:
             sys.exit(f"{c['stats_label']}: no stock pace curve in {args.stock_pace}")
 
     ops, table, missing, centers = build(crosswalk, verve, stock_rows, pace_curves, ratings=not args.no_ratings,
-                                         center=args.center, gain=args.gain, pace_tol=args.pace_tol)
+                                         center=args.center, gain=args.gain, pace_tol=args.pace_tol,
+                                         tie_mode=args.tie_mode)
 
     out = args.out
     (out / "db").mkdir(parents=True, exist_ok=True)

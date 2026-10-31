@@ -105,11 +105,23 @@ predictions (mean reaction 0.35 - 0.21 k rs, mean bad-start draw 0.24 - 0.08 k m
 Simulated and skipped sessions use baked lap times plus the **ratings**, not the physics, so the `pace` rating
 follows Verve Pace. Verve Pace sets the order and the grid's stock season-0 pace ratings
 (`docs/stock/pace_curves_grid.csv`) are handed out in that order, so the grid keeps its stock spread. Drivers within
-0.03 of each other in Verve Pace (`--pace-tol`) share the mean of their slots, so differences below Verve's
-resolution can't move anyone: today Verve puts 14 drivers at 0.62 to 0.64, and they share one rating. Each driver's
-stock `evolution` curve is then shifted by (target - its season-0 value), keeping its shape and so its season
-progression (#21), in both the `default` and `2026` datasets. The ratings don't drive the live AI's start draws
-(F-36); they show in simulated sessions, career sims and the UI.
+0.03 of each other in Verve Pace (`--pace-tol`) form a group, and the group's rating slots go out in **stock order**
+(`--tie-mode stock`, the default): Verve orders the groups, the game orders the drivers inside one. Verve's pace
+comes from win, pole and podium rates normalised within its roster, so its low end is mostly a floor for drivers with
+little or no winning record, not a judgement that they are equally fast; where Verve has no signal, the game's own
+order is the better information. `--tie-mode mean` gives a group the mean of its slots instead. Today's groups
+(Verve pace @ 80d1798):
+
+- 0.62 to 0.64, 14 drivers (Bearman, Colapinto, Bortoleto, Lawson, Tsunoda, Hadjar, Stroll, Hulkenberg, Albon, Ocon,
+  Gasly, Lindblad, Perez, Sainz): Verve's floor, so stock order on the 14 lowest slots (moves of 5 or less).
+- 0.66 to 0.69 (Russell, Bottas, Piastri) and 0.70 to 0.73 (Antonelli, Leclerc, Norris, Alonso): the next slots up,
+  stock order inside each, so Antonelli rises from 76 to 87 because Verve puts him above the floor.
+- Hamilton (0.96) and Verstappen (1.00) take the top two slots.
+
+Each driver's stock `evolution` curve is then shifted by (target - its season-0 value), keeping its shape and so its
+season progression (#21), in both the `default` and `2026` datasets. The ratings don't drive the live AI's start
+draws (F-36); they show in simulated sessions, career sims and the UI.
+
 ### Strategy
 
 Left stock. Verve has no strategy axis, and risk is not a strategy input (#6).
