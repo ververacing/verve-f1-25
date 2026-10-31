@@ -466,9 +466,9 @@
         "runs/2026-10-30-B-0005/summary.md, racestarts_1.log, racestarts_2.log (#37)",
         "harness/addons/verve.b0005 (40 ops, tags.csv)"
       ],
-      "implications": "The per-driver ai_driver_config route works for race_start (v0.2a, #10), and part of Q-08 is answered: these keys are per driver. Equal bounds pin the reaction exactly. It also gives a vehicle id -> driver map for benchmark Austria (docs/stock/vehicle_map_benchmark_austria.csv).",
+      "implications": "Per driver in benchmark, for the 9 AI-controlled cars that took the tag (vehicle 19 ignores it, F-34). The per-driver ai_driver_config route works for race_start: v0.2a (#10) is partly unblocked (the race_start reaction bounds work). Part of Q-08 is answered: these keys are per driver. Equal bounds pin the reaction exactly, which makes them a precise instrument. It also gives a vehicle id -> driver map for benchmark Austria (docs/stock/vehicle_map_benchmark_austria.csv).",
       "related_questions": ["Q-08"],
-      "status": "verified (benchmark only)"
+      "status": "verified (benchmark only, 9 AI cars)"
     },
     {
       "id": "F-34",
@@ -476,9 +476,10 @@
       "confidence": "inferred (elimination from B-0005; the player-car part is a hypothesis)",
       "evidence": [
         "runs/2026-10-30-B-0005/summary.md (#37)",
-        "runs/2026-10-30-B-0003/summary.md (#33)"
+        "runs/2026-10-30-B-0003/summary.md (#33)",
+        "B-0005 start 2: vehicle 19 reacted at exactly 0.050000, a round number, as if clamped or a fixed launch (supervisor review on #40)"
       ],
-      "implications": "Exclude vehicle 19 (and normally both Ferraris) from every arm and field statistic in benchmark batches.",
+      "implications": "Exclude vehicle 19 (and normally both Ferraris) from every arm and field statistic in benchmark batches. Optional later check (low priority): change the benchmark's player/driver key, if one exists, and see whether the 0.05 behaviour moves to another car.",
       "related_questions": [],
       "status": "open"
     },
