@@ -41,7 +41,7 @@ $ops = foreach ($a in $arms) {
     }
 }
 New-Item -ItemType Directory -Force (Join-Path $here 'db') | Out-Null
-[IO.File]::WriteAllText((Join-Path $here 'db\b0010.json'), (@{ ops = @($ops) } | ConvertTo-Json -Depth 5), (New-Object System.Text.UTF8Encoding $false))
+[IO.File]::WriteAllText((Join-Path $here 'db\b0010.json'), ([ordered]@{ schema_version = 1; ops = @($ops) } | ConvertTo-Json -Depth 5), (New-Object System.Text.UTF8Encoding $false))
 # ops whose value equals the stock row are dropped by the build (docs/harness.md), so they don't count as overwrites
 $same = @($arms | ForEach-Object { if ([double]$_.stock_rs -eq $_.rs) { 1 }; if ([double]$_.stock_m -eq $_.m) { 1 } }).Count
 "ops: $(@($ops).Count), equal to stock: $same, expect overwritten: $(52 + @($ops).Count - $same)"
