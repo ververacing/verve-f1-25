@@ -1,0 +1,3 @@
+"statistic","estimate","boot_se","z","passes_2se","starts","resamples"
+"ROW_high-ROW_low","7.7859","3.3925","2.3","True","5","2000"
+"STATS_high-STATS_low","5.2273","6.9583","0.75","False","5","2000"
