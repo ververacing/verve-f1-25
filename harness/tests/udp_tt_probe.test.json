@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "suite": "verve.udp-time-trial-probe",
+  "defaults": { "addons": [], "timeout_s": 600 },
+  "tests": [
+    {
+      "id": "time_trial_menu_probe",
+      "tags": ["udp", "#4", "probe"],
+      "fresh": true,
+      "env": { "kind": "route", "routes": ["f1_world", "play"] },
+      "steps": [
+        { "wait": { "log": "\\[test\\] screen (solo_container|f1_world_activity_container)" }, "timeout_s": 60 },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "right" } },
+        { "pad": { "press": "ls", "ms": 4000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 6000 } },
+        { "pad": { "press": "a", "ms": 250 } },
+        { "pad": { "press": "ls", "ms": 6000 } }
+      ],
+      "assert": [{ "no_crash": true }]
+    }
+  ]
+}

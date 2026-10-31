@@ -175,8 +175,37 @@ after, restore the originals if anything changed. `tools/run_with_udp.ps1` does 
   identical to the post-B-0010 hashes. Never deleted.
 - **Steam Cloud** syncs `remote\` when the game exits, so a test's write can reach the cloud before the restore. The
   fresh modified time makes the restored files the newer local copy. If a later launch shows a cloud-conflict
-  dialog, stop and tell Tyler rather than clicking through it. Turning Steam Cloud off for F1 25 during test runs
-  would close this hole; that's Tyler's setting and his call.
+  dialog, stop and tell Tyler rather than clicking through it.
+- **Steam Cloud toggle (Tyler confirmed, 2026-10-31):** "Keep game saves in the Steam Cloud" for F1 25 may be
+  switched off for route testing, which closes that hole. The rules:
+  - Toggle it only with F1 25 closed.
+  - Switch it off before the first guarded route run of a session.
+  - Before switching it back on, `saves_guard.ps1 -Action Check` must pass against the master backup or the last
+    verified restore, so a bad local save is never what gets synced.
+  - Switch it back on whenever route testing stops, and on PAUSE before reporting PAUSED (say so in that message).
+  - Log every toggle below with time, on/off and why.
+  It's a Steam UI setting (Library > F1 25 > Properties > General), and Steam rewrites its config files while it runs,
+  so it needs desktop control or Tyler's hand. Until it's off, runs use the fresh-mtime fallback above.
+
+  Toggle log:
+  - 2026-10-31 07:16: not toggled. No desktop control in this session, so I asked Tyler. Cloud was on, and udp-tt-2
+    ran with the fallback (saves unchanged).
+  - 2026-10-31 ~07:45: **OFF**, set by Tyler by hand for route testing. Game closed; saves matched the master backup
+    beforehand. Verified in `userdata\928649988\7\remote\sharedconfig.vdf`: `"3059520" { "cloudenabled" "0" }`.
+    Check that key to confirm the state before switching it back on.
+
+## Time Trial by route (works since 2026-10-31)
+
+`harness/tests/udp_tt.test.json` reaches an AI-driven Time Trial session at Melbourne. The pad sequence, with a frame
+of each screen, is in `runs/2026-10-31-udp-tt-3/summary.md` and `docs/time_trial_route/`. Points that cost runs:
+
+- `play` opens either `solo_container` or `f1_world_activity_container` (F1 World's offline cards), depending on the
+  run, so wait on a log regex that takes either.
+- There's no pause step: `wait` takes only event, log or screen, and `sample` fails outside a session. Hold `ls` (does
+  nothing on these menus) as the pause; a hold of N ms takes about 2N ms of wall time.
+- `capture` doesn't work yet; `tools/window_frames.ps1` saves the game window every few seconds (PrintWindow) to
+  see what the menus show.
+- A Time Trial rewrites `savegame@profile` even without a completed lap, so the save guard restores it every run.
 
 ### Benchmark leaves them alone
 
