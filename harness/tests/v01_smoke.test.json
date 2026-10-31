@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "suite": "verve.v01-smoke",
+  "defaults": {
+    "addons": ["verve.driver-profiles"]
+  },
+  "tests": [
+    {
+      "id": "v01_applies_in_benchmark",
+      "tags": ["smoke", "v01"],
+      "env": { "kind": "benchmark", "track": "austria", "laps": 3, "cars": 20, "weather": "clear" },
+      "timeout_s": 900,
+      "steps": [
+        { "wait": { "log": "RaceStarts: Reaction Time for driver with vehicle id" }, "timeout_s": 240 },
+        { "wait": { "log": "session trace StateSession Exiting \\(benchmark\\)" }, "timeout_s": 720 }
+      ],
+      "assert": [
+        { "log": "RaceStarts: Reaction Time for driver with vehicle id", "min": 20 },
+        { "no_crash": true }
+      ]
+    }
+  ]
+}
