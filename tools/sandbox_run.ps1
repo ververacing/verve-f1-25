@@ -12,7 +12,7 @@ Usage:
     powershell -File tools/sandbox_run.ps1 -Test harness/tests/<suite>.test.json -Out runs/<id>
     powershell -File tools/sandbox_run.ps1 -Fixture <name> -Commands <file> -Out runs/<id>   # `swofty test shell`
                                                                                                 # fed from the file
-    powershell -File tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=aston driver=stroll session=race laps=5" `
+    powershell -File tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5" `
         -Fixture <name> -ExpProfile <isolated profile> -Plan <file> [-Udp] -Out runs/<id>            # direct start
 
 -Session (#64) runs `swofty test session` under the same hash check. It FAILS CLOSED: no fixture or no explicit

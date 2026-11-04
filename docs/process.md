@@ -34,6 +34,12 @@ Game testing runs every day in two windows, Pacific time: **09:00-17:00** and **
 - **Tyler's PAUSE inside a window** holds until RESUME or the next window opening.
 - **Planning:** the day window suits shorter batches and tooling checks. The night window suits long unattended batches (20-30 start replications, multi-race behavioural batches). Size every batch to finish 15 minutes before its wrap-up.
 
+**Scheduled messages only reach the agent between turns, so these rules can't depend on one arriving on time:**
+
+- Check the Pacific clock before every launch and between runs. Never start a run that can't finish 15 minutes before the next wrap-up (16:45 or 05:45).
+- No single blocking command may run past a wrap-up. Split long batches into per-race calls, so control comes back between races.
+- If a window turns out to have closed unnoticed, do the PAUSE routine at once.
+
 The supervisor's scheduled tasks post into the local session: "Verve testing window opens" (09:03 PT), "Verve night testing window opens" (00:00 PT), "Verve testing window wrap-up" (05:45 and 16:45 PT) and "Verve hourly heartbeat (window-aware)" (:37 every hour).
 
 ## Messages to the supervisor
