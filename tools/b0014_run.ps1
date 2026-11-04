@@ -4,8 +4,7 @@ Run one B-0014 race (#71). One call per race, so control comes back between race
 Usage:
     powershell -File tools/b0014_run.ps1 -Race <n> -Batch runs/<date>-B-0014
 
-Odd races use verve.b0014a and the plan with a press during the grid rundown (#65); even races verve.b0014b and the plain
-plan. Refuses to launch outside the testing windows, if a game is running that it didn't start, or if a race can't finish
+Odd races use verve.b0014a and even races verve.b0014b, all on the plan with a press during the grid rundown (#65). Refuses to launch outside the testing windows, if a game is running that it didn't start, or if a race can't finish
 15 minutes before the next wrap-up (05:45 and 16:45 PT). Exits 8 and 9 for those, 5 if saves changed. Rerunning a race
 moves the earlier attempt to <Batch>\invalid\.
 A race takes about 17 min. Check validity afterwards with tools/b0014_check.py.
@@ -28,7 +27,7 @@ if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "race ${Race}: a game is 
 
 $odd = ($Race % 2) -eq 1
 $addon = if ($odd) { 'verve.b0014a' } else { 'verve.b0014b' }
-$plan = if ($odd) { 'harness\sessions\gp_menu_full_press.plan' } else { 'harness\sessions\gp_menu_full.plan' }
+$plan = 'harness\sessions\gp_menu_full_press.plan'   # the rundown press runs in every race, so it can't confound the arms (#71)
 $out = Join-Path $Batch "race_$Race"
 if (Test-Path $out) {
     # a rerun must never mix with the attempt it replaces: keep that one aside, where the scoring won't read it

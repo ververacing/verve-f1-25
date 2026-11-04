@@ -51,7 +51,7 @@ These are declared `address<...>` with no signature, so they may need `SWOFTY_MI
 
 **In a menu race, one `pad a` during the grid rundown ends it.** The press at 18:30:02.4 stopped `r_grid3_06` at 18:30:02.423, then `grid_plyshot` and the grid followed by 18:30:04, about 40 s early. It **did not fire Start Race**: `race.start` came only from a separate press at 18:30:17 (`runs/2026-11-03-menu-trace`). The same in both rehearsals, at difficulty 100.
 
-So the first version of the grid skip may need **no hook at all**, only a synthetic accept, and possibly not even that for a player willing to press. B-0014 repeats it during each odd race's rundown, before lights out. These were all the virtual pad: a real wheel press hasn't been tried.
+So the first version of the grid skip may need **no hook at all**, only a synthetic accept, and possibly not even that for a player willing to press. B-0014 repeats it during every race's rundown, before lights out. These were all the virtual pad: a real wheel press hasn't been tried.
 
 Also: `BroadcastGridRundownViewModel - Skipping Rundown screen` logs twice, about 18 s before the press and with no input, so the game has its own notion of skipping the rundown screen. What sets it isn't known.
 
@@ -184,7 +184,7 @@ Channels: `CUTSCENE_MANAGER`, `CUTSCENE_SCRIPT_VERBOSE`, `GARAGECREW`, `GARAGE`,
 
 **Can run unattended, no addon:**
 
-- [ ] **The game's own skip, repeated:** 5 more times, during B-0014's odd races.
+- [ ] **The game's own skip, repeated:** about 20 more times, during B-0014's races.
 - [ ] **Do other scenes skip on accept?** `pad a` during the post-race chain and the podium. Do it on a run where nothing's being scored.
 - [ ] **Post-race scenes when the player doesn't win,** now that difficulty 100 makes that likely.
 
