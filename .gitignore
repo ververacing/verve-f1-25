@@ -19,3 +19,8 @@ test-fixtures/
 runs/**/*.png
 runs/**/frames/
 runs/**/hires*/
+
+# native addon builds: Zig cache, fetched SDK headers and the built DLLs
+addons/*/native/build/
+addons/*/native/*.dll
+addons/*/native/*.lib
