@@ -51,11 +51,11 @@ From memory of the UDP spec, penalty 6 is "disqualified" and infringement 18 is 
 - The Time Trial garage is the trace bed. Whether it has a push-in isn't known yet.
 - Whether the G29 raises `Menu Accept` still needs Tyler at the wheel.
 
-## Next candidates
+## Update, later the same day
 
-1. `direct_start` on another fixture (`stroll-career-20261031`), one change.
-2. Post the bug report below, if Tyler wants to.
-3. If it can't be fixed soon, #57 needs another route: the career fixture's weekend, whose menu mapping is paused, or a Swofty fix.
+- **A fixture that holds a Grand Prix (`gp-austria-20261104`) doesn't fix it** (`runs/2026-11-03-direct-race-gpfixture`). The session list fills and grid slots are real, but half the field reads 264 km/h 3 s after lights out and the session ends at 18 s.
+- **The normal menu route races to the flag in the sandbox** (`runs/2026-11-03-gp-fixture`), and it's now the route for racing tests. See `docs/harness.md`.
+- #57 passed on this direct-start state (`runs/2026-11-03-B-0012`), and #70 passed on the menu route (`runs/2026-11-03-B-0012b`).
 
 ## Draft bug report for Tyler to post (nothing private in it)
 
@@ -67,7 +67,11 @@ From memory of the UDP spec, penalty 6 is "disqualified" and infringement 18 is 
 >
 > The start itself is great: cover screen, right seat, `race laps 18 -> 5`, and the grid with `Start Race` in about 3.5 minutes. But after Start Race, the cars aren't on the grid. UDP Motion shows all 20 strung out over 1-2 km, near the end of the lap, drifting at 2-8 m/s while telemetry reads about 0 km/h. The Safety Car or a red flag comes within seconds. With `laps=5`, all 20 cars are disqualified at 20 s (`penalty_type=6, infringement=18`), and the results screen shows DSQ for all. Same at Melbourne, without `laps=`, and with `ai_drives_player` on.
 >
-> Also, `session=practice1` and `session=practice_1` both land on the race grid, although the cover says "Opening the garage". `[direct] Grand Prix (built): ... current session 0 of: ` logs an empty session list, so `choose_session` looks like it returns at `if (!n)`. Your docs show a filled list on Classic Seasons boxes. Could the session list be empty for `f1_2025`, leaving the race without a grid to build from?
+> Also, `session=practice1` and `session=practice_1` both land on the race grid, although the cover says "Opening the garage". `[direct] Grand Prix (built): ... current session 0 of: ` logs an empty session list, so `choose_session` looks like it returns at `if (!n)`. Your docs show a filled list on Classic Seasons boxes.
+>
+> **From a fixture that already holds a Grand Prix,** the list fills (`current session 0 of: race`), laps apply (`race laps 71 -> 5`) and cars get real grid slots. But it's still broken: 3 s after lights out about half the field reads 264 km/h while the rest read 0, 12 cars are penalised and retired, and the session ends at 18 s.
+>
+> **The same race through the menus works perfectly,** in the same save sandbox: a real grid, a full 5 laps to the flag, UDP complete. The differences I can see in the session trace: menus use `f1_custom_team` of setup mode `f1`, and direct start uses `f1_2025` of `swofty_f1`.
 >
 > `time_trial f1_2025 austria team=forceindia` works perfectly. Logs and UDP captures are available.
 >

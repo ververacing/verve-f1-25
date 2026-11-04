@@ -27,19 +27,21 @@ import subprocess
 import sys
 from pathlib import Path
 
-BATCH_CHECKS = {"B-0012": "b0012_check.py"}  # batch name in the folder name -> script in tools/
+# batch name in the folder name -> script in tools/ and its arguments; the first match wins, so longer names go first
+BATCH_CHECKS = {"B-0012b": ("b0012_check.py", ["--menu"]), "B-0012": ("b0012_check.py", [])}
 TOOLS = Path(__file__).resolve().parent
 REACTION = re.compile(r"RaceStarts: Reaction Time")
 GAMEDB = re.compile(r"gamedb: (\d+) overwritten, (\d+) created")
 PLAN = re.compile(r"^plan: (.*?); test exit: (\S*); sandbox (.*?); took (\d+) s", re.M)
-LAUNCH = re.compile(r"^launched (\S+):", re.M)
+LAUNCH = re.compile(r"^(?:launched|attempt \d+ started) (\S+)", re.M)
+SHELL_RESULT = re.compile(r"^result: (.*)$", re.M)
 SEAT = re.compile(r"the player drives for (\S+) as (\S+)")
 GRID_SIGNAL = re.compile(r"(\d\d:\d\d:\d\d\.\d+) .*\[test\] screen garage_monitor_container")
 GREEN = re.compile(r"(\d\d:\d\d:\d\d\.\d+) .*RaceStarts: Reaction Time")
 
 
 def seconds(stamp: str) -> float:
-    h, m, s = stamp.split(":")
+    h, m, s = stamp.rstrip(":").split(":")
     return int(h) * 3600 + int(m) * 60 + float(s)
 
 
@@ -68,10 +70,11 @@ def batch_of(run: Path) -> str:
 
 def scored(run: Path) -> tuple[str, str]:
     """Status and a one-line detail from the batch's own check, or ('', '') when it has none."""
-    script = next((s for b, s in BATCH_CHECKS.items() if b in str(run)), None)
-    if not script:
+    entry = next((c for b, c in BATCH_CHECKS.items() if b in str(run)), None)
+    if not entry:
         return "", ""
-    out = subprocess.run([sys.executable, "-I", str(TOOLS / script), str(run)], capture_output=True, text=True).stdout
+    script, extra = entry
+    out = subprocess.run([sys.executable, "-I", str(TOOLS / script), *extra, str(run)], capture_output=True, text=True).stdout
     result = re.search(r"RESULT: (PASS|FAIL|INVALID)", out)
     block = re.search(r"first block: (.*)", out)
     rolls = re.search(r"all logged re-rolls: (.*)", out)
@@ -101,7 +104,9 @@ def summarise(run: Path) -> dict:
     r = {"run": run.name, "batch": batch_of(run), "path": run, "detail": ""}
 
     diff = read(run / "saves_diff.txt").strip()
-    r["saves"] = "CHANGED" if diff else ("unchanged" if (run / "saves_diff.txt").exists() else "?")
+    # the guards always record it now; older runs only have the line in their transcript, or nothing
+    recorded = (run / "saves_diff.txt").exists() or "saves unchanged" in transcript
+    r["saves"] = "CHANGED" if diff else ("unchanged" if recorded else "?")
     db = GAMEDB.search(log)
     r["gamedb"] = f"{db[1]} / {db[2]}" if db else "-"
     seat = SEAT.search(log)
@@ -134,6 +139,8 @@ def summarise(run: Path) -> dict:
             status = "ran" if tests and all(t == "pass" for t in tests) else "problem"
             detail = ", ".join(str(t.get("reason") or t.get("status")) for t in report.get("tests", []))[:160]
         elif plan and plan[-1][0] == "plan done" and plan[-1][2] == "ON":
+            status = "ran"
+        elif SHELL_RESULT.search(transcript) and SHELL_RESULT.search(transcript)[1].strip() == "plan done":
             status = "ran"
         else:
             status = "problem"

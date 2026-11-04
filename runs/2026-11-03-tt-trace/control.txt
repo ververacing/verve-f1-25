@@ -1,0 +1,15 @@
+pad a 250
+@sleep 6
+status
+pad a 250
+@sleep 12
+status
+pad start 250
+@sleep 4
+status
+pad down 200
+pad down 200
+pad a 250
+@sleep 14
+status
+@end

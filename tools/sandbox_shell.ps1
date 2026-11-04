@@ -30,6 +30,10 @@ param(
     [int] $ConfirmS = 120,
     [int] $IntroTries = 3,
     [int] $SkippedIntroS = 40,
+    [string[]] $Addon = @(),      # installed addons to switch on in the shell's minimal profile
+    [string] $Channels = '',      # SWOFTY_GAME_LOG_CHANNELS for the game, when given
+    [switch] $Udp,                # record tools/udp_capture.py alongside and parse it into <Out>/udp/
+    [string] $Python = 'python',
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
     [string] $SteamApp = ''   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
 )
@@ -60,9 +64,24 @@ if ($steps[0] -notmatch '^wait screen=splash') { throw 'the plan must start with
 $before = Snapshot
 Log "saves before: $($before.Count) entries"
 
+if ($Channels) { $env:SWOFTY_GAME_LOG_CHANNELS = $Channels }
+$addonArgs = ($Addon | ForEach-Object { "--addon $_" }) -join ' '
+# UDP capture from %TEMP%: python here can't read under %APPDATA% or most of %LOCALAPPDATA% (docs/harness.md)
+$cap = $null
+if ($Udp) {
+    $udpWork = Join-Path $env:TEMP ("verve-udp\shell-" + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+    New-Item -ItemType Directory -Force $udpWork | Out-Null
+    Copy-Item (Join-Path $PSScriptRoot 'udp_capture.py'), (Join-Path $PSScriptRoot 'udp_parse.py') $udpWork -Force
+    $udpBin = Join-Path $udpWork 'udp.bin'; $udpStop = Join-Path $udpWork 'stop.flag'; $udpLog = Join-Path $udpWork 'capture.log'
+    $cap = Start-Process -FilePath $Python -ArgumentList @('-I', "`"$udpWork\udp_capture.py`"", '--out', "`"$udpBin`"", '--seconds', '14400', '--stop-file', "`"$udpStop`"") `
+        -RedirectStandardOutput $udpLog -RedirectStandardError "$udpLog.err" -WindowStyle Hidden -PassThru
+    Start-Sleep -Seconds 2
+    if ($cap.HasExited) { Log 'ABORT: UDP capture failed to start; nothing launched'; exit 1 }
+    Log "udp capture pid $($cap.Id)"
+}
 $result = 'not run'
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
-    $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "test shell --fixture $Fixture --wait 0"
+    $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true
     $p = [Diagnostics.Process]::Start($psi)
@@ -193,6 +212,19 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
 }
 Log "result: $result"
 
+if ($cap) {
+    New-Item -ItemType File -Force $udpStop | Out-Null
+    if (-not $cap.WaitForExit(15000)) { Stop-Process -Id $cap.Id -Force }
+    Log "udp recording: $((Get-Item $udpBin -ErrorAction SilentlyContinue).Length) bytes"
+    $parsed = Join-Path $udpWork 'udp'
+    try { & $Python -I "$udpWork\udp_parse.py" $udpBin --out $parsed --launch-s '1,3,6' | Out-Null } catch { Log "udp parse failed: $_" }
+    if (Test-Path $parsed) { $dest = Join-Path $Out 'udp'; New-Item -ItemType Directory -Force $dest | Out-Null; Copy-Item "$parsed\*" $dest -Force }
+}
+# the game's log, before the restore below can remove it (a session's copy appears when the game exits)
+$sessionLog = Get-ChildItem "$env:LOCALAPPDATA\Swofty\sessions" -Directory -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -ge $t0.AddSeconds(-5) } |
+    Sort-Object CreationTime -Descending | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'loader.log' }
+if ($sessionLog -and (Test-Path $sessionLog)) { New-Item -ItemType Directory -Force (Join-Path $Out 'raw') | Out-Null; Copy-Item $sessionLog (Join-Path $Out 'raw\loader.log') -Force }
+
 Start-Sleep -Seconds 5
 # the shell leaves its game lock and test profile behind even after a clean quit; free them for the next run
 & $Swofty restore | Out-Null
@@ -201,7 +233,8 @@ $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }
 }
-$diff | Set-Content (Join-Path $Out 'saves_diff.txt') -Encoding utf8
+# always written, empty when nothing changed: a missing file means the check never ran
+Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
 if ($result -ne 'plan done') { exit 6 }

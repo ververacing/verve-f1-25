@@ -1,7 +1,10 @@
 """Check one direct-start race against B-0012's pre-registered criterion (#57).
 
 Usage:
-    python -I tools/b0012_check.py [--expect-overwritten N] runs/<id> [more runs]
+    python -I tools/b0012_check.py [--menu] [--expect-overwritten N] runs/<id> [more runs]
+
+--menu is for B-0012b (#70): the menu route logs no seat line, so the run must instead show the stock 2025 grid
+over UDP, with the player in Alonso's team and named Stroll by LAPTIMES.
 
 Reads <run>/raw/loader.log and <run>/udp/ (tools/sandbox_run.ps1 -Session -Udp). Each run is PASS, FAIL or INVALID.
 Exit 0 if every run passes, 1 if any fails, 3 if none fails but some are invalid and must be rerun.
@@ -29,7 +32,10 @@ PINNED = 0.65
 TOLERANCE = 0.0005
 REACTION = re.compile(r"RaceStarts: Reaction Time for driver with vehicle id (\d+): ([\d.]+)")
 GAMEDB = re.compile(r"gamedb: (\d+) overwritten, (\d+) created")
-LAPNAME = re.compile(r"v\((\d+), [^)]*?([A-Z][A-Z'\- ]+)\)")
+LAPNAME = re.compile(r"v\((\d+), ([^)]+)\)")
+STOCK_2025 = {"ALBON", "ALONSO", "ANTONELLI", "BEARMAN", "BORTOLETO", "COLAPINTO", "GASLY", "HADJAR", "HAMILTON",
+              "HULKENBERG", "LAWSON", "LECLERC", "NORRIS", "OCON", "PIASTRI", "RUSSELL", "SAINZ", "STROLL", "TSUNODA",
+              "VERSTAPPEN"}
 
 
 def race_uid(udp: Path) -> str:
@@ -53,7 +59,25 @@ def is_pinned(value: float) -> bool:
     return abs(value - PINNED) < TOLERANCE
 
 
-def check(run: Path, expect_overwritten: int) -> str:
+def menu_validity(names: dict[int, str], player: int, teams: dict[int, str], log: list[str]) -> list[str]:
+    """B-0012b: the menu route's list reads f1_custom_team, so prove it's the stock grid with Stroll as the player."""
+    invalid = []
+    others = {n for v, n in names.items() if v != player}
+    if others != STOCK_2025 - {"STROLL"}:
+        invalid.append(f"not the stock 2025 grid: missing {sorted(STOCK_2025 - {'STROLL'} - others)}, "
+                       f"extra {sorted(others - STOCK_2025)}")
+    alonso = next((v for v, n in names.items() if n == "ALONSO"), None)
+    if alonso is None or teams.get(player) != teams.get(alonso):
+        invalid.append(f"the player's car {player} isn't in Alonso's team")
+    logged = {int(m[1]): m[2] for m in map(LAPNAME.search, log) if m}
+    if player in logged and "STROLL" not in logged[player].upper():
+        invalid.append(f"LAPTIMES names the player's car {player} as {logged[player]}")
+    print(f"  menu route: UDP grid {'is' if others == STOCK_2025 - {'STROLL'} else 'is NOT'} stock; "
+          f"LAPTIMES names car {player} as {logged.get(player, 'nothing')}")
+    return invalid
+
+
+def check(run: Path, expect_overwritten: int, menu: bool = False) -> str:
     print(f"=== {run.name}")
     log = (run / "raw" / "loader.log").read_text(encoding="utf-8", errors="replace").splitlines()
     draws = [(int(m[1]), float(m[2])) for m in map(REACTION.search, log) if m]
@@ -107,7 +131,16 @@ def check(run: Path, expect_overwritten: int) -> str:
         invalid.append(f"gamedb {counts[0][0]} overwritten, expected {expect_overwritten}")
     seat = next((m[0] for m in (re.search(r"the player drives for \S+ as \S+", l) for l in log) if m), "no seat line")
     print(f"  gamedb: {counts[0] if counts else 'none'}; {seat}; UDP player car {player} ({names.get(player, '?')})")
-    if "forceindia as lance_stroll" not in seat:
+    # one reaction line per car per start is what a normal start should give (recorded, not scored)
+    per_car = {v: sum(1 for x, _ in draws if x == v) for v in set(x for x, _ in draws)}
+    print(f"  reaction lines per car: min {min(per_car.values(), default=0)}, max {max(per_car.values(), default=0)}, "
+          f"{'exactly one each' if per_car and set(per_car.values()) == {1} else 're-rolled or partial'}")
+    if menu:
+        with open(run / "udp" / "cars.csv", newline="", encoding="utf-8") as f:
+            uid = race_uid(run / "udp")
+            teams = {int(r["car"]): r["team_id"] for r in csv.DictReader(f) if r["session_uid"] == uid}
+        invalid += menu_validity(names, player, teams, log)
+    elif "forceindia as lance_stroll" not in seat:
         invalid.append(f"player is not Stroll: {seat}")
     if player in pinned:
         invalid.append(f"the player's car {player} reads 0.650")
@@ -128,6 +161,8 @@ def check(run: Path, expect_overwritten: int) -> str:
 def main() -> int:
     args = sys.argv[1:]
     expect = EXPECT_OVERWRITTEN
+    menu = "--menu" in args
+    args = [a for a in args if a != "--menu"]
     if args[:1] == ["--expect-overwritten"]:
         expect = int(args[1])
         args = args[2:]
@@ -135,7 +170,7 @@ def main() -> int:
     if not runs:
         print(__doc__)
         return 2
-    results = [check(r, expect) for r in runs]
+    results = [check(r, expect, menu) for r in runs]
     print(f"\n{results.count('pass')} pass, {results.count('fail')} fail, {results.count('invalid')} invalid, "
           f"of {len(results)} run(s)")
     if "fail" in results:

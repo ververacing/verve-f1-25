@@ -1,0 +1,23 @@
+udp capture pid 26956
+launched 17:29:15.551: test session time_trial f1_2025 austria team=forceindia (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261104-012915-1, save sandbox)
+sandbox confirmed after 23 s: shell-20261104-012915-1
+attempt 1: intro video played (9.8 s)
+17:30:29 log: 2026-11-03 17:30:28.439 [26276] [direct] screen garage_cockpit opened 1890 ms into the session
+17:30:41 > status  =>  {"seq":1,"status":"ok","value":{"v":1,"pid":316,"run":"shell-20261104-012915-1","ticks":14593,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+control: waiting for steps in %USERPROFILE%\Documents\verve-f1-25\runs\2026-11-03-tt-trace\control.txt
+17:30:43 > pad a 250  =>  {"seq":2,"status":"ok","ms":500}
+17:30:50 > status  =>  {"seq":3,"status":"ok","value":{"v":1,"pid":316,"run":"shell-20261104-012915-1","ticks":17647,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+17:31:03 > pad a 250  =>  {"seq":4,"status":"ok","ms":500}
+17:31:15 > status  =>  {"seq":5,"status":"ok","value":{"v":1,"pid":316,"run":"shell-20261104-012915-1","ticks":26689,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+17:31:27 > pad start 250  =>  {"seq":6,"status":"ok","ms":500}
+17:31:32 > status  =>  {"seq":7,"status":"ok","value":{"v":1,"pid":316,"run":"shell-20261104-012915-1","ticks":32689,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+17:31:44 > pad down 200  =>  {"seq":8,"status":"ok","ms":406}
+17:31:45 > pad down 200  =>  {"seq":9,"status":"ok","ms":406}
+17:31:57 > pad a 250  =>  {"seq":10,"status":"ok","ms":500}
+17:32:12 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":316,"run":"shell-20261104-012915-1","ticks":47107,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+control: ended
+17:32:47 > quit  =>  {"seq":12,"status":"ok","value":{"windows":1},"ms":0}
+plan: plan done; test exit: 0; sandbox ON; took 224 s
+udp recording: 19087505 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-172913
+saves unchanged (22 entries)

@@ -4,41 +4,53 @@ Static research from Swofty's `re/db`, its SDK headers and `bindings.json` (laun
 
 ## The constraint that shapes everything
 
-**An addon can only hook exported bindings, and a plugin that names an unexported one is dropped whole.** `swofty/addons/core/bindings.json` is the list. Checked against 1.8.4:
+**An addon can only hook bindings exported in `swofty/addons/core/bindings.json`, and a plugin naming an unexported one is dropped whole.** Checked against 1.8.4, 2,660 ids:
 
-| Target | Level | Exported to addons? |
+**Not exported, so can't be hooked** (all L1): `Game_CutsceneManager_PlayInternal` and `StopInternal`, `Game_CutsceneScript_RequestShutdown`, `SetStateShutdown` and `TestAndClrRequestStop`, `Game_GarageCrew_StateTransition`, every `GarageCrewInstanceLogic_State*`, `Game_Input_IsMenuAcceptPressed`.
+
+So the brief's plan of wrapping `PlayInternal` and `StateTransition` can't be built as written. A request to export them is drafted in [upstream/swofty_skip_bindings.md](upstream/swofty_skip_bindings.md). `api->scan` can find those addresses for **calling**, but nothing offers a mixin on a raw address.
+
+**Exported, and potentially enough** (all L2):
+
+| Binding | Address | What it offers |
 |---|---|---|
-| `Ne_InputMapper_IsActionPressed` 0x1441162f0 | L2 | **Yes** |
-| `Ne_InputMapper_IsActionReleased` | L2 | **Yes** |
-| `Ne_Input_IsActionDownAnyDevice` 0x144116870 | L2 | **Yes** |
-| `Ne_Input_InternActionName` 0x143a860a0 | L2 | **Yes** |
-| `Sess_PlayCutScene_OnStateEnter` 0x142d78f80 | L2 | **Yes** |
-| `Sess_PreRaceGridState_OnEnter` 0x142d81270 | L2 | **Yes** |
-| `Sess_RetirementSequence_Update`, `_ShouldEnd`, `_PlayTerminalDamage` | L2 | **Yes** |
-| `Sess_IntroVideo_CanFinish` 0x142d6d3b0 | L2 | **Yes** |
-| `Game_Handle_GarageCrewEvent_Thunk` 0x14038cc80 | L2 | **Yes**, but a jump into `.data1` |
-| `Game_Input_IsMenuAcceptPressed` 0x1436af750 | L1 | No |
-| `Game_CutsceneManager_PlayInternal` 0x140227db0, `StopInternal` 0x140228870 | L1 | No |
-| `Game_CutsceneScript_RequestShutdown` 0x140237150, `SetStateShutdown`, `TestAndClrRequestStop` | L1 | No |
-| `Game_CutSceneParams_SetIgnoreEndEvent` 0x14022d340 | L1 | No, and no signature either |
-| `Game_GarageCrew_StateTransition` 0x14043e5a0, every `GarageCrewInstanceLogic_State*` | L1 | No |
+| `Ne_InputMapper_IsActionPressed`, `IsActionReleased`, `Ne_Input_IsActionDownAnyDevice`, `InternActionName` | 0x1441162f0, -, 0x144116870, 0x143a860a0 | Read and swallow a game action |
+| `Game_DataDrivenCutSceneScript_FireEvent` | 0x1402527b0 | An event named `STOP` calls the script's own stop. **The most promising way to end a scene.** Also sees the script pointer |
+| `Game_DataDrivenCutSceneScript_SetStateStop` | 0x140251f80 | Direct stop: state 8, and notifies its components |
+| `Game_CutSceneScript_SetStateFinished`, `Game_CutSceneScript_Initialise`, `_RunCommand` | 0x140238af0, -, 0x14023c600 | Script lifecycle: a place to learn script pointers without `PlayInternal`. Note says the name is at script+0x550 |
+| `Sess_PreRace_Update`, `Sess_PreRace_PlayGridPlayerShotCutscene`, `Sess_PreRace_OnStateExit` | 0x142d831e0, 0x142d83e30, 0x142d843e0 | The grid state, and the call that plays `grid_plyshot` |
+| `Sess_PlayCutScene_OnStateEnter` | 0x142d78f80 | The session's own cutscene state |
+| `Sess_RetirementSequence_ShouldEnd`, `_OnEnter`, `_PlayTerminalDamage` | 0x142d8b080, 0x142d89960, - | A clean decision point for terminal damage |
+| `Sess_IntroVideo_CanFinish` | 0x142d6d3b0 | True when its skip flag +0xdc6 is set |
+| `Game_RewardSequence_PlayCutscene`, `Game_Pod2019FirstScript_Shutdown` | 0x142c74860, - | Reward and podium paths |
+| `Game_Handle_GarageCrewEvent_Thunk` | 0x14038cc80 | **Every crew request passes here, `_Inst` events included.** A stub jumping into `.data1`: the stub can be used, the body can't be patched |
+| `Game_GarageCrewInstance_PlaySequence`, `PlayOverlaySequence` | 0x140382500, 0x1403848a0 | The crew's animation sequences, by name |
+| `Game_InGameMenuVM_OnReturnToGarage` | 0x141d592c0 | Return handler; references `flying_to_track_instant` |
+| `Game_Garage_FadeOutForExit`, `FadeInAfterReturn`, `OnFadedOutInRace` | 0x142a3a560, 0x142a3ac00, 0x142a3cbe0 | Garage fades |
 
-So the brief's plan of wrapping `PlayInternal` and `StateTransition` **can't be built as written**. All the unexported rows except `SetIgnoreEndEvent` do have signatures in upstream's `re/db/signatures.json`, so there are three ways forward:
+These are declared `address<...>` with no signature, so they may need `SWOFTY_MIXIN_WRAP` with a signature we state ourselves. Not tried yet.
 
-1. **Ask upstream to export them (recommended first).** It's the clean route, and it needs them raised to L2. The same request can go with the bug report.
-2. **Find them with `api->scan`.** The API can return an address from a signature, which is enough to **call** a function such as `requestShutdown`. Nothing in the docs or `swofty_api.h` offers a mixin on a raw address, so this doesn't give us a hook. Upstream's advice is also "hook bindings, not fixed addresses".
-3. **Use only what's exported.** See the fallbacks below. This covers less, but it can ship without upstream.
+## What's possible, per scene
 
-The exported bindings are declared `address<...>` with no signature, so `SWOFTY_WRAP`'s compile-time check may not apply. They may need the lower-level `SWOFTY_MIXIN_WRAP` with a signature we state ourselves. Not tried yet.
+"Exported only" means possible without any upstream change. **None of this is tested.** The "game's own skip" column matters most: `IsMenuAcceptPressed` has callers in `PlayCutScene`, `IntroVideo_CanFinish`, `RetirementSequence` and TalkingPoints, so some scenes may already skip on an accept press.
+
+| Scene | Seen so far | Game's own skip? | Exported only? | Route to test first |
+|---|---|---|---|---|
+| **Grid rundown** (`grid_scs_*`, `r_grid*`) | Yes, about 45 s of 10 s shots | Unknown. Press `a` during it | **Maybe** | `FireEvent("STOP")` on the active scripts, if they're data-driven. They chain, so each one needs it |
+| **`grid_plyshot`** | Yes | `Start Race` ends it | **Likely** | Wrap `Sess_PreRace_PlayGridPlayerShotCutscene` and don't call `orig`. Risk: the grid UI may wait on it |
+| **Session intro video** | Yes, in the flow | Yes, by the `CanFinish` flag | **Likely** | Wrap `CanFinish` |
+| **Intro flag** (`intro_flag`, `_alt`) | No | Unknown | **Maybe** | `FireEvent("STOP")`. Initialise is L1 and not exported |
+| **Podium** | No, needs a full race with the player on the podium | Unknown | **Maybe** | `Game_Pod2019FirstScript_Shutdown`, or `Game.SkipRewardSequence` |
+| **Results** | Screen only: `session_results_container` | `Advance` is a menu, not a scene | **Yes**, but it may need nothing | It's a menu press. Check what, if anything, plays first |
+| **Terminal damage** | No | Note says `RetirementSequence` reads accept | **Likely** | Wrap `ShouldEnd` to return true |
+| **Track extras** (marshals, helicopter...) | No | No: ambient, not blocking | **No** | Initialise functions are L1. Low value: they block nothing, so leave them out of v1 |
+| **Garage: to track** | Yes, Time Trial: instant | Yes, the `_Inst` request exists | **Maybe** | Rewrite the request at the thunk |
+| **Garage push-in** | **No: not seen yet** | Same | **Maybe** | Same |
 
 ## (a) Detecting the press and swallowing it
 
-**What the game does:** `IsMenuAcceptPressed` asks whether any local controller reports the interned action `Menu Accept`, through `Ne_Input_IsActionDownAnyDevice` (database note, L1). It has 15 callers, including the cutscene state and the TalkingPoints skip button. `Ne_InputMapper_IsActionPressed` returns a pressed-edge flag by action hash.
-
-**Design:**
-
 - Intern `Menu Accept` once with `Ne_Input_InternActionName`, so the handle can be compared by value.
-- Wrap `IsActionPressed` and `IsActionDownAnyDevice`, both exported. Only the action we care about is touched. Everything else goes straight to `orig`.
+- Wrap `IsActionPressed` and `IsActionDownAnyDevice`. Only that action is touched. Everything else goes straight to `orig`.
 - While a skippable scene is up and `skip_input` is `game_action`, a true result from `orig` counts as a press.
 - On a press, ask for the skip and enter **swallowing**: both wraps return false for that action until `orig` has read false for a release **and** at least 300 ms has passed.
 
@@ -46,20 +58,19 @@ The exported bindings are declared `address<...>` with no signature, so `SWOFTY_
 idle --press during a skippable scene--> swallowing --released and 300 ms passed--> idle
 ```
 
-- **While swallowing, the game must see no press at all**, so `Start Race` and `Go to Track` can't fire from the same one.
-- **Hold a safety limit:** if `orig` never reads released (a stuck button or a lost device), leave swallowing after about 5 s and log it, so the player's button can't stay dead.
+- **Safety limit:** if `orig` never reads released (a stuck button or a lost device), leave swallowing after about 5 s and log it, so the player's button can't stay dead.
 
 **Three unknowns that could break this:**
 
-1. **Does the G29 raise `Menu Accept`?** `INPUT` logs from today show no per-press lines, so the trace needs a log line in the wrap. It needs Tyler at the wheel.
-2. **Do the wraps get called while a scene plays?** Detection only works if something polls the action each frame. If nothing does, poll it ourselves from `on_frame`, which needs the manager pointer `[0x14604c2c8]+0x140+0x1c0` (an L1 field path).
-3. **Do menu prompts read the same path?** `Start Race` and `Go to Track` may come through UI view-model input rather than these two functions. **If they do, these wraps won't swallow the press**, and the double-fire hazard stays open. This is the biggest risk in the design.
+1. **Does the G29 raise `Menu Accept`?** `INPUT` logs show no per-press lines, so this needs a line from a wrap, and Tyler at the wheel.
+2. **Do the wraps get called while a scene plays?** If nothing polls the action, poll it from `on_frame`, which needs the manager pointer `[0x14604c2c8]+0x140+0x1c0` (an L1 field path).
+3. **Do menu prompts read the same path?** `Start Race` and `Go to Track` may come through UI view-model input. **If they do, these wraps won't swallow the press**, and the double-fire hazard stays open. This is the biggest risk here.
 
-**Fallback inputs** don't change the state machine: DirectInput with a learned button, or `key_pressed(vk)` from the overlay. They'd only need the swallow if they share a button with the game's binding, and the same 3rd unknown applies then.
+**Fallback inputs** don't change the state machine: DirectInput with a learned button, or `key_pressed(vk)`.
 
 ## (b) The active cutscene's name and script pointer
 
-**What the logs show.** The manager logs every step, with the script pointer and name. A real race grid from `direct-race-2`, with no input:
+A real race grid from `direct-race-2`, with no input:
 
 ```text
 15:50:14.006 playInternal [..68C6C0] [grid_scs_2018_np]
@@ -73,41 +84,42 @@ idle --press during a skippable scene--> swallowing --released and 300 ms passed
 15:51:11.134 setStateShutdown (all of them), about when Start Race was pressed
 ```
 
-And as a session starts, `requestShutdown` then `setStateShutdown` on `f1_world_loadout` about 9 ms later. So `requestShutdown` followed by `setStateShutdown` **is a real path in the game**, which supports asking for a shutdown rather than jumping states. L3 for the sequence, not for calling it ourselves.
+And as a session starts, `requestShutdown` then `setStateShutdown` on `f1_world_loadout` about 9 ms later. So asking for a shutdown **is a real path in the game**.
 
-**Lessons from that sequence:**
+- **"Grid" is several scripts in a row, about 10 s each**, some active at once. A skip has to deal with the chain, or the next one just starts.
+- **Preloaded isn't playing.** `f1_26_cloth_car` and others are preloaded and shut down without playing.
+- **Never touch `f1_world_loadout`.** It's the front-end scene the session's own start shuts down.
 
-- **"Grid" is several scripts in a row, about 10 s each**, and more than one is active at once. A skip has to deal with a chain, or the next one just starts.
-- **The game itself uses `stopInternal`** at the end of the rundown, then `testAndClrRequestStop`. That may be a better way in than `requestShutdown`. The trace should compare them.
-- **Preloaded isn't playing.** `f1_26_cloth_car` and others are preloaded and get shut down without ever playing.
-- **Don't touch `f1_world_loadout`.** It's the front-end scene the session's own start shuts down.
+**Getting the name and pointer without `PlayInternal`:** wrap `Game_CutSceneScript_Initialise` or a lifecycle function to collect script pointers, and read the name at script+0x550 (one database note: confirm in the trace). Then map names to the per-scene toggles, and treat anything unknown as "don't skip".
 
-**How to get the name and pointer, by route:**
+## (c) The garage: today's trace (Time Trial)
 
-- **With upstream's exports:** wrap `playInternal` and `stopInternal`. The log format gives `this`-style script pointer and name.
-- **Without them:** no wrap can see this. `Sess_PlayCutScene_OnStateEnter` builds `CutSceneParams` for the session's own cutscene state, so it gives a state-level signal ("a session cutscene is starting") but not a list of grid scripts. Mapping the per-scene toggles (podium, grid, garage...) onto that signal is unproven.
+```text
+Go to Track, then Flying Lap:
+17:31:03.011 GARAGE: onPitStateChanged m_nextPitState 1
+17:31:03.013 GARAGECREW: GAME EVENT [0] ERequest_SendCarToTrack_Inst
+17:31:03.016 GARAGECREW: StateTransition setNextState StateSendCarToTrack_P3
+17:31:03.049 GARAGECREW: m_transitionComplete, ANIM EVENT [0] SC, GarageCrewInstance::hide
 
-The scene names need a table: `grid_*`, `r_grid*` and `grid_plyshot` are seen. Podium, results, `terminal_damage` and `intro_flag` names aren't seen yet, as no race has reached them.
+Pause, Return to Garage:
+17:31:58.077 GARAGE: returnVehicleToGarage (virtualiseData 1, sessionSkipped 0)
+17:31:58.093 GARAGE: onPitStateChanged m_nextPitState 9, changeToGarageCamera
+17:31:58.098 GARAGECREW: GAME EVENT [0] ERequest_ReturnToGarage_Inst
+17:31:58.112 GARAGECREW: StateTransition setNextState StateCarIsReadyForTrack
+17:31:58.113 GARAGECREWINSTANCE: unhide
+```
 
-**Also available:** `Sess_IntroVideo_CanFinish` (exported) returns true when its skip flag `+0xdc6` is set, so the session intro video may have a simple, safe skip. And `Game.SkipRewardSequence` is an existing console variable for reward sequences.
+**What this shows:**
 
-## (c) Garage-crew transitions
+- **There are instant requests in the game itself:** `ERequest_SendCarToTrack_Inst` and `ERequest_ReturnToGarage_Inst`. Each transition took under 40 ms, with no push-in.
+- **A Time Trial's return has no push-in**, so it can't be the push-in's trace bed. It may still be fine for a Time Trial player's exit.
+- **`StateWaitPushIntoGarage` and `StateZoomIntoMonitor` never ran.** They're presumably the non-`_Inst` path, in a real weekend.
 
-**What's known:** `StateWaitPushIntoGarage` -> `StateZoomIntoMonitor` -> `StateCarIsReadyForTrack` -> `StateSendCarToTrack_P3`, driven by `StateTransition` (`setNextState` logs), with requests through `Game_Handle_GarageCrewEvent_Thunk`. All L1 except the thunk. The car's own pit status goes garage 0/9 -> WantsToLeave 10 -> 11/12 -> LeavingGarage 13 -> LeavingPitLane 14 -> OnTrack 1 (session notes).
+**The new candidate, replacing "skip to a state":** when a non-instant request reaches `Game_Handle_GarageCrewEvent_Thunk` (exported), rewrite it to its `_Inst` twin. The game then uses its own instant path, so no state is jumped, and the stuck-car risk should be far lower. **Unproven:** we don't know the requests' enum values, which a log-only trace at the thunk can show, or whether the rest of the game expects the animation to finish.
 
-**What today's logs add:** nothing on the sequence itself. The Time Trial sat in the garage for 3 minutes with no input and logged only `onSessionLoaded`, `spawnGarageCrew` and one `GarageCrewInstance::hide`, with no `setNextState`. So **the states only move on a garage exit or return**, and no exit has been traced yet.
+**Still never do:** anything from `StateSendCarToTrack_P3` onward by hand. The car's pit status 10 -> 13 -> 14 is live physics.
 
-**Candidates, all unproven until traced:**
-
-| Candidate | Why it might be safe | Risk |
-|---|---|---|
-| `StateWaitPushIntoGarage` -> `StateZoomIntoMonitor` on return | It's the state after the push-in, so the game gets there anyway | The car may not be physically in the box yet, which could leave it stuck |
-| `StateCarIsReadyForTrack` -> `StateSendCarToTrack_P3` on exit | Purely the crew's send-off | It may wait for the pit lane to clear. Skipping that could release the car into traffic |
-| Never: `StateSendCarToTrack_P3` onward | | The car's own status 10 -> 13 -> 14 is live physics, not a cutscene |
-
-**Route:** `StateTransition` isn't exported, so this also needs upstream's export. `Game_Handle_GarageCrewEvent_Thunk` is exported but jumps into `.data1`, which upstream's rules say to treat as a black box: it can be called, not patched. Calling it to request a state may be the only route without an export, and that's unproven.
-
-**Honest read:** the garage push-in is the riskiest part and has the least support. Build the cutscene skip first.
+**Honest read:** still the part with least support, because the push-in itself hasn't been seen. Build the cutscene skip first.
 
 ## (d) Watchdog
 
@@ -119,34 +131,36 @@ waiting --expected state seen--> armed
 waiting --deadline passed--> tripped: log it, one-line notice, no more auto-skips of this type this session
 ```
 
-- **Expected next state:** for cutscenes, `stopInternal` or `setStateShutdown` on that script, or the next scene or screen. For the garage, the next crew state from the trace, plus the car's pit status.
-- **Runs on `on_frame`** from `swofty/events.hpp`. If the frame tick isn't available, don't skip at all: the core logs a missing tick, and no watchdog means no skips.
-- **Button mode:** a tripped watchdog stops auto-skip for that type, and a press still works, because it's the player's own choice. Whether a press should be allowed after a garage trip is a judgement call, and I'd say no for the garage.
-- **Reset:** on `session.start`. Never carried across sessions.
-- **Fail safe:** a trip only stops further skips. It never tries to repair the state: a repair is another blind jump.
-- **It can't undo a stuck car.** A stuck state after a garage skip needs a test before shipping, not a watchdog. The 20 exits and returns in #65's acceptance are what cover this.
+- **Expected next state:** for cutscenes, the script's stop or finish, or the next scene or screen. For the garage, the next crew state from the trace, plus the car's pit status.
+- **Runs on `on_frame`.** If the frame tick isn't available, don't skip at all: no watchdog means no skips.
+- **Button mode:** a tripped watchdog stops auto-skip for that type, and a press still works, except for the garage.
+- **Reset** on `session.start`. Never carried across sessions.
+- **A trip only stops further skips.** It never tries to repair the state, because a repair is another blind jump.
+- **It can't undo a stuck car.** That's what the 20 exits and returns in #65's acceptance are for.
 
-## Checklist for the trace
+## Checklist for the next traces
 
-Run with `CUTSCENE_MANAGER`, `CUTSCENE_SCRIPT_VERBOSE`, `GARAGECREW`, `GARAGE`, `GARAGECREWINSTANCE`, `INPUT` at info. Time Trial: `time_trial f1_2025 austria team=forceindia`, in the sandbox.
+Channels: `CUTSCENE_MANAGER`, `CUTSCENE_SCRIPT_VERBOSE`, `GARAGECREW`, `GARAGE`, `GARAGECREWINSTANCE`, `INPUT`, all at info.
 
-**Can run unattended:**
+**Done today:** ✓ Time Trial exit and return sequences. ✓ Time Trial has no push-in on return. ✓ Grid cutscene chain.
 
-- [ ] `Go to Track` once: the full `setNextState` sequence and timings on exit, with the car's pit status from UDP.
-- [ ] Return to the garage (a `start`, `down`, `down`, `a` sequence is documented upstream; check it first): the full sequence on return. **Is there a push-in in a Time Trial at all?** If not, fall back to the career fixture's weekend route to the P1 garage.
-- [ ] The cutscenes that play on exit and return, by name.
-- [ ] A test build with log-only wraps on `IsActionPressed` and `IsActionDownAnyDevice`: are they called during a scene, and how often? Which action hashes? Does a `pad a` on `Go to Track` go through them? **That answers whether a press can be swallowed.** A log-only wrap changes nothing, so this is a safe first native step, but it does need SWOFTY_MIXIN_WRAP to work on an `address<>` binding.
+**Can run unattended, no addon:**
+
+- [ ] **Push-in:** a menu Grand Prix with a practice session (Weekend Structure in the settings hub), then go out and return. Is it non-`_Inst`? The full sequence and its timings.
+- [ ] **The game's own skip:** `pad a` during the grid rundown in a menu race. Does anything skip? Does it fire `Start Race` too?
+- [ ] **Which scenes come after the flag:** a menu race driven past `Advance`, for podium and results scene names.
+
+**Needs a log-only test build first (safe: it changes nothing):**
+
+- [ ] Wraps on `IsActionPressed` and `IsActionDownAnyDevice`: are they called during a scene? With which action hashes? Does a `pad a` on `Go to Track` pass through them? **That answers whether a press can be swallowed.**
+- [ ] Are the grid scripts data-driven? Does `FireEvent` see them? Is the name really at script+0x550?
+- [ ] What do requests look like at `Game_Handle_GarageCrewEvent_Thunk`? The enum values for the `_Inst` pairs.
 
 **Needs Tyler at the wheel:**
 
-- [ ] Does the G29's Cross button raise `Menu Accept`? Press it in the garage with the log-only build running, and watch for the wrap's line.
-- [ ] Which button is bound to it in his profile?
-
-**Later, once a race runs (blocked by #64):**
-
-- [ ] Podium, results, `terminal_damage` and `intro_flag` scene names.
+- [ ] Does the G29's Cross button raise `Menu Accept`? Which button is bound to it in Tyler's profile?
 
 ## Decisions needed
 
-1. **Ask Swofty to export the cutscene manager, script and garage-crew functions?** Recommended; everything except input hangs on it. It's Tyler's call, along with the bug report.
-2. **Ship cutscenes before the garage?** Recommended, given the risk above. It means #65's acceptance splits in two.
+1. **Ask Swofty to export the manager, script and garage-crew functions?** It's less critical than it first looked, since the exported functions may be enough, but the request is drafted. It's Tyler's call, along with the bug report.
+2. **Ship cutscenes before the garage?** Recommended. It means #65's acceptance splits in two.
