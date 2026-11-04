@@ -1,0 +1,54 @@
+# As gp_menu_race.plan up to the settings hub, then live steps from <Out>/control.txt: for mapping settings, such as a
+# practice session for the #65 push-in trace.
+# Sub-screens share the id solo_container, so each press relies on the default highlight and a settle time.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+@expect fe_f1_world
+@raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}
+@sleep 6
+@expect f1_world_activity_container
+# the Grand Prix card
+pad a 250
+@sleep 6
+# the season: one right is F1 2025
+pad right 250
+@sleep 3
+pad a 250
+@sleep 6
+@expect solo_container
+# round 1's track: ten right from Australia is Austria
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+# team: four right from McLaren is Aston Martin. Then the driver: Stroll is the default
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+pad a 250
+@sleep 7
+@expect settings_container
+status
+@control 420

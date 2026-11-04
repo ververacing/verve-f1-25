@@ -96,6 +96,9 @@ powershell -File tools/sandbox_shell.ps1 -Fixture tyler-profile-20261031 -Plan h
 - **Reads per-driver `race_start`:** B-0012b (#70), 5 of 5. Each car draws exactly once per start.
 - **The session trace reads `f1_custom_team` of setup mode `f1`,** but UDP shows the stock 2025 grid, and game-database rows apply (52 + the batch's edits).
 - **The player is car 19** on this route, every time. The direct start shuffles vehicle numbers.
+- **The grid is random:** it changes every race, with no qualifying to set it. Read each car's slot from UDP. The AI-driven player car also moves through the field much faster than the other AI cars (P12 to P1 in the one stock race measured), so keep it out of field statistics.
+- **UDP `OVTK` events equal LapData position gains exactly** (140 = 140, car by car, in the stock race). So they count every position gain, including re-passes and any swap from a pit stop or incident, not only clean passes.
+- **FinalClassification didn't arrive** in the race quit 73 s after `SEND`, so `final_position` in `cars.csv` is empty. LapData's last positions still give the result.
 - **The selections are presses on default highlights,** with `@expect` screen checks where the id changes. Sub-screens all read `solo_container`, so a menu change could slip through: check the run's seat from UDP and `LAPTIMES`.
 - **`ai_drives_player`** works about 2 s after Start Race, as on the direct start.
 - **The sandbox's profile save is written during the menus.** So every run here is a save-writing run, and the hash guard is what proves Tyler's saves weren't touched.

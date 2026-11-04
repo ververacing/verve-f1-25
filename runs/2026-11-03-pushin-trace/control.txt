@@ -1,0 +1,43 @@
+pad down 250
+@sleep 3
+pad right 250
+@sleep 2
+pad down 250
+@sleep 3
+pad a 250
+@sleep 5
+status
+pad b 250
+@sleep 4
+pad down 250
+@sleep 3
+pad a 250
+@sleep 5
+status
+pad down 250
+@sleep 2
+pad right 250
+@sleep 3
+pad b 250
+@sleep 4
+pad left 250
+@sleep 3
+pad a 250
+@sleep 5
+status
+status
+pad a 250
+pad x 250
+status
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+pad start 250
+@sleep 4
+status
+pad down 250
+@sleep 2
+pad a 250
+@sleep 18
+status
+@sleep 180
+status
+@end
