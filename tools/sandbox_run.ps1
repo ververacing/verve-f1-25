@@ -360,8 +360,10 @@ $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }
 }
-$diff | Set-Content (Join-Path $Out 'saves_diff.txt') -Encoding utf8
+# always written, empty when nothing changed: a missing file means the check never ran
+Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 if ($diff) { 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 "saves unchanged ($($after.Count) entries)"
+if ($Session) { Log "saves unchanged ($($after.Count) entries)" }
 if ($verdict -ne 'ON') { exit 6 }
 exit $job.ExitCode

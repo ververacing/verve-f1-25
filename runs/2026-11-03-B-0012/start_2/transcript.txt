@@ -1,0 +1,13 @@
+udp capture pid 24236
+launched 16:45:20.584: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race (profile verve-exp-b0012, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261104-004520-1, save sandbox)
+sandbox confirmed after 23 s: shell-20261104-004520-1
+attempt 1: intro video played (9.3 s)
+16:46:08 log: 2026-11-03 16:46:07.675 [36192] [direct] Grand Prix: the player drives for forceindia as lance_stroll (seat 17)
+16:48:57 log: 2026-11-03 16:48:57.437 [15576] [test] screen garage_monitor_container
+16:49:07 > pad a 700  =>  {"seq":1,"status":"ok","ms":1407}
+16:49:10 log: 2026-11-03 16:49:10.215 [32052] [game] RaceStarts: Reaction Time for driver with vehicle id 11: 0.305898
+16:49:22 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":28552,"run":"shell-20261104-004520-1","ticks":104689,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+16:49:23 > quit  =>  {"seq":3,"status":"ok","value":{"windows":1},"ms":0}
+plan: plan done; test exit: 0; sandbox ON; took 254 s
+udp recording: 2682564 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-164518
