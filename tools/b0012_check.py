@@ -1,17 +1,20 @@
 """Check one direct-start race against B-0012's pre-registered criterion (#57).
 
 Usage:
-    python -I tools/b0012_check.py runs/<id> [more runs]
+    python -I tools/b0012_check.py [--expect-overwritten N] runs/<id> [more runs]
 
-Reads <run>/raw/loader.log and <run>/udp/ (tools/sandbox_run.ps1 -Session -Udp). Exit 0 only if every run passes.
+Reads <run>/raw/loader.log and <run>/udp/ (tools/sandbox_run.ps1 -Session -Udp). Each run is PASS, FAIL or INVALID.
+Exit 0 if every run passes, 1 if any fails, 3 if none fails but some are invalid and must be rerun.
 
 PASS, as ruled on #57 before any data:
 - the first 20 reaction lines after the first lights-out cover 20 distinct vehicles;
 - exactly one car at 0.650 in each of the 9 tagged teams, and no 0.650 car anywhere else;
 - the UDP Participants join maps each 0.650 vehicle id to the expected driver.
 Aston (player Stroll, untagged Alonso) is excluded. Later re-rolls are reported, as the log's rate limit makes them
-incomplete, and don't count toward the criterion. It also reports the game-database count and whether the player
-really is Stroll: a wrong count or a wrong seat invalidates the run even if the tags read right.
+incomplete, and don't count toward the criterion.
+
+INVALID (supervisor, on #68): a run with the wrong game-database count, the wrong seat or a pinned player car is
+discarded and rerun, not scored, even if the tags read right.
 """
 from __future__ import annotations
 
@@ -50,7 +53,7 @@ def is_pinned(value: float) -> bool:
     return abs(value - PINNED) < TOLERANCE
 
 
-def check(run: Path) -> bool:
+def check(run: Path, expect_overwritten: int) -> str:
     print(f"=== {run.name}")
     log = (run / "raw" / "loader.log").read_text(encoding="utf-8", errors="replace").splitlines()
     draws = [(int(m[1]), float(m[2])) for m in map(REACTION.search, log) if m]
@@ -89,33 +92,49 @@ def check(run: Path) -> bool:
     if off:
         print(f"    off 0.650: {off[:10]}")
 
-    # validity of the run
+    # validity of the run: breaking any of these discards it, whatever the tags read
+    invalid = []
     counts = [(int(m[1]), int(m[2])) for m in map(GAMEDB.search, log) if m]
     if not counts:
-        problems.append("no gamedb count in the log")
-    elif counts[0][0] != EXPECT_OVERWRITTEN:
-        problems.append(f"gamedb {counts[0][0]} overwritten, expected {EXPECT_OVERWRITTEN}: isolation not as planned")
+        invalid.append("no gamedb count in the log")
+    elif counts[0][0] != expect_overwritten:
+        invalid.append(f"gamedb {counts[0][0]} overwritten, expected {expect_overwritten}")
     seat = next((m[0] for m in (re.search(r"the player drives for \S+ as \S+", l) for l in log) if m), "no seat line")
     print(f"  gamedb: {counts[0] if counts else 'none'}; {seat}; UDP player car {player} ({names.get(player, '?')})")
     if "forceindia as lance_stroll" not in seat:
-        problems.append(f"player is not Stroll: {seat}")
+        invalid.append(f"player is not Stroll: {seat}")
     if player in pinned:
-        problems.append(f"the player's car {player} reads 0.650")
+        invalid.append(f"the player's car {player} reads 0.650")
 
+    if invalid:
+        for p in invalid:
+            print(f"  INVALID: {p}")
+        for p in problems:
+            print(f"  (not scored): {p}")
+        print("  RESULT: INVALID, discard and rerun")
+        return "invalid"
     for p in problems:
         print(f"  FAIL: {p}")
-    print("  PASS" if not problems else f"  RESULT: FAIL ({len(problems)})")
-    return not problems
+    print("  RESULT: PASS" if not problems else f"  RESULT: FAIL ({len(problems)})")
+    return "fail" if problems else "pass"
 
 
 def main() -> int:
-    runs = [Path(a) for a in sys.argv[1:]]
+    args = sys.argv[1:]
+    expect = EXPECT_OVERWRITTEN
+    if args[:1] == ["--expect-overwritten"]:
+        expect = int(args[1])
+        args = args[2:]
+    runs = [Path(a) for a in args]
     if not runs:
         print(__doc__)
         return 2
-    results = [check(r) for r in runs]
-    print(f"\n{sum(results)} of {len(results)} run(s) pass")
-    return 0 if all(results) else 1
+    results = [check(r, expect) for r in runs]
+    print(f"\n{results.count('pass')} pass, {results.count('fail')} fail, {results.count('invalid')} invalid, "
+          f"of {len(results)} run(s)")
+    if "fail" in results:
+        return 1
+    return 3 if "invalid" in results else 0
 
 
 if __name__ == "__main__":
