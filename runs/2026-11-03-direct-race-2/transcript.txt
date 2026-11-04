@@ -1,0 +1,18 @@
+udp capture pid 22160
+launched 15:47:32.752: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5 (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261103-234732-1, save sandbox)
+sandbox confirmed after 22 s: shell-20261103-234732-1
+attempt 1: intro video played (9.3 s)
+15:48:18 log: 2026-11-03 15:48:17.519 [17496] [direct] Grand Prix: the player drives for forceindia as lance_stroll (seat 6)
+15:48:34 log: 2026-11-03 15:48:34.174 [32088] [direct] race laps 18 -> 5 (session race)
+15:51:01 log: 2026-11-03 15:51:01.471 [22620] [test] screen garage_monitor_container
+15:51:10 > status  =>  {"seq":1,"status":"ok","value":{"v":1,"pid":39564,"run":"shell-20261103-234732-1","ticks":94204,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+15:51:10 > ai_drives_player on  =>  {"seq":2,"status":"unavailable","error":"the player's car: no car is driven by a human (every CarLive.is_ai is set)","ms":0}
+15:51:12 > pad a 700  =>  {"seq":3,"status":"ok","ms":1422}
+15:51:15 log: 2026-11-03 15:51:14.818 [22620] [game] RaceStarts: Reaction Time for driver with vehicle id 7: 0.206064
+15:58:15 > status  =>  {"seq":4,"status":"ok","value":{"v":1,"pid":39564,"run":"shell-20261103-234732-1","ticks":354152,"phase":"|session_results_container|#c56923a6|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+control: waiting for steps in %USERPROFILE%\Documents\verve-f1-25\runs\2026-11-03-direct-race-2\control.txt
+control: ended
+15:58:16 > quit  =>  {"seq":5,"status":"ok","value":{"windows":1},"ms":0}
+plan: plan done; test exit: 0; sandbox ON; took 656 s
+udp recording: 8718598 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-154730

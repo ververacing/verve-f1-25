@@ -1,0 +1,19 @@
+udp capture pid 29116
+launched 15:31:01.638: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5 (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261103-233101-1, save sandbox)
+sandbox confirmed after 22 s: shell-20261103-233101-1
+WAITLOG FAILED: the player drives for forceindia as lance_stroll
+15:36:24 > quit  =>  {"seq":1,"status":"ok","value":{"windows":1},"ms":0}
+plan: stopped at: @waitlog the player drives for forceindia as lance_stroll 300; test exit: 0; sandbox ON; took 334 s
+udp recording: 0 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-153059
+udp capture pid 9268
+launched 15:39:08.383: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5 (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261103-233908-1, save sandbox)
+sandbox confirmed after 22 s: shell-20261103-233908-1
+attempt 1: intro video played (9.3 s)
+15:39:53 log: 2026-11-03 15:39:53.111 [18056] [direct] Grand Prix: the player drives for forceindia as lance_stroll (seat 10)
+15:40:10 log: 2026-11-03 15:40:09.750 [36480] [direct] race laps 18 -> 5 (session race)
+WAITLOG FAILED: \[direct\] screen garage_monitor_container opened
+15:46:51 > quit  =>  {"seq":1,"status":"ok","value":{"windows":1},"ms":0}
+plan: stopped at: @waitlog \[direct\] screen garage_monitor_container opened 400; test exit: 0; sandbox ON; took 475 s
+udp recording: 2310 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-153906

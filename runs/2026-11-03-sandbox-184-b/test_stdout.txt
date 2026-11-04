@@ -1,0 +1,6 @@
+swofty test: 1 test in 1 game start
+  career stroll-career-20261031 at team_hq .. career_fixture_team_hq       ERROR  the batch did not start: timed out: career load: the title screen's press did not happen within 90 s (waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 44 press(es) of the virtual pad's a)
+      timed out: career load: the title screen's press did not happen within 90 s (waiting: the title's view ([[StateIntro+0xc88]+0x140]+0x198) is not up; 44 press(es) of the virtual pad's a)
+      save sandbox %USERPROFILE%\AppData\Local\Swofty\test-runs\20261103-231033-1\saves with fixture stroll-career-20261031
+      could not delete the batch profile test-20261103-231033-1: %USERPROFILE%\AppData\Local\Swofty\cache\overlay\test-20261103-231033-1: The process cannot access the file because it is being used by another process. (os error 32)
+0 passed, 1 errors  ·  report: %USERPROFILE%\Documents\verve-f1-25\runs\2026-11-03-sandbox-184-b\raw/report.json, junit.xml

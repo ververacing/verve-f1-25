@@ -1,0 +1,5 @@
+[test] save sandbox: verified for this F1_25.exe by bindings.json (Ne_SaveSystem2Win_Start experimental, Ne_SaveSystem2Win_Mount experimental, Ne_SaveSystem2Win_WriteInfoXml experimental)
+[test] holding the game lock %USERPROFILE%\AppData\Local\swofty-game.lock.d
+[test] save sandbox %USERPROFILE%\AppData\Local\Swofty\test-runs\20261103-230935-1\saves: fixture stroll-career-20261031 (4 file(s)) copied in
+[test] batch 1: starting F1 25 (career stroll-career-20261031 at team_hq)
+[test] career stroll-career-20261031 at team_hq: the core never reported the save sandbox (no sandbox.json): the save device may not have started

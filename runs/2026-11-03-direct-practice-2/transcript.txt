@@ -1,0 +1,13 @@
+udp capture pid 26172
+launched 15:22:57.688: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=practice1 (profile verve-exp-base, fixture tyler-profile-20261031)
+ABORT: save sandbox unconfirmed, run folder missing; killing the test and the game
+plan: no sandbox; test exit: 3; sandbox unconfirmed; took 1 s
+udp recording: 0 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-152255
+udp capture pid 20644
+launched 15:23:54.029: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=practice1 (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261103-232354-1, save sandbox)
+sandbox confirmed after 22 s: shell-20261103-232354-1
+WAITLOG FAILED: the player drives for forceindia as lance_stroll
+15:29:17 > quit  =>  {"seq":1,"status":"ok","value":{"windows":1},"ms":0}
+plan: stopped at: @waitlog the player drives for forceindia as lance_stroll 300; test exit: 0; sandbox ON; took 336 s
+udp recording: 2310 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-152351

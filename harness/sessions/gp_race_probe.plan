@@ -1,0 +1,12 @@
+# Short direct-start race probe (#64): does the field get off the grid? Ends 45 s after lights out.
+@waitlog the player drives for forceindia as lance_stroll 300
+@waitlog \[test\] screen garage_monitor_container 400
+@sleep 8
+pad a 700
+@sleep 1
+ai_drives_player on
+@sleep 1
+ai_drives_player on
+@waitlog RaceStarts: Reaction Time for driver with vehicle id 60
+@sleep 45
+status

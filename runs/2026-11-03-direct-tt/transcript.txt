@@ -1,0 +1,10 @@
+udp capture pid 35284
+launched 16:15:28.078: test session time_trial f1_2025 austria team=forceindia (profile verve-exp-base, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261104-001528-1, save sandbox)
+sandbox confirmed after 22 s: shell-20261104-001528-1
+attempt 1: intro video played (9.5 s)
+16:19:26 > status  =>  {"seq":1,"status":"ok","value":{"v":1,"pid":34764,"run":"shell-20261104-001528-1","ticks":69112,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+16:19:42 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":34764,"run":"shell-20261104-001528-1","ticks":74614,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+16:19:42 > quit  =>  {"seq":3,"status":"ok","value":{"windows":1},"ms":0}
+plan: plan done; test exit: 0; sandbox ON; took 266 s
+udp recording: 31680332 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261103-161526

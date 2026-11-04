@@ -1,0 +1,28 @@
+# Direct-start race (#64): Start Race pressed once its prompt is up, then the AI takes the player car.
+# Use with tools/sandbox_run.ps1 -Session "grand_prix f1_2025 <track> team=forceindia driver=stroll session=race laps=5" -Udp
+@waitlog the player drives for forceindia as lance_stroll 300
+@waitlog \[direct\] race laps \d+ -> 5 400
+# the grid: this screen opens as the rundown ends, and the Start Race prompt comes with it
+# (a race logs only the [test] line; the [direct] form appears when practice1 was asked for)
+@waitlog \[test\] screen garage_monitor_container 400
+@sleep 8
+status
+ai_drives_player on
+pad a 700
+# on the grid every car reads as AI, so the first try is refused: keep asking until the player car shows up
+ai_drives_player on
+@sleep 1
+ai_drives_player on
+@sleep 1
+ai_drives_player on
+@waitlog RaceStarts: Reaction Time for driver with vehicle id 180
+ai_drives_player on
+@sleep 2
+ai_drives_player on
+@sleep 2
+ai_drives_player on
+@sleep 30
+status
+ai_drives_player on
+# steps go in <Out>/control.txt from here, to see the race out and map what follows it
+@control 480
