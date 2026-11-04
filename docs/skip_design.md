@@ -47,11 +47,11 @@ These are declared `address<...>` with no signature, so they may need `SWOFTY_MI
 | **Garage: to track** | Yes, Time Trial: instant | Yes, the `_Inst` request exists | **Maybe** | Rewrite the request at the thunk |
 | **Garage push-in** | **No: not seen yet** | Same | **Maybe** | Same |
 
-## The game's own skip (one test, 2026-11-03)
+## The game's own skip (3 of 3, 2026-11-03)
 
-**In a menu race, one `pad a` during the grid rundown ends it.** The press at 18:30:02.4 stopped `r_grid3_06` at 18:30:02.423, then `grid_plyshot` and the grid followed by 18:30:04, about 40 s early. It **did not fire Start Race**: `race.start` came only from a separate press at 18:30:17 (`runs/2026-11-03-menu-trace`).
+**In a menu race, one `pad a` during the grid rundown ends it.** The press at 18:30:02.4 stopped `r_grid3_06` at 18:30:02.423, then `grid_plyshot` and the grid followed by 18:30:04, about 40 s early. It **did not fire Start Race**: `race.start` came only from a separate press at 18:30:17 (`runs/2026-11-03-menu-trace`). The same in both rehearsals, at difficulty 100.
 
-So the first version of the grid skip may need **no hook at all**, only a synthetic accept, and possibly not even that for a player willing to press. One sample so far. B-0014 repeats it during each odd race's rundown, before lights out.
+So the first version of the grid skip may need **no hook at all**, only a synthetic accept, and possibly not even that for a player willing to press. B-0014 repeats it during each odd race's rundown, before lights out. These were all the virtual pad: a real wheel press hasn't been tried.
 
 Also: `BroadcastGridRundownViewModel - Skipping Rundown screen` logs twice, about 18 s before the press and with no input, so the game has its own notion of skipping the rundown screen. What sets it isn't known.
 
