@@ -1,0 +1,8 @@
+# Direct start into a practice session (#64), also the trace bed for verve.skip (#65).
+# Use with tools/sandbox_run.ps1 -Session "grand_prix f1_2025 <track> team=forceindia driver=stroll session=practice1"
+# The game's labels are old team names: Aston Martin is forceindia, Alpine is renault, RB is tororosso.
+@waitlog the player drives for forceindia as lance_stroll 300
+@waitlog \[direct\] screen (garage_cockpit|garage_monitor_container) opened 400
+status
+@sleep 15
+status

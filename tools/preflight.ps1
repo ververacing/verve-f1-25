@@ -10,8 +10,8 @@ Checks, in order, and exits 1 on the first hard failure:
 - drift: doctor must show `baseline no drift` or `drift: swofty is not part of the game` (the post-run state).
 - game lock: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no F1_25 or swofty
   process is running, and deletes leftover test profiles.
-- settings: lists how `hardware_settings_config.xml` differs from the pre-UDP backup. The only expected difference is
-  the `<udp .../>` line; anything else (graphics, etc.) is reported, not changed.
+- settings: warns if UDP is off, lists how `hardware_settings_config.xml` changed since the last pre-flight, then keeps
+  this copy as the next reference (%LOCALAPPDATA%\verve-f1-25\settings-snapshots). Changes are reported, never undone.
 #>
 param(
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
@@ -27,10 +27,18 @@ if (-not ($doc | Where-Object { $_ -match 'baseline\s+no drift|drift\s+swofty is
 }
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Swofty $Swofty
 $d = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings'
-$cur = Join-Path $d 'hardware_settings_config.xml'; $bak = Join-Path $d 'hardware_settings_config.pre-udp.xml'
-if ((Test-Path $cur) -and (Test-Path $bak)) {
-    $diff = @(Compare-Object (Get-Content $bak) (Get-Content $cur) | Where-Object { $_.InputObject -notmatch '<udp ' })
-    if ($diff.Count) { "settings: $($diff.Count) line(s) differ from the pre-UDP backup besides <udp>:"; $diff | Format-Table -AutoSize -Wrap }
-    else { 'settings: only the <udp> line differs from the pre-UDP backup' }
+$cur = Join-Path $d 'hardware_settings_config.xml'
+if (Test-Path $cur) {
+    if (-not (Select-String $cur -Pattern '<udp enabled="true"' -Quiet)) { 'settings: WARNING: UDP telemetry is not enabled; UDP captures will be empty' }
+    # Tyler's own graphics choices aren't ours to flag, so compare with the last pre-flight, not the pre-UDP backup
+    $snapDir = Join-Path $env:LOCALAPPDATA 'verve-f1-25\settings-snapshots'
+    New-Item -ItemType Directory -Force $snapDir | Out-Null
+    $last = Join-Path $snapDir 'hardware_settings_config.last.xml'
+    if (Test-Path $last) {
+        $diff = @(Compare-Object (Get-Content $last) (Get-Content $cur))
+        if ($diff.Count) { "settings: $($diff.Count) line(s) changed since the last pre-flight:"; $diff | Format-Table -AutoSize -Wrap }
+        else { 'settings: unchanged since the last pre-flight' }
+    } else { 'settings: no earlier snapshot; this one is the new reference' }
+    Copy-Item $cur $last -Force
 }
 'PREFLIGHT OK'

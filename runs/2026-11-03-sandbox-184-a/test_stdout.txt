@@ -1,0 +1,6 @@
+swofty test: 1 test in 1 game start
+  career stroll-career-20261031 at team_hq .. career_fixture_team_hq       ERROR  the core never reported the save sandbox (no sandbox.json): the save device may not have started
+      the core never reported the save sandbox (no sandbox.json): the save device may not have started
+      save sandbox %USERPROFILE%\AppData\Local\Swofty\test-runs\20261103-230935-1\saves with fixture stroll-career-20261031
+      could not delete the batch profile test-20261103-230935-1: %USERPROFILE%\AppData\Local\Swofty\cache\overlay\test-20261103-230935-1: The process cannot access the file because it is being used by another process. (os error 32)
+0 passed, 1 errors  ·  report: %USERPROFILE%\Documents\verve-f1-25\runs\2026-11-03-sandbox-184-a\raw/report.json, junit.xml

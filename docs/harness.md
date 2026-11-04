@@ -1,9 +1,87 @@
 # Test harness: `swofty test`
 
 How Verve runs unattended races on PC1, what Swofty's built-in harness covers, and the gaps left for issue #24
-(re-scoped). Swofty 1.6.11, F1 25 build 25251167. Sources: `docs/std/testing.md`,
+(re-scoped). Written on Swofty 1.6.11; see "Swofty 1.8.4" below for what changed. F1 25 build 25251167.
+Working rules (PAUSE, RESUME, messages, merging, testing windows) are in [process.md](process.md). Sources: `docs/std/testing.md`,
 `docs/design/std-2/test-suite.md` and `docs/reference/std/telemetry.md` in the Swofty repo, plus the smoke runs in
 `runs/2026-10-30-smoke/` (issue #3).
+
+## Swofty 1.8.4 (checked 2026-11-03)
+
+Tyler updated Swofty on 2026-11-03. Doctor: build 25251167, `baseline no drift`, or `drift swofty is not part of the
+game` after a run. Both count as clean.
+
+- **Benchmark:** unchanged. 3-lap smoke passed with 20/20 `RaceStarts` lines and `LAPTIMES` present, saves unchanged.
+  **gamedb baseline unchanged: 52 overwritten, 322 created.**
+- **`swofty test run` can exit 2 after a pass**, when it can't delete its test profile (the known lock on
+  `cache\overlay\<profile>`). Read `report.json`'s per-test status, not only the exit code.
+- **The live `loader.log` is `<game folder>\swofty\loader.log`.** `sessions\<id>\loader.log` is a copy made when the
+  game exits (its creation time is the exit), so it can't confirm anything during a run.
+- **The skipped intro no longer alternates.** 2 career launches in a row skipped it, and 3 of 3 skipped launches
+  stalled: 2 career loads at the title, and 1 direct start on `PRESS ANY BUTTON`. Signature: `video_1` to `legal` in
+  under 1 s (9-10 s when it plays). `tools/sandbox_run.ps1` relaunches, up to 3 tries.
+- **A lock can linger after a game exits** (`addon-profiles\teamsimplified.mods\.saved-old`, seen about 35 s after
+  an exit). The wrapper then stops before the game starts, and the report misleadingly says `the core never reported
+  the save sandbox`. `tools/sandbox_run.ps1` waits and retries.
+- **Leftover `test-*` profiles pile up:** `saves\test-*` stay locked, so `tools/cleanup_test_profiles.ps1` can't always
+  delete them. Not yet explained. No process of ours holds them.
+
+## Direct start: `swofty test session` (#64)
+
+```powershell
+powershell -File tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5" `
+    -Fixture tyler-profile-20261031 -ExpProfile verve-exp-base -Plan harness/sessions/gp_race_ai.plan -Udp -Out runs/<id>
+```
+
+`-Session` refuses to start without a fixture and an explicit profile, and kills the game if the sandbox isn't
+confirmed within 120 s. The confirmed line, on stderr about 22 s after launch:
+`[test] starting F1 25 in test mode (run folder ..., save sandbox)`.
+
+**Experiment profile.** `test session` runs on a copy of `--profile`, or the active profile if none is given. Every
+experiment names an isolated profile. `verve-exp-base` (`%LOCALAPPDATA%\Swofty\profiles\verve-exp-base.json`) holds
+swofty.core and the always-on teamsimplified.mods. There's no CLI command to create a profile, so it's a hand-written
+file. A batch adds its addon with `--addon` or its own profile.
+
+**Team labels are old names.** Matching is on labels in the `f1_2025` list:
+
+| Team | Label | | Team | Label |
+|---|---|---|---|---|
+| Aston Martin | `forceindia` | | McLaren | `mclaren` |
+| Alpine | `renault` | | Ferrari | `ferrari` |
+| RB | `tororosso` | | Red Bull | `redbull` |
+| Kick Sauber | `sauber` | | Mercedes | `mercedes` |
+| Williams | `williams` | | Haas | `haas` |
+
+A label that matches nothing doesn't fail. The game logs `no entrant of team ...; the player takes the first seat` and
+goes on in the wrong car, so `sandbox_run.ps1` treats that line as a hard failure. The seat and vehicle id change from
+run to run (12, 10, 6, 18), so read the player's vehicle id from each run. Don't assume it.
+
+**Timings:** launch to grid about 3 min 30 s, of which about 2 min 10 s is the session's own rundown under the cover.
+No title, menu or screenshot is needed. Grid signal: `[test] screen garage_monitor_container`. Start Race: `pad a`
+about 8 s later, then lights out in about 2 s.
+
+**`ai_drives_player`:** refused on the grid (`no car is driven by a human`, every `is_ai` set). It works about 1 s after
+Start Race.
+
+**UDP works here, unlike benchmark:** Session, Participants, LapData, Motion, telemetry and FinalClassification all
+arrive once the race starts (none before). `udp_parse.py` reads them, so the #57 join has its data.
+
+**BLOCKER: the race doesn't run (4 of 4 attempts past lights out).** With `f1_2025`, after lights out:
+- the 20 cars are strung out over about 1-2 km of track near the end of the lap, not on a grid (no two within 2 m);
+- they all drift at a steady 2-8 m/s while telemetry reads about 0 km/h, and `grid` reads the same for every car;
+- the Safety Car or a red flag comes within seconds of `LGOT`;
+- with `laps=5`, at 20 s, every car gets `penalty_type=6, infringement=18` plus `RTMT reason=6` (disqualified; from
+  memory of the UDP spec, 18 is "parked for too long"), then `SEND` and the results screen with DSQ for all.
+
+The AI takeover, `laps=` and the track are ruled out, one change at a time. Another fixture or box isn't tested. Root
+cause not known. A lead: `current session 0 of:` logs an empty session list, and the race builds its grid from earlier
+sessions. Upstream documents direct start reaching the grid; it doesn't say it has raced from one. Evidence, variants
+and a draft bug report: `runs/2026-11-03-direct-start/summary.md`.
+
+**`session=practice1` and `session=practice_1` both land on the race grid** with this box, for the same empty list.
+
+**The Time Trial direct start works:** `time_trial f1_2025 austria team=forceindia` reaches `garage_cockpit` 74 s after
+launch (`Look Around / Session Info / Go to Track`). It's the garage test bed for #65.
 
 ## Running a test
 
