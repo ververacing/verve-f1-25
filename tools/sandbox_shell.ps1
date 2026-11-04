@@ -125,7 +125,9 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         $deadline = (Get-Date).AddSeconds($timeoutS)
         while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
             if (Test-Path $results) {
-                $line = Get-Content $results | Where-Object { $_ -match "`"seq`":$script:seq[,}]" } | Select-Object -First 1
+                # the agent is writing this file: a sharing clash here just means trying again
+                $line = $null
+                try { $line = Get-Content $results | Where-Object { $_ -match "`"seq`":$script:seq[,}]" } | Select-Object -First 1 } catch { }
                 if ($line) { Log ("{0:HH:mm:ss} > {1}  =>  {2}" -f (Get-Date), $cmd, $line); return ($line | ConvertFrom-Json) }
             }
             Start-Sleep -Milliseconds 300
@@ -175,6 +177,8 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
 
     $result = 'plan done'
+    # a bad step must still reach the quit, the restore and the hash check below
+    try {
     foreach ($s in $steps | Select-Object -Skip 1) {
         if ($p.HasExited) { $result = 'shell exited'; break }
         if ($s -match '^@control (\d+)$') {
@@ -203,11 +207,14 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         }
         Step $s; if ($script:stop) { $result = $script:stop; break }
     }
-    if (-not $p.HasExited) { Send 'quit' 120 | Out-Null }
+    } catch { $result = "plan error: $_"; Log $result }
+    try { if (-not $p.HasExited) { Send 'quit' 120 | Out-Null } } catch { Log "quit failed: $_" }
     if (-not $p.WaitForExit(120000)) { Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force }
     $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8
     $errTask.Result | Set-Content (Join-Path $Out 'shell_stderr.txt') -Encoding utf8
     Log "run folder: $($run.Name)"
+    # which addons this run really had, for checks that need to prove the arm
+    Copy-Item (Join-Path $run.FullName 'addons.json') (Join-Path $Out 'addons.json') -ErrorAction SilentlyContinue
     break
 }
 Log "result: $result"

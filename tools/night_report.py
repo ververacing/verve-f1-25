@@ -10,6 +10,7 @@ A run is any folder holding transcript.txt (tools/sandbox_run.ps1 -Session) or r
 in the same parent folder form a batch; a run with no batch folder stands alone. Each run gets a status:
 
     pass, fail, invalid   from the batch's own check, where it has one (BATCH_CHECKS)
+    valid                 for a batch scored only at the end: this race can count, and its result isn't shown yet
     ran                   finished with no checks to score it
     problem               the plan or test stopped early, or the sandbox wasn't confirmed
     SAVES CHANGED         Tyler's saves or Steam's records changed: stop and read this first
@@ -28,7 +29,8 @@ import sys
 from pathlib import Path
 
 # batch name in the folder name -> script in tools/ and its arguments; the first match wins, so longer names go first
-BATCH_CHECKS = {"B-0012b": ("b0012_check.py", ["--menu"]), "B-0012": ("b0012_check.py", [])}
+BATCH_CHECKS = {"B-0012b": ("b0012_check.py", ["--menu"]), "B-0012": ("b0012_check.py", []),
+                "B-0014": ("b0014_check.py", ["--validity"])}  # validity only: #71 scores after the last race
 TOOLS = Path(__file__).resolve().parent
 REACTION = re.compile(r"RaceStarts: Reaction Time")
 GAMEDB = re.compile(r"gamedb: (\d+) overwritten, (\d+) created")
@@ -75,7 +77,7 @@ def scored(run: Path) -> tuple[str, str]:
         return "", ""
     script, extra = entry
     out = subprocess.run([sys.executable, "-I", str(TOOLS / script), *extra, str(run)], capture_output=True, text=True).stdout
-    result = re.search(r"RESULT: (PASS|FAIL|INVALID)", out)
+    result = re.search(r"RESULT: (PASS|FAIL|INVALID|VALID)", out)
     block = re.search(r"first block: (.*)", out)
     rolls = re.search(r"all logged re-rolls: (.*)", out)
     detail = "; ".join(m[1].strip() for m in (block, rolls) if m)

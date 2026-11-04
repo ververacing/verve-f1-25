@@ -79,7 +79,8 @@ pad a 250
 @sleep 8
 # one press inside the grid rundown, before lights out (about 108 s into the session), for #65
 @sleep 125
-status
+# only press inside the rundown: on the grid, this press would fire Start Race. All 3 test runs read this state
+@expect \|hud\|#fe9b028c\|
 pad a 250
 @sleep 4
 status
