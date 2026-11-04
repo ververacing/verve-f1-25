@@ -1,10 +1,13 @@
 """Score B-0014 (#71): row aggression vs overtaking, within-driver crossover.
 
 Usage:
-    python -I tools/b0014_check.py runs/<batch> [--order-of race_N=a|b ...] [--expect-overwritten N] [--expect-difficulty N]
+    python -I tools/b0014_check.py runs/<batch> [--expect-overwritten N] [--expect-difficulty N]
+    python -I tools/b0014_check.py --validity runs/<batch>/race_<n>     # one race's validity, no scoring
     python -I tools/b0014_check.py --selftest
 
-Each run folder is runs/<batch>/race_<n>. Odd races are order a (G1 high, G2 low), even races order b, unless given.
+Each run folder is runs/<batch>/race_<n>. Odd races are order a (G1 high, G2 low), even races order b.
+A race is invalid if addons.json doesn't name its order's addon, and a batch can't be scored unless exactly 8 database
+keys flip between the two orders: that's what proves each race really ran the arm its number says.
 Reads udp/cars.csv, events.csv, laps.csv, sessions.csv and raw/loader.log. Exit 0 PASS, 1 FAIL-NULL, 2 INCONCLUSIVE, 3 not
 enough valid races. All the rules are on #71: model, bootstrap and validity were fixed before any data.
 
@@ -13,6 +16,7 @@ No third-party packages: python here is the bare WindowsApps one, so the least s
 from __future__ import annotations
 
 import csv
+import json
 import random
 import re
 import statistics
@@ -29,7 +33,9 @@ PLAYER_CAR = 19
 BOOTSTRAPS, BOOT_SEED = 2000, 1
 NULL_BAND = 0.3
 HOLD_S = 10  # a pass counts as held if the same pair doesn't swap back within this many seconds
+ARM_OVERWRITTEN = 60  # 52 + 8: the arm checks only apply at this count, not on stock test data
 GAMEDB = re.compile(r"gamedb: (\d+) overwritten")
+OVERWROTE = re.compile(r"gamedb: overwrote (0x[0-9a-f]+) .*tag 1 float\): \S+ -> (\S+)\s*$")
 LAPNAME = re.compile(r"v\((\d+), ([^)]+)\)")
 
 
@@ -60,6 +66,14 @@ def load_race(run: Path, order: str, expect_overwritten: int, expect_difficulty:
     db = next((m for m in map(GAMEDB.search, log) if m), None)
     if not db or int(db[1]) != expect_overwritten:
         invalid.append(f"gamedb {db[1] if db else 'none'} overwritten, expected {expect_overwritten}")
+    if expect_overwritten == ARM_OVERWRITTEN:  # both arms have the same count, so the count can't tell them apart
+        want = "verve.b0014a" if order == "a" else "verve.b0014b"
+        try:
+            addons = set(json.loads((run / "addons.json").read_text(encoding="utf-8")))
+        except (OSError, ValueError):
+            addons = set()
+        if addons != {want}:
+            invalid.append(f"addons {sorted(addons) or 'unknown'}, expected {want}")
     difficulty = sessions[0].get("ai_difficulty", "")
     if difficulty != str(expect_difficulty):
         invalid.append(f"AI difficulty reads {difficulty or 'nothing'}, expected {expect_difficulty}")
@@ -116,6 +130,26 @@ def load_race(run: Path, order: str, expect_overwritten: int, expect_difficulty:
             "dnf": 0 if c["result_status"] in ("3", "NA") else 1,
         })
     return rows, invalid
+
+
+def applied_values(run: Path) -> dict[str, float]:
+    """What the run's log says each database key was overwritten with, for float keys."""
+    out = {}
+    for line in (run / "raw" / "loader.log").read_text(encoding="utf-8", errors="replace").splitlines():
+        m = OVERWROTE.search(line)
+        if m:
+            out[m[1]] = float(m[2])
+    return out
+
+
+def flipping_keys(runs: list[tuple[Path, str]]) -> tuple[int, int]:
+    """Keys at 1.0 in every order-a race and 0.05 in every order-b race, and the reverse: 4 of each if the arms are right."""
+    values = [(applied_values(run), order) for run, order in runs]
+    keys = set.intersection(*(set(v) for v, _ in values)) if values else set()
+
+    def count(a: float, b: float) -> int:
+        return sum(1 for k in keys if all(abs(v[k] - (a if o == "a" else b)) < 1e-6 for v, o in values))
+    return count(1.0, 0.05), count(0.05, 1.0)
 
 
 def solve(a: list[list[float]], b: list[float]) -> list[float]:
@@ -235,9 +269,21 @@ def main() -> int:
         i = args.index("--expect-difficulty")
         difficulty = int(args[i + 1])
         del args[i:i + 2]
-    if not args:
-        print(__doc__)
+    validity = "--validity" in args
+    args = [a for a in args if a != "--validity"]
+    unknown = [a for a in args if a.startswith("--")]
+    if unknown or len(args) != 1:
+        print(f"unknown or extra arguments: {unknown or args}\n{__doc__}")
         return 2
+    if validity:
+        # one race, for the morning report: no scoring, so no interim look at the result (#71)
+        run = Path(args[0])
+        order = "a" if int(run.name.split("_")[1]) % 2 == 1 else "b"
+        _, invalid = load_race(run, order, expect, difficulty)
+        for why in invalid:
+            print(f"  INVALID: {why}")
+        print("  RESULT: INVALID, discard and rerun" if invalid else "  RESULT: VALID")
+        return 3 if invalid else 0
     runs = sorted((p for p in Path(args[0]).glob("race_*") if p.is_dir()), key=lambda p: int(p.name.split("_")[1]))
     rows = []
     valid = []
@@ -247,11 +293,17 @@ def main() -> int:
         print(f"{run.name} (order {order}): {'VALID' if not invalid else 'INVALID: ' + '; '.join(invalid)}")
         if not invalid:
             rows += r
-            valid.append(run.name)
+            valid.append(run)
     print(f"\n{len(valid)} valid of {len(runs)} races")
     if len({r['order'] for r in rows}) < 2 or len(valid) < 4:
         print("not enough valid races in both orders to score")
         return 3
+    if expect == ARM_OVERWRITTEN:
+        pair = flipping_keys([(run, "a" if int(run.name.split("_")[1]) % 2 == 1 else "b") for run in valid])
+        print(f"Arm check: {pair[0]} keys at 1.0 in order a and 0.05 in order b; {pair[1]} the reverse (expect 4 and 4)")
+        if pair != (4, 4):
+            print("ARM CHECK FAILED: the logs don't show these races ran the arms their numbers say. Not scoring")
+            return 3
     try:
         verdict, o = decide(rows)
     except ValueError:

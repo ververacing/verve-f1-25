@@ -348,7 +348,10 @@ Start-Sleep -Seconds 5
 "test exit: $($job.ExitCode); sandbox $verdict"
 # the wrapper can stop on a lock held just after the last game's exit: nothing launched, so it's safe to retry
 $stdoutNow = Get-Content (Join-Path $Out 'test_stdout.txt') -Raw -ErrorAction SilentlyContinue
-if ($verdict -eq 'unconfirmed' -and $stdoutNow -match 'still locked|never reported the save sandbox') { $intro = 'skipped'; "attempt ${attempt}: transient lock; waiting, then retrying" }
+# Only the lock text counts: "never reported the save sandbox" alone may be a real sandbox failure, so that stops here
+$launcherLog = Join-Path $raw 'batches\1\launcher.log'
+$locked = ($stdoutNow -match 'still locked') -or ((Test-Path $launcherLog) -and (Select-String -LiteralPath $launcherLog -Pattern 'still locked' -Quiet))
+if ($verdict -eq 'unconfirmed' -and $locked) { $intro = 'skipped'; "attempt ${attempt}: transient lock; waiting, then retrying" }
 if ($intro -ne 'skipped' -or $verdict -eq 'OFF') { break }
 # killed for a skipped intro, or stopped on a lock: put the game folder back and free the lock before relaunching
 & $Swofty restore | Out-Null
