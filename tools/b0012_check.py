@@ -57,7 +57,13 @@ def check(run: Path, expect_overwritten: int) -> str:
     print(f"=== {run.name}")
     log = (run / "raw" / "loader.log").read_text(encoding="utf-8", errors="replace").splitlines()
     draws = [(int(m[1]), float(m[2])) for m in map(REACTION.search, log) if m]
-    names, player = participants(run / "udp")
+    try:
+        names, player = participants(run / "udp")
+    except (OSError, SystemExit, StopIteration) as e:
+        # the run never produced a usable race session: nothing to score, and the rest of a batch must still be read
+        print(f"  INVALID: no usable UDP race session ({e})")
+        print("  RESULT: INVALID, discard and rerun")
+        return "invalid"
     problems = []
 
     first = draws[:20]
