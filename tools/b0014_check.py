@@ -28,6 +28,7 @@ STOCK_2025 = {"ALBON", "ALONSO", "ANTONELLI", "BEARMAN", "BORTOLETO", "COLAPINTO
 PLAYER_CAR = 19
 BOOTSTRAPS, BOOT_SEED = 2000, 1
 NULL_BAND = 0.3
+HOLD_S = 10  # a pass counts as held if the same pair doesn't swap back within this many seconds
 GAMEDB = re.compile(r"gamedb: (\d+) overwritten")
 LAPNAME = re.compile(r"v\((\d+), ([^)]+)\)")
 
@@ -79,6 +80,11 @@ def load_race(run: Path, order: str, expect_overwritten: int, expect_difficulty:
     if not ovtk and moved:
         invalid.append("no OVTK events, though positions changed")
 
+    ovtk.sort(key=lambda o: o["t"])
+    for i, o in enumerate(ovtk):
+        o["back"] = next((n["t"] - o["t"] for n in ovtk[i + 1:] if n["vehicle"] == o["other"] and n["other"] == o["vehicle"]),
+                         float("inf"))  # seconds until the same pair swaps back
+    print(f"  {run.name}: OVTK raw {len(ovtk)}, held at {HOLD_S} s {sum(1 for o in ovtk if o['back'] > HOLD_S)}")
     lap1 = {int(l["car"]): int(l["lap_time_ms"]) / 1000 for l in laps if l["lap"] == "1"}
     coll, pen = {}, {}
     for e in events:
@@ -101,6 +107,10 @@ def load_race(run: Path, order: str, expect_overwritten: int, expect_difficulty:
         rows.append({
             "race": run.name, "order": order, "driver": name, "high": 1 if name in high else 0,
             "grid": int(c["first_position"]), "made_2_5": sum(1 for o in made if o["t"] >= cut),
+            "held_2_5": sum(1 for o in made if o["t"] >= cut and o["back"] > HOLD_S),
+            "held_5s": sum(1 for o in made if o["t"] >= cut and o["back"] > 5),
+            "held_20s": sum(1 for o in made if o["t"] >= cut and o["back"] > 20),
+            "flips": sum(1 for o in made if o["back"] <= HOLD_S),
             "made_1": sum(1 for o in made if o["t"] < cut), "suffered_2_5": sum(1 for o in lost if o["t"] >= cut),
             "net": int(c["first_position"]) - int(c["last_position"]), "coll": coll.get(car, 0), "pen": pen.get(car, 0),
             "dnf": 0 if c["result_status"] in ("3", "NA") else 1,
@@ -124,7 +134,7 @@ def solve(a: list[list[float]], b: list[float]) -> list[float]:
     return [m[i][n] / m[i][i] for i in range(n)]
 
 
-def condition_coef(rows: list[dict], y: str = "made_2_5") -> float:
+def condition_coef(rows: list[dict], y: str = "held_2_5") -> float:
     """OLS of y on condition + grid + driver fixed effects; returns the condition coefficient."""
     drivers = sorted({r["driver"] for r in rows})
     x = [[r["high"], r["grid"]] + [1.0 if r["driver"] == d else 0.0 for d in drivers] for r in rows]
@@ -171,10 +181,12 @@ def bootstrap_se(rows: list[dict], stat) -> float:
 def decide(rows: list[dict]) -> tuple[str, dict]:
     coef = condition_coef(rows)
     se = bootstrap_se(rows, condition_coef)
-    raw = within_diff(rows, "made_2_5")
+    raw = within_diff(rows, "held_2_5")
     net = within_diff(rows, "net")
     coll, coll_se = within_diff(rows, "coll"), bootstrap_se(rows, lambda s: within_diff(s, "coll"))
     out = {"coef": coef, "se": se, "raw": raw, "net": net, "coll": coll, "coll_se": coll_se,
+           "ovtk_2_5": within_diff(rows, "made_2_5"), "flips": within_diff(rows, "flips"),
+           "coef_5s": condition_coef(rows, "held_5s"), "coef_20s": condition_coef(rows, "held_20s"),
            "made_1": within_diff(rows, "made_1"), "suffered_2_5": within_diff(rows, "suffered_2_5"),
            "pen": within_diff(rows, "pen"), "dnf": within_diff(rows, "dnf")}
     if coef > 0 and coef >= 2 * se and raw > 0 and net > 0:
@@ -197,7 +209,8 @@ def selftest() -> int:
                 h = 1 if d in high else 0
                 made = 4 + 0.2 * g + effect * h + rng.gauss(0, 1.5)
                 rows.append({"race": f"race_{race + 1}", "order": order, "driver": d, "high": h, "grid": g,
-                             "made_2_5": made, "made_1": 0, "suffered_2_5": 0, "net": effect * h + rng.gauss(0, 1),
+                             "made_2_5": made + 3, "held_2_5": made, "held_5s": made, "held_20s": made, "flips": 3,
+                             "made_1": 0, "suffered_2_5": 0, "net": effect * h + rng.gauss(0, 1),
                              "coll": 0, "pen": 0, "dnf": 0})
         return rows
     verdict, o = decide(fake(2.0, 11))
@@ -239,12 +252,19 @@ def main() -> int:
     if len({r['order'] for r in rows}) < 2 or len(valid) < 4:
         print("not enough valid races in both orders to score")
         return 3
-    verdict, o = decide(rows)
-    print(f"\nPrimary, OVTK made on laps 2-5, per race: condition coefficient {o['coef']:+.3f}, bootstrap SE {o['se']:.3f}")
-    print(f"Within-driver high minus low: made laps 2-5 {o['raw']:+.3f}; net position change {o['net']:+.3f}")
-    print(f"Secondary: made lap 1 {o['made_1']:+.3f}; suffered laps 2-5 {o['suffered_2_5']:+.3f}; collisions {o['coll']:+.3f} (SE {o['coll_se']:.3f}); penalties {o['pen']:+.3f}; DNFs {o['dnf']:+.3f}")
+    try:
+        verdict, o = decide(rows)
+    except ValueError:
+        print("the model can't be fitted: grid slot doesn't vary within drivers. Check that these are different races")
+        return 3
+    print(f"\nPrimary, held passes on laps 2-5, per race: condition coefficient {o['coef']:+.3f}, bootstrap SE {o['se']:.3f}")
+    print(f"Within-driver high minus low: held passes {o['raw']:+.3f}; net position change {o['net']:+.3f}")
+    print(f"Sensitivity (not scored): coefficient at 5 s {o['coef_5s']:+.3f}, at 20 s {o['coef_20s']:+.3f}")
+    print(f"Secondary: raw OVTK laps 2-5 {o['ovtk_2_5']:+.3f}; flip-flops {o['flips']:+.3f}; made lap 1 {o['made_1']:+.3f}; suffered laps 2-5 {o['suffered_2_5']:+.3f}; collisions {o['coll']:+.3f} (SE {o['coll_se']:.3f}); penalties {o['pen']:+.3f}; DNFs {o['dnf']:+.3f}")
     if o["coll"] >= 2 * o["coll_se"] and o["coll"] > 0:
         print("FLAG: high aggression raises collisions by >= 2 SE: a cost, even on a PASS")
+    if o["coef_5s"] * o["coef"] <= 0 or o["coef_20s"] * o["coef"] <= 0:
+        print("NOTE: the coefficient's sign doesn't hold at both 5 s and 20 s, so treat the verdict with care")
     print(f"\nRESULT: {verdict}")
     return {"PASS": 0, "FAIL-NULL": 1, "INCONCLUSIVE": 2}[verdict]
 

@@ -61,7 +61,7 @@ Also: `BroadcastGridRundownViewModel - Skipping Rundown screen` logs twice, abou
 |---|---|---|
 | Practice garage entry | `pq_garage7_02` | Then `garage_cockpit` |
 | Race grid | `grid_scs_2018_np`, then `r_grid3_*` shots about 10 s each, in varying order, then `grid_plyshot` | Rundown takes about 45 s |
-| After a win | `celebrate_pitlane01`, `pod_crew_cele_garage02`, `celebrate_parcferme01`, then `pod_2019_1st` (44 s) | Flag to results took about 100 s. Then `session_results_container`, where FinalClassification arrives. Other finishing positions will differ |
+| After the flag | `celebrate_pitlane01`, `pod_crew_cele_garage01` or `02`, `celebrate_parcferme01`, then `pod_2019_1st` (44 s) | Seen with the player first and with the player tenth, so it plays for whoever won. Flag to results takes about 100 s. Then `session_results_container`, where FinalClassification arrives |
 
 ## (a) Detecting the press and swallowing it
 

@@ -19,7 +19,9 @@ $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
 $now = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
 $wrapups = @($now.Date.AddHours(5).AddMinutes(45), $now.Date.AddHours(16).AddMinutes(45), $now.Date.AddDays(1).AddHours(5).AddMinutes(45))
 $next = $wrapups | Where-Object { $_ -gt $now } | Select-Object -First 1
-if ($now.AddMinutes($RaceMinutes + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and it wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
+# #71's stopping rule: complete pairs only, so an odd race starts only if its even partner also fits
+$need = if (($Race % 2) -eq 1) { 2 * $RaceMinutes } else { $RaceMinutes }
+if ($now.AddMinutes($need + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and $need min of racing wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "race ${Race}: a game is running that this batch didn't start; not launching"; exit 9 }
 
 $odd = ($Race % 2) -eq 1
