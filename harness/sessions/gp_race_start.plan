@@ -1,0 +1,10 @@
+# Shortest direct-start race for start-only batches (#57): quits once the start lines and UDP Participants are in.
+# Use with tools/sandbox_run.ps1 -Session "grand_prix f1_2025 <track> team=forceindia driver=stroll session=race" -Udp
+@waitlog the player drives for forceindia as lance_stroll 300
+@waitlog \[test\] screen garage_monitor_container 400
+@sleep 8
+pad a 700
+@waitlog RaceStarts: Reaction Time for driver with vehicle id 60
+# Participants comes about every 5 s
+@sleep 12
+status

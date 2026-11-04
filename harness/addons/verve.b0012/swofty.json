@@ -1,0 +1,34 @@
+{
+    "schema_version":  1,
+    "id":  "verve.b0012",
+    "name":  "Verve test B-0012 (race_start tags, direct-start Grand Prix)",
+    "version":  "0.0.1",
+    "author":  "TC Verve",
+    "description":  "Test-only addon for race batch B-0012: all four ai_driver_config.race_start reaction bounds = 0.65 on one driver in each of 9 teams (B-0005 set minus Alonso). Not for play.",
+    "license":  "MIT",
+    "category":  "ai",
+    "kind":  [
+                 "database"
+             ],
+    "compat":  {
+                   "game":  "f1_25",
+                   "game_builds":  [
+                                       "25251167"
+                                   ],
+                   "launcher":  "\u003e=1.5.13"
+               },
+    "requires":  [
+                     {
+                         "id":  "swofty.core",
+                         "version":  "\u003e=0.2.13"
+                     }
+                 ],
+    "saves":  {
+                  "affects":  false
+              },
+    "operations":  {
+                       "database":  [
+                                        "db/b0012.json"
+                                    ]
+                   }
+}
