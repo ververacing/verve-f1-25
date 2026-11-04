@@ -33,7 +33,7 @@ This is the first measured effect of a Verve setting on a real race start. Avera
 | 4 | 12.9 / 19.6 | 82.3 / 91.6 | 208.3 / 205.5 | -0.3 / +0.3 |
 | 5 | 12.8 / 19.4 | 79.0 / 93.2 | 210.2 / 210.4 | -0.8 / +0.8 |
 
-A slower reaction loses speed and places off the line, in all five starts. **Treat this as a lead for a pre-registered batch, not a finding:** it wasn't the question asked, 5 starts is few, and the grid looks the same each start, so the same cars are compared each time.
+A slower reaction loses speed and places off the line, in all five starts. **Treat this as a lead for a pre-registered batch, not a finding:** it wasn't the question asked, and 5 starts is few. **The grid changes every race**, so these averages mix different grid slots, and places gained depends on where each car started. (An earlier version of this summary said the grid looks the same each start. That was wrong: slots 6-15 differ in all five.)
 
 ## What it doesn't show
 

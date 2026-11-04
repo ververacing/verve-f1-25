@@ -1,0 +1,8 @@
+status
+status
+status
+pad a 250
+@sleep 8
+status
+@sleep 2
+@end

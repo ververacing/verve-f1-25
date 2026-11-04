@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "ops": [
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.05"
+    }
+  ]
+}

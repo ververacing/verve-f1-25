@@ -1,0 +1,99 @@
+# A full menu Grand Prix for behaviour batches (#71): as gp_menu_race.plan, at AI difficulty 100, run to the results
+# screen. Tools/b0014_check.py reads the difficulty back from UDP, and any race not at 100 is invalid.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+@expect fe_f1_world
+@raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}
+@sleep 6
+@expect f1_world_activity_container
+# the Grand Prix card
+pad a 250
+@sleep 6
+# the season: one right is F1 2025
+pad right 250
+@sleep 3
+pad a 250
+@sleep 6
+@expect solo_container
+# round 1's track: ten right from Australia is Austria
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+# team: four right from McLaren is Aston Martin. Then the driver: Stroll is the default
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+pad a 250
+@sleep 7
+@expect settings_container
+# Difficulty 100: from Start Event, right then down is the Difficulty tile. Holding right reaches the cap of 110 from
+# any start, and ten presses left from there is exactly 100. Then back, and left to Start Event.
+pad right 250
+@sleep 2
+pad down 250
+@sleep 2
+pad a 250
+@sleep 4
+pad right 6000
+@sleep 2
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+@sleep 2
+pad b 250
+@sleep 4
+pad left 250
+@sleep 3
+# back on the hub, Start Event selected
+pad a 250
+@sleep 8
+# one press inside the grid rundown, before lights out (about 108 s into the session), for #65
+@sleep 125
+status
+pad a 250
+@sleep 4
+status
+wait screen=garage_monitor_container 300
+@sleep 8
+@expect garage_monitor_container
+pad a 700
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+# 5 laps: the flag at about 354 s, the results screen up to about 100 s later
+@sleep 340
+status
+wait screen=session_results_container 200
+@sleep 5
+status

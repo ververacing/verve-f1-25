@@ -1,0 +1,42 @@
+pad right 250
+@sleep 2
+pad down 250
+@sleep 2
+pad a 250
+@sleep 4
+pad right 6000
+@sleep 2
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad b 250
+@sleep 4
+pad left 250
+@sleep 3
+pad a 250
+@sleep 125
+status
+pad a 250
+@sleep 4
+status
+wait screen=garage_monitor_container 300
+@sleep 8
+status
+pad a 700
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 340
+status
+wait screen=session_results_container 200
+@sleep 5
+status
+@end

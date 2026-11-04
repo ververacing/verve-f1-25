@@ -47,6 +47,22 @@ These are declared `address<...>` with no signature, so they may need `SWOFTY_MI
 | **Garage: to track** | Yes, Time Trial: instant | Yes, the `_Inst` request exists | **Maybe** | Rewrite the request at the thunk |
 | **Garage push-in** | **No: not seen yet** | Same | **Maybe** | Same |
 
+## The game's own skip (one test, 2026-11-03)
+
+**In a menu race, one `pad a` during the grid rundown ends it.** The press at 18:30:02.4 stopped `r_grid3_06` at 18:30:02.423, then `grid_plyshot` and the grid followed by 18:30:04, about 40 s early. It **did not fire Start Race**: `race.start` came only from a separate press at 18:30:17 (`runs/2026-11-03-menu-trace`).
+
+So the first version of the grid skip may need **no hook at all**, only a synthetic accept, and possibly not even that for a player willing to press. One sample so far. B-0014 repeats it during each odd race's rundown, before lights out.
+
+Also: `BroadcastGridRundownViewModel - Skipping Rundown screen` logs twice, about 18 s before the press and with no input, so the game has its own notion of skipping the rundown screen. What sets it isn't known.
+
+## Scenes seen so far
+
+| Stage | Scenes, in order | Notes |
+|---|---|---|
+| Practice garage entry | `pq_garage7_02` | Then `garage_cockpit` |
+| Race grid | `grid_scs_2018_np`, then `r_grid3_*` shots about 10 s each, in varying order, then `grid_plyshot` | Rundown takes about 45 s |
+| After a win | `celebrate_pitlane01`, `pod_crew_cele_garage02`, `celebrate_parcferme01`, then `pod_2019_1st` (44 s) | Flag to results took about 100 s. Then `session_results_container`, where FinalClassification arrives. Other finishing positions will differ |
+
 ## (a) Detecting the press and swallowing it
 
 - Intern `Menu Accept` once with `Ne_Input_InternActionName`, so the handle can be compared by value.
@@ -109,13 +125,35 @@ Pause, Return to Garage:
 17:31:58.113 GARAGECREWINSTANCE: unhide
 ```
 
+**The same exit in a practice session, choosing `Drive Out`** (`runs/2026-11-03-pushin-trace`):
+
+```text
+18:47:39.318 GARAGECREW: GAME EVENT [19] ERequest_SendCarToTrack
+18:47:39.327 GARAGE: onPitStateChanged m_nextPitState 10
+18:47:39.333 GARAGECREW: StateTransition setNextState StateSendCarToTrack_P1
+18:47:43.459 GARAGECREW: setNextState StateSendCarToTrack_P2 (other crews, vehicles 2 and 17, step the same way)
+18:47:43.487 GARAGECREW: GAME EVENT ERequest_SendCarToTrack_LaneClear
+18:47:43.493 GARAGECREW: setNextState StateSendCarToTrack_P3
+```
+
 **What this shows:**
 
-- **There are instant requests in the game itself:** `ERequest_SendCarToTrack_Inst` and `ERequest_ReturnToGarage_Inst`. Each transition took under 40 ms, with no push-in.
-- **A Time Trial's return has no push-in**, so it can't be the push-in's trace bed. It may still be fine for a Time Trial player's exit.
-- **`StateWaitPushIntoGarage` and `StateZoomIntoMonitor` never ran.** They're presumably the non-`_Inst` path, in a real weekend.
+- **The game has instant requests of its own:** `ERequest_SendCarToTrack_Inst` and `ERequest_ReturnToGarage_Inst`, each done in under 40 ms. The animated exit takes about 4 s to reach P3, and the lane-clear step shows the crew really does wait for the lane.
+- **The player already has the instant choice:** the garage offers `Flying Lap` next to `Drive Out`, and the pause menu's `Return to Garage` was `_Inst` in both a Time Trial and a practice session. **So a push-in only happens when driving into the box.**
+- **The push-in, from an AI car coming back in the same session:**
 
-**The new candidate, replacing "skip to a state":** when a non-instant request reaches `Game_Handle_GarageCrewEvent_Thunk` (exported), rewrite it to its `_Inst` twin. The game then uses its own instant path, so no state is jumped, and the stuck-car risk should be far lower. **Unproven:** we don't know the requests' enum values, which a log-only trace at the thunk can show, or whether the rest of the game expects the animation to finish.
+```text
+18:52:44.267 GARAGECREW: GAME EVENT [17] ERequest_PrepareToPushIntoGarage
+18:52:44.273 GARAGECREW: setNextState StateWaitPushIntoGarage        (complete at 18:52:52.866)
+18:52:57.224 GARAGECREW: GAME EVENT [17] ERequest_PushIntoGarage
+18:52:57.229 GARAGECREW: setNextState StateWaitPushIntoGaragePart2   (complete at 18:53:35.246)
+```
+
+  So it's two requests, about 51 s in all, and `StateWaitPushIntoGaragePart2` isn't in the KB. `StateZoomIntoMonitor` didn't appear for AI cars, so it may only apply to the player. **A player's own drive-in hasn't been traced.**
+
+This lowers the stakes: a player can already avoid most of this with `Flying Lap` and `Return to Garage`, and the only slow case left is driving into the box.
+
+**The candidate, replacing "skip to a state":** when a non-instant request reaches `Game_Handle_GarageCrewEvent_Thunk` (exported), rewrite it to its `_Inst` twin. **Don't rewrite past the lane-clear step:** that's the check that stops a car being released into traffic. The game then uses its own instant path, so no state is jumped, and the stuck-car risk should be far lower. **Unproven:** we don't know the requests' enum values, which a log-only trace at the thunk can show, or whether the rest of the game expects the animation to finish.
 
 **Still never do:** anything from `StateSendCarToTrack_P3` onward by hand. The car's pit status 10 -> 13 -> 14 is live physics.
 
@@ -142,13 +180,17 @@ waiting --deadline passed--> tripped: log it, one-line notice, no more auto-skip
 
 Channels: `CUTSCENE_MANAGER`, `CUTSCENE_SCRIPT_VERBOSE`, `GARAGECREW`, `GARAGE`, `GARAGECREWINSTANCE`, `INPUT`, all at info.
 
-**Done today:** ✓ Time Trial exit and return sequences. ✓ Time Trial has no push-in on return. ✓ Grid cutscene chain.
+**Done:** ✓ Time Trial exit and return. ✓ Practice `Drive Out` and `Return to Garage`. ✓ Grid cutscene chain. ✓ One rundown skip by `pad a`. ✓ Scene chain after a win.
 
 **Can run unattended, no addon:**
 
-- [ ] **Push-in:** a menu Grand Prix with a practice session (Weekend Structure in the settings hub), then go out and return. Is it non-`_Inst`? The full sequence and its timings.
-- [ ] **The game's own skip:** `pad a` during the grid rundown in a menu race. Does anything skip? Does it fire `Start Race` too?
-- [ ] **Which scenes come after the flag:** a menu race driven past `Advance`, for podium and results scene names.
+- [ ] **The game's own skip, repeated:** 5 more times, during B-0014's odd races.
+- [ ] **Do other scenes skip on accept?** `pad a` during the post-race chain and the podium. Do it on a run where nothing's being scored.
+- [ ] **Post-race scenes when the player doesn't win,** now that difficulty 100 makes that likely.
+
+**Needs Tyler driving:**
+
+- [ ] **The player's own drive-in:** does it use the same two requests as the AI cars' push-in, plus `StateZoomIntoMonitor`?
 
 **Needs a log-only test build first (safe: it changes nothing):**
 

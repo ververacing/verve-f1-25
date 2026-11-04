@@ -134,6 +134,9 @@ def parse(path: Path, launch_offsets: list[float]):
         body = p[HEADER.size:]
         if pid == 1 and len(body) >= 9:
             s["laps"], s["type"], s["track"] = body[3], body[6], struct.unpack_from("<b", body, 7)[0]
+            # the AI difficulty: checked against the menu's 19 on three recordings, 2026-11-03. The first packets read 0
+            if len(body) > 640 and body[640]:
+                s["ai_difficulty"] = body[640]
         elif pid == 2:
             need = n_cars * LAP.size + 2
             if len(body) != need:
@@ -226,12 +229,13 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
     with (out / "sessions.csv").open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["session_uid", "format", "game_version", "session_type", "track_id", "total_laps", "n_active",
-                    "player_car", "lights_out_s", "lapdata_grid_order", "bad_sizes", "packets"])
+                    "player_car", "lights_out_s", "lapdata_grid_order", "bad_sizes", "packets", "ai_difficulty"])
         for uid, s in sessions.items():
             w.writerow([uid, s["format"], s["version"], SESSION_TYPES.get(s["type"], s["type"]), s["track"],
                         s["laps"], s["n_active"], s.get("player"), s["launch"].get("lights_out"), s["grid_order"],
                         ";".join(f"{k}={v}" for k, v in s["bad_sizes"].items()),
-                        ";".join(f"{PACKET_NAMES.get(k, k)}={v}" for k, v in sorted(s["counts"].items()))])
+                        ";".join(f"{PACKET_NAMES.get(k, k)}={v}" for k, v in sorted(s["counts"].items())),
+                        s.get("ai_difficulty", "")])
     with (out / "events.csv").open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["session_uid", "session_time", "wall_time", "code", "fields"])
@@ -251,7 +255,7 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                     last[c] = n
     head = ["session_uid", "car", "name", "team_id", "ai", "race_number", "grid", "final_position", "laps",
             "best_lap_ms", "pit_stops", "result_status", "overtakes_made", "overtakes_suffered", "collisions",
-            "penalties"]
+            "penalties", "first_position", "last_position"]
     for off in offsets:
         head += [f"speed_kph_at_{off:g}s", f"lap_distance_m_at_{off:g}s", f"position_at_{off:g}s"]
     with (out / "cars.csv").open("w", newline="") as f:
@@ -271,6 +275,7 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                 elif code == "PENA":
                     ev[fields.get("vehicle")]["pen"] += 1
             first = s["lap_frames"][0][1] if s["lap_frames"] else None
+            final = s["lap_frames"][-1][1] if s["lap_frames"] else None
             for c in range(n):
                 part = (s["participants"] or [{}] * cars_max)[c]
                 fin = (s["final"] or [None] * cars_max)[c]
@@ -280,7 +285,8 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                        fin["position"] if fin else "NA", fin["laps"] if fin else "NA",
                        fin["best_lap_ms"] if fin else "NA", fin["pit_stops"] if fin else "NA",
                        fin["result_status"] if fin else "NA",
-                       ev[c]["made"], ev[c]["suffered"], ev[c]["coll"], ev[c]["pen"]]
+                       ev[c]["made"], ev[c]["suffered"], ev[c]["coll"], ev[c]["pen"],
+                       first[c][L_POS] if first else "NA", final[c][L_POS] if final else "NA"]
                 for off in offsets:
                     m = s["launch"].get(off)
                     if not m or m["speed"] is None:
