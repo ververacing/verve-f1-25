@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "verve.skip",
+  "name": "Verve Skip",
+  "version": "0.0.1",
+  "author": "TC Verve",
+  "description": "Skip cutscenes and the garage push-in, on a press or automatically. Skeleton: the settings load, but nothing is skipped yet.",
+  "license": "MIT",
+  "category": "qol",
+  "kind": ["native"],
+  "compat": {
+    "game": "f1_25",
+    "game_builds": ["25251167"],
+    "launcher": ">=1.7.12"
+  },
+  "requires": [{ "id": "swofty.core", "version": ">=0.2.13" }],
+  "saves": { "affects": false },
+  "options": [
+    {
+      "id": "skip_mode",
+      "type": "choice",
+      "label": "Skip mode",
+      "description": "Off, on a press, or everything automatically.",
+      "values": [
+        { "value": "off", "label": "Off" },
+        { "value": "button", "label": "On a press" },
+        { "value": "auto", "label": "Automatic" }
+      ],
+      "default": "button",
+      "binds": "native"
+    },
+    {
+      "id": "skip_input",
+      "type": "choice",
+      "label": "Skip input",
+      "description": "What counts as a press. Game action uses your existing wheel or pad binding.",
+      "values": [
+        { "value": "game_action", "label": "Game action" },
+        { "value": "wheel_button", "label": "Wheel button" },
+        { "value": "keyboard", "label": "Keyboard" }
+      ],
+      "default": "game_action",
+      "binds": "native"
+    },
+    {
+      "id": "skip_wheel_button",
+      "type": "slider",
+      "label": "Wheel button index",
+      "description": "The learned wheel button. -1 means none learned yet.",
+      "min": -1,
+      "max": 63,
+      "step": 1,
+      "default": -1,
+      "binds": "native"
+    },
+    {
+      "id": "skip_key",
+      "type": "choice",
+      "label": "Skip key",
+      "values": [
+        { "value": "space", "label": "Space" },
+        { "value": "enter", "label": "Enter" }
+      ],
+      "default": "space",
+      "binds": "native"
+    },
+    { "id": "skip_garage_pushin", "type": "toggle", "label": "Garage push-in", "default": true, "binds": "native" },
+    { "id": "skip_scene_podium", "type": "toggle", "label": "Podium", "default": true, "binds": "native" },
+    { "id": "skip_scene_grid", "type": "toggle", "label": "Grid", "default": true, "binds": "native" },
+    { "id": "skip_scene_garage", "type": "toggle", "label": "Garage", "default": true, "binds": "native" },
+    { "id": "skip_scene_results", "type": "toggle", "label": "Results", "default": true, "binds": "native" },
+    { "id": "skip_scene_terminal_damage", "type": "toggle", "label": "Terminal damage", "default": true, "binds": "native" },
+    { "id": "skip_scene_intro_flag", "type": "toggle", "label": "Intro flag", "default": true, "binds": "native" },
+    { "id": "skip_scene_track_extras", "type": "toggle", "label": "Track extras", "default": true, "binds": "native" }
+  ],
+  "operations": {
+    "native": [{ "dll": "native/verve_skip.dll" }]
+  }
+}
