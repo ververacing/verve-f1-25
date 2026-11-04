@@ -83,6 +83,23 @@ and a draft bug report: `runs/2026-11-03-direct-start/summary.md`.
 **The Time Trial direct start works:** `time_trial f1_2025 austria team=forceindia` reaches `garage_cockpit` 74 s after
 launch (`Look Around / Session Info / Go to Track`). It's the garage test bed for #65.
 
+## A normal Grand Prix through the menus (works since 2026-11-03)
+
+**This is the route for racing tests.** It forms a real grid, races to the flag, and runs in the save sandbox with UDP:
+
+```powershell
+powershell -File tools/sandbox_shell.ps1 -Fixture tyler-profile-20261031 -Plan harness/sessions/gp_menu_race.plan `
+    -Addon <batch addon> -Udp -Channels "default,RaceStarts:info,LAPTIMES:info" -Out runs/<id>
+```
+
+- **Timings:** launch to lights out about 6 min 30 s, of which the session's own rundown is about 3 min. A start-only run takes about 9 min 30 s, so about 6 an hour. The default race is 5 laps at Austria, with the flag at about 354 s.
+- **Reads per-driver `race_start`:** B-0012b (#70), 5 of 5. Each car draws exactly once per start.
+- **The session trace reads `f1_custom_team` of setup mode `f1`,** but UDP shows the stock 2025 grid, and game-database rows apply (52 + the batch's edits).
+- **The player is car 19** on this route, every time. The direct start shuffles vehicle numbers.
+- **The selections are presses on default highlights,** with `@expect` screen checks where the id changes. Sub-screens all read `solo_container`, so a menu change could slip through: check the run's seat from UDP and `LAPTIMES`.
+- **`ai_drives_player`** works about 2 s after Start Race, as on the direct start.
+- **The sandbox's profile save is written during the menus.** So every run here is a save-writing run, and the hash guard is what proves Tyler's saves weren't touched.
+
 ## Running a test
 
 ```powershell

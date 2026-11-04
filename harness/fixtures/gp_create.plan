@@ -1,0 +1,18 @@
+# Create a Grand Prix fixture inside the save sandbox (tools/sandbox_shell.ps1 plan), fixture tyler-profile-20261031.
+# #64's root-cause experiment: does a profile that already holds a Grand Prix give a direct start a working race?
+# Boot as the career plans do, then open F1 World's offline cards. The rest is mapped live from frames.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+status
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+status
+@raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}
+@sleep 6
+status
+@control 420

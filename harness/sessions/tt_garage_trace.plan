@@ -1,5 +1,6 @@
-# Direct start into a Time Trial (#65): the candidate garage trace bed. Maps what the session lands on.
-@sleep 200
+# Direct start into a Time Trial (#65): the garage trace bed. Steps after the garage go in <Out>/control.txt, checked
+# against frames: Go to Track, then return to the garage. Run with the cutscene and garage-crew log channels on.
+@waitlog \[direct\] screen garage_cockpit opened 240
+@sleep 12
 status
-@sleep 15
-status
+@control 240

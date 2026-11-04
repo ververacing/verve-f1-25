@@ -1,0 +1,67 @@
+# A normal Grand Prix through the menus, in the save sandbox (tools/sandbox_shell.ps1 plan, fixture
+# tyler-profile-20261031): Austria, 5 laps by default, Aston Martin, Stroll, AI driving. Mapped from frames on 2026-11-03,
+# runs/2026-11-03-gp-fixture. This route forms a real grid and races, which the direct start doesn't yet (#64).
+# Sub-screens share the id solo_container, so each press relies on the default highlight and a settle time.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+@expect fe_f1_world
+@raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}
+@sleep 6
+@expect f1_world_activity_container
+# the Grand Prix card
+pad a 250
+@sleep 6
+# the season: one right is F1 2025
+pad right 250
+@sleep 3
+pad a 250
+@sleep 6
+@expect solo_container
+# round 1's track: ten right from Australia is Austria
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+# team: four right from McLaren is Aston Martin. Then the driver: Stroll is the default
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+pad a 250
+@sleep 7
+@expect settings_container
+# Start Event
+pad a 250
+@sleep 8
+wait screen=garage_monitor_container 300
+# the grid: prompt is Start Race
+@sleep 8
+@expect garage_monitor_container
+pad a 700
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 40
+status

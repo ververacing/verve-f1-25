@@ -1,0 +1,45 @@
+pad a 250
+@sleep 6
+status
+pad right 250
+pad a 250
+@sleep 6
+status
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad a 250
+@sleep 7
+status
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad a 250
+@sleep 7
+status
+pad a 250
+@sleep 7
+status
+pad a 250
+@sleep 8
+status
+save now
+@sleep 3
+status
+pad a 700
+@sleep 1
+status
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+status
