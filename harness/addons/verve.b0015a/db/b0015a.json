@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "ops": [
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    }
+  ]
+}

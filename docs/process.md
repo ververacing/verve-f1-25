@@ -58,6 +58,7 @@ override window also gets a `window_override.txt` in its folder.
 |---|---|---|---|---|
 | 2026-11-14 | about 17:27 to 20:30 PT | 20:15 | Tyler, relayed by the supervisor about 17:27 PT | "Also you are good to start running tests from now till 8:30pm, exception for tonight" |
 | 2026-11-14 | about 18:12 PT to 06:00 PT (15 Nov), continuous | 05:45 | Tyler, relayed by the supervisor about 18:12 PT | "You can start things now, no need to wait till midnight. Just plan to go through the night. I'll likely pause you around 8:30 but we can work around that and I'll give you a heads up" |
+| 2026-11-15 | about 07:58 PT to 06:00 PT (16 Nov), continuous (no 16:45 wrap-up; joins the night window) | 05:45 (16 Nov) | Tyler, relayed by the supervisor about 07:58 PT | "You're good to test all day today" |
 
 The supervisor's scheduled tasks post into the local session: "Verve testing window opens" (09:03 PT), "Verve night testing window opens" (00:00 PT), "Verve testing window wrap-up" (05:45 and 16:45 PT) and "Verve hourly heartbeat (window-aware)" (:37 every hour).
 
@@ -110,6 +111,7 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 |---|---|---|
 | 2026-11-14 20:42 | PAUSE ("Pause now"). B-0014 race 5 aborted before its session, marked invalid ("pause") on #71. | Tyler, in the agent's chat |
 | 2026-11-14 22:17 | RESUME ("you are good to resume"). Pre-flight OK after one `swofty restore` for the benign cache-file line; fresh LKG `20261114-221808-lkg-20261114-resume` (Steam remote unchanged since 17:21; Tyler's launcher save changed by his play). | Tyler, in the agent's chat (also relayed by the supervisor) |
+| 2026-11-15 08:28 | PAUSE AFTER THE CURRENT RACE ("Pause after the current race"). B-0016 race 2 runs to the end with its full checks; nothing launches after it. Race 2's game quit at 08:29:56; the Swofty Launcher (not ours) opened at 08:30:24, so its saves check and post-run check were deferred (exit 11) and the rest of the PAUSE routine waits for the standing rule to allow it. | Tyler, relayed by the supervisor |
 
 ## Housekeeping log
 
