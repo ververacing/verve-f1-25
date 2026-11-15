@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "verve.b0015b",
+  "name": "Verve test B-0015b (per-driver blocking distance crossover)",
+  "version": "0.0.1",
+  "author": "TC Verve",
+  "description": "Test-only addon for race batch B-0015 (#100), order b: ai_driver_config.blocking.max_blocking_distance = 45 on alex_albon, george_russell, nico_hulkenberg, pierre_gasly; 5 on carlos_sainz-jr, gabriel_bortoleto, isack_hadjar, oliver_bearman. The _at_race_start key is left stock (18). Not for play.",
+  "license": "MIT",
+  "category": "ai",
+  "kind": [
+    "database"
+  ],
+  "compat": {
+    "game": "f1_25",
+    "game_builds": [
+      "25251167"
+    ],
+    "launcher": ">=1.5.13"
+  },
+  "requires": [
+    {
+      "id": "swofty.core",
+      "version": ">=0.2.13"
+    }
+  ],
+  "saves": {
+    "affects": false
+  },
+  "operations": {
+    "database": [
+      "db/b0015b.json"
+    ]
+  }
+}
