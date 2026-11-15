@@ -26,6 +26,12 @@ param(
     [switch] $DryRun   # log what it WOULD delete or move, change nothing; the refuse checks stay live
 )
 $ErrorActionPreference = 'Stop'
+# Standing rule (supervisor, 2026-11-14): when F1 25 or the Swofty Launcher is running and it isn't ours (Tyler
+# playing, or his launcher open), touch nothing under %LOCALAPPDATA%\Swofty or the game folder. Our own runs never
+# have the launcher open, and they call this only before launch or after their game has exited.
+if (Get-Process F1_25, swofty-launcher -ErrorAction SilentlyContinue) {
+    "REFUSE: F1 25 or the Swofty Launcher is running (not ours); nothing checked or moved"; exit 1
+}
 $data = Join-Path $env:LOCALAPPDATA 'Swofty'
 $store = Join-Path $data 'addon-profiles'
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
