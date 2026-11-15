@@ -38,7 +38,7 @@ Output: runs/<id>/race_feel.csv (one row per car per race) plus summary.json (fi
 - P1: tooling plus stock baseline. race_feel.py, then 10 stock races at difficulty 100 on two tracks: Hungary (check its game label) and Austria. This shows how bad each problem is in numbers, and which track shows it best.
 - P2 (now community first): screens of stock vs swofty.lap1-ai vs kizi.ai-driver-behaviour (Tyler setting, then the addon defaults) vs kizi.f1-25-more-aggresive-ai-2 vs Contact Physics (gentle). 6+6 per batch, alternating, on the train-prone track. Our own lever groups only for what's left:
   - S1 lap 1: fraction_of_follow_speed_at_race_start 0.875 -> 1.0, max_blocking_distance_at_race_start 18 -> 10 (note: lap1-ai moves this to 45), plus a field-wide tightening of the race-start bounds
-  - S2 trains: opportunist 0.25 s -> 0.10 s, 12 -> 6 km/h; attacker_close_enough 3 -> 4; start window 1.5 -> 2.0
+  - S2 trains: opportunist 0.25 s -> 0.10 s; attacker_close_enough 3 -> 4; start window 1.5 -> 2.0. (The opportunist speed-difference step 12 -> 6 km/h is dropped: Swofty marks oppertunist_overtake_track_speed_difference "off", with no AI-vs-AI reader. See docs/community/swofty_19_ai_learnings.md.)
   - S3 following and sudden braking: follow_speed_factor high-difficulty corners 1.05 -> 1.0; alongside_space_factor 1.15 -> 1.05; blocking distance/threat keys in small steps both ways
   - S4 dirty air: the downforce_loss scalars in small steps, with a field-pace guard
   - Never: cede_position.*, yellow_flag_*, flying_lap_yield_*
@@ -47,5 +47,6 @@ Output: runs/<id>/race_feel.csv (one row per car per race) plus summary.json (fi
 
 ## Risks
 - Several keys have undecoded signs (Q-09): screen with clear opposite steps, and accept "no effect".
+- **Unproven reader:** for a key with no proven consumer in Swofty's AI guide (most overtake.* and space_seeking.* keys), a null result is reported as "unproven reader", not "no effect": the game may cache it or never read it. Prefer the tick-read keys (blocking.*, overtake.overlap_percentage, the alongside yield floats) for S1 and S3.
 - More aggression can mean more contact, hence the guards.
 - Some sudden braking may be baked into per-track AI data (the .aispline). The community spline pack is the test of that.

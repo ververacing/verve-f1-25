@@ -1,0 +1,8 @@
+﻿process trace 18:18:34 pilot (full trace moved to %TEMP%\verve-trace, not committed); named processes only:
+  18:18:36.703 + swofty pid 376 started 18:18:35.433 %USERPROFILE%\AppData\Local\Programs\SwoftyLauncher\bin\swofty.exe
+  18:18:36.705 + swofty pid 25736 started 18:18:35.248 %USERPROFILE%\AppData\Local\Programs\SwoftyLauncher\bin\swofty.exe
+  18:18:37.892 + simplified-helper pid 26424 started 18:18:37.615 %USERPROFILE%\AppData\Local\Swofty\addons\teamsimplified.mods\bin\simplified-helper.exe
+  18:18:46.819 + EAAntiCheat.GameServiceLauncher pid 27876 started 18:18:46.600 C:\Program Files (x86)\Steam\steamapps\common\F1 25\EAAntiCheat.GameServiceLauncher.exe
+  18:18:48.179 + F1_25 pid 18340 started 18:18:47.699 C:\Program Files (x86)\Steam\steamapps\common\F1 25\F1_25.exe
+  18:19:04.188 + gameoverlayui64 pid 5172 started 18:19:03.992 C:\Program Files (x86)\Steam\gameoverlayui64.exe
+  trace end 18:19:19.825 with simplified-helper still running

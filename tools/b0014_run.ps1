@@ -31,6 +31,7 @@ $wrapups = @($now.Date.AddHours(5).AddMinutes(45), $now.Date.AddHours(16).AddMin
 $inWindow = $now.Hour -lt 6 -or ($now.Hour -ge 9 -and $now.Hour -lt 17)
 if ($WindowOverride) {
     $end = $now.Date + [TimeSpan]::Parse($WindowOverride)
+    if ($end -le $now) { $end = $end.AddDays(1) }   # an override ending at 06:00 set in the evening means tomorrow 06:00
     if ($now -lt $end) { $inWindow = $true; $wrapups = @($end.AddMinutes(-15)) + $wrapups | Sort-Object }
 }
 if (-not $inWindow) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, outside the testing windows (00:00-06:00, 09:00-17:00$(if ($WindowOverride) { ", override to $WindowOverride" })); not launching"; exit 8 }
@@ -39,6 +40,9 @@ $next = $wrapups | Where-Object { $_ -gt $now } | Select-Object -First 1
 $need = if (($Race % 2) -eq 1) { 2 * $RaceMinutes } else { $RaceMinutes }
 if ($now.AddMinutes($need + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and $need min of racing wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "race ${Race}: a game is running that this batch didn't start; not launching"; exit 9 }
+# ruling A (2026-11-14): clean up after the last race, and refuse while any test-* profile is left over
+$cleanup = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1')
+if ($LASTEXITCODE -ne 0) { "race ${Race}: test profiles are left over; not launching"; $cleanup | ForEach-Object { "  $_" }; exit 10 }
 
 $odd = ($Race % 2) -eq 1
 $addon = if ($odd) { 'verve.b0014a' } else { 'verve.b0014b' }

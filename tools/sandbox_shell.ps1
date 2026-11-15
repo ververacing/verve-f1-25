@@ -195,7 +195,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force
         Start-Sleep -Seconds 3
         PostCheck
-        & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
+        & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
         $result = 'intro skipped'; continue
     }
     Log "intro played (splash after $([math]::Round($ms / 1000)) s)"
@@ -281,7 +281,7 @@ if ($sessionLog -and (Test-Path $sessionLog)) { New-Item -ItemType Directory -Fo
 Start-Sleep -Seconds 5
 # the shell leaves its game lock and test profile behind even after a clean quit; free them for the next run
 PostCheck
-& powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
+& powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
 $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }

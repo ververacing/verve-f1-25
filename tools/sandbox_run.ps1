@@ -159,7 +159,7 @@ if ($Session) {
         CloseStreams
         Start-Sleep -Seconds 5
         PostCheck
-        & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
+        & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
         Start-Sleep -Seconds 20   # file locks (addon-profiles, overlay cache) hold on for a while after the game exits
     }
     $planResult = 'not run'
@@ -324,7 +324,7 @@ if ($Session) {
     # the shell leaves its game lock and test profile behind even after a clean quit
     Start-Sleep -Seconds 5
     PostCheck
-    & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
+    & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
     if ($planResult -ne 'plan done') { $verdict = if ($verdict -eq 'ON') { 'ON, plan failed' } else { $verdict } }
     $IntroTries = 0   # the suite and shell loop below doesn't run; the hash check after it does
 }
@@ -394,7 +394,7 @@ if ($verdict -eq 'unconfirmed' -and $locked) { $intro = 'skipped'; "attempt ${at
 if ($intro -ne 'skipped' -or $verdict -eq 'OFF') { break }
 # killed for a skipped intro, or stopped on a lock: put the game folder back and free the lock before relaunching
 PostCheck
-& powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
+& powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
 Start-Sleep -Seconds 20
 }
 
