@@ -50,4 +50,18 @@ if (Test-Path $addonStore) {
         }
     }
 }
+# Live addon data (addon-storage\<id>\) while the addon's .current names a profile that isn't ours: that's Tyler's
+# live data (addon_storage.rs Holder::Storage). Hashed, never touched.
+$live = Join-Path (Split-Path $LauncherSaves) 'addon-storage'
+if (Test-Path $live) {
+    foreach ($a in Get-ChildItem $live -Directory | Sort-Object Name) {
+        $cur = Join-Path $addonStore "$($a.Name)\.current"
+        $label = if (Test-Path $cur) { (Get-Content $cur -Raw).Trim() } else { '' }
+        if ($label -like 'verve-*' -or $label -like 'test-*') { continue }
+        foreach ($f in Get-ChildItem $a.FullName -File -Recurse -Force | Sort-Object FullName) {
+            $h["live $($a.Name)\$($f.FullName.Substring($a.FullName.Length + 1))"] =
+                "{0} {1} {2}" -f $f.Length, $f.LastWriteTimeUtc.Ticks, (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+        }
+    }
+}
 $h

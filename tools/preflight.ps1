@@ -26,7 +26,7 @@ if ($bid -ne $Build) { "PREFLIGHT FAIL: build $bid, pinned $Build. Stop and tell
 if (-not ($doc | Where-Object { $_ -match 'baseline\s+no drift|drift\s+swofty is not part of the game' })) {
     "PREFLIGHT FAIL: game folder drift. Run ``swofty restore`` and check again."; exit 1
 }
-$open = @(Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Swofty\state\journal') -Filter *.json -ErrorAction SilentlyContinue)
+$open = @($doc | Where-Object { $_ -match 'journal\s+\S+\s+is open' }) + @(Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Swofty\state\journal') -File -Force -ErrorAction SilentlyContinue)
 if ($open.Count) { "PREFLIGHT FAIL: $($open.Count) open Swofty journal(s): the game folder may be modded. Run tools/post_run_check.ps1."; exit 1 }
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Swofty $Swofty
 if ($LASTEXITCODE -ne 0) { "PREFLIGHT FAIL: test-* profiles are left over (above). Every run deletes its own; find out why before testing."; exit 1 }
