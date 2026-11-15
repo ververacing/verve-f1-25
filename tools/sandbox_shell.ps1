@@ -147,6 +147,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true
     $p = [Diagnostics.Process]::Start($psi)
     Ours-Add $p "test shell (attempt $attempt)"
+    $attemptRoles = "^(test shell \(attempt $attempt\)|game \(attempt $attempt)"   # what a stop of this attempt may touch
     $errTask = $p.StandardError.ReadToEndAsync()   # stderr is read from the run folder's files below, not here
     $outTask = $p.StandardOutput.ReadToEndAsync()
     $t0 = Get-Date; $run = $null; $seq = 0
@@ -161,7 +162,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
     if (-not $run) {
         Log 'ABORT: save sandbox not confirmed'
-        if (-not (Ours-Stop 'save sandbox not confirmed')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
+        if (-not (Ours-Stop 'save sandbox not confirmed' $attemptRoles)) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
         $result = 'no sandbox'; break
     }
     Log "sandbox: $($run.FullName) ($((Get-Content (Join-Path $run.FullName 'sandbox.json') -Raw).Trim()))"
@@ -210,19 +211,28 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $first = Send $steps[0]
     if (-not $first) {
         Log 'ABORT: the agent never answered the first command'; $result = 'no agent'
-        if (-not (Ours-Stop 'agent never answered')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
+        if (-not (Ours-Stop 'agent never answered' $attemptRoles)) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
         break
     }
     # the game is ours by the PID its test agent reports (it starts through Steam, so it isn't in the shell's tree)
     $st = Send 'status' 30
     $gpid = if ($st -and $st.value -and $st.value.pid) { [int]$st.value.pid } else { 0 }
     $gname = if ($gpid) { (Get-Process -Id $gpid -ErrorAction SilentlyContinue).ProcessName } else { '' }
-    if ($gname -match '^F1_25') { Ours-AddId $gpid 'game (test agent pid)' | Out-Null; Log "game pid $gpid (test agent)" }
+    if ($gname -match '^F1_25') { Ours-AddId $gpid "game (attempt $attempt, test agent pid)" | Out-Null; Log "game pid $gpid (test agent)" }
     else { Log 'game pid not reported by the test agent: the game stays foreign (never stopped by this run; left for pre-flight)' }
     $ms = [int]$first.ms
     if ($ms -lt $SkippedIntroS * 1000) {
         Log "intro skipped (splash after $([math]::Round($ms / 1000)) s); relaunching"
-        if (-not (Ours-Stop 'intro skipped, relaunch')) { $script:foreign = $true; $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
+        # docs/harness.md: "a skipped intro means quitting and relaunching". Quit cleanly first, so the game exits on
+        # its own (a stopped game kept skipping: race 3 of 2026-11-15 skipped 3 of 3); stop this attempt only if it won't
+        Send 'quit' 60 | Out-Null
+        $qEnd = (Get-Date).AddSeconds(90)
+        while (-not $p.HasExited -and (Get-Date) -lt $qEnd) { if (@(Ours-Foreign).Count) { $script:foreign = $true; break }; Start-Sleep -Milliseconds 500 }
+        if ($script:foreign) { $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
+        if (-not $p.HasExited) {
+            Log 'quit did not end the shell in 90 s; stopping this attempt (shell and game only)'
+            if (-not (Ours-Stop 'intro skipped, relaunch' $attemptRoles)) { $script:foreign = $true; $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
+        } else { Log 'quit: the shell exited on its own' }
         Start-Sleep -Seconds 3
         PostCheck
         & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
@@ -293,7 +303,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         Start-Sleep -Milliseconds 500
     }
     if (-not $p.HasExited -and -not $script:foreign) {
-        if (-not (Ours-Stop 'shell did not exit 120 s after quit')) { $script:foreign = $true }
+        if (-not (Ours-Stop 'shell did not exit 120 s after quit' $attemptRoles)) { $script:foreign = $true }
     }
     if (-not $p.HasExited) { Log "shell (pid $($p.Id)) still running; left alone$(if ($script:foreign) { ': a process that is not ours is running' })" }
     if ($outTask.Wait(5000)) { $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8 }
