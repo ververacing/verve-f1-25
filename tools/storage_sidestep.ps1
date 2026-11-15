@@ -13,7 +13,8 @@ Usage (run right before a swofty launch or restore, with no swofty or F1 25 proc
 
 For each addon (the profile's enabled addons plus -Addon, or -Ids): delete an empty .saved-old, and move
 addon-profiles\<id>\<.current label> and addon-profiles\<id>\<active profile> to
-Documents\verve-f1-25-recovery\<stamp>\<id>\<label> when they hold 0 files. A .saving / .saving.ready / .incoming* /
+Documents\verve-f1-25-recovery\<stamp>\<id>\<label> when they hold 0 files. -DryRun logs those moves without
+making them (the checks that refuse still apply). A .saving / .saving.ready / .incoming* /
 .outgoing entry means Swofty is mid-swap: refuse. Exit 0 = done (or nothing to do), 1 = refused.
 #>
 param(
@@ -21,7 +22,8 @@ param(
     [string[]] $Addon = @(),
     [string[]] $Ids = @(),
     [string] $Log = '',
-    [string] $Recovery = (Join-Path $env:USERPROFILE 'Documents\verve-f1-25-recovery')
+    [string] $Recovery = (Join-Path $env:USERPROFILE 'Documents\verve-f1-25-recovery'),
+    [switch] $DryRun   # log what it WOULD delete or move, change nothing; the refuse checks stay live
 )
 $ErrorActionPreference = 'Stop'
 $data = Join-Path $env:LOCALAPPDATA 'Swofty'
@@ -65,6 +67,12 @@ foreach ($id in $list) {
     }
 }
 if ($refuse) { $refuse | ForEach-Object { L "REFUSE: $_" }; L 'nothing moved'; exit 1 }
+if ($DryRun) {
+    foreach ($d in $deletes) { L "DRY RUN: would delete empty $(Split-Path (Split-Path $d) -Leaf)\.saved-old" }
+    foreach ($m in $moves) { L "DRY RUN: would move empty $($m.id)\$($m.label)" }
+    if (-not ($deletes -or $moves)) { L 'DRY RUN: nothing to move' }
+    exit 0
+}
 foreach ($d in $deletes) { [IO.Directory]::Delete($d); L "deleted empty $(Split-Path (Split-Path $d) -Leaf)\.saved-old" }
 foreach ($m in $moves) {
     $dest = Join-Path $Recovery "$stamp\$($m.id)"

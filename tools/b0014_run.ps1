@@ -21,7 +21,8 @@ param(
     [Parameter(Mandatory)] [string] $Batch,
     [int] $RaceMinutes = 17,
     [string] $WindowOverride = '',   # 'HH:mm' PT, end of a one-off window granted by Tyler (docs/process.md)
-    [string] $ExpProfile = 'verve-test'
+    [string] $ExpProfile = 'verve-test',
+    [switch] $SidestepDryRun   # storage sidestep logs only (the Defender exclusion handles the lock); refuse checks stay live
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -55,8 +56,11 @@ if (Test-Path $out) {
 New-Item -ItemType Directory -Force $out | Out-Null
 if ($WindowOverride) { Set-Content (Join-Path $out 'window_override.txt') -Value "one-off window to $WindowOverride PT (docs/process.md override log)" -Encoding utf8 }
 "race $Race at $($now.ToString('HH:mm:ss')) PT: $addon, $plan"
-powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'sandbox_shell.ps1') -Fixture tyler-profile-20261031 -ExpProfile $ExpProfile -Plan $plan -Addon $addon -Udp `
-    -Channels 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info' -Out $out |
+$shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'sandbox_shell.ps1'), '-Fixture', 'tyler-profile-20261031',
+    '-ExpProfile', $ExpProfile, '-Plan', $plan, '-Addon', $addon, '-Udp',
+    '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
+if ($SidestepDryRun) { $shellArgs += '-SidestepDryRun' }
+powershell @shellArgs |
     ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording' }
 $code = $LASTEXITCODE
 "guard exit: $code"
