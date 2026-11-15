@@ -24,6 +24,9 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
      isn't itself a restoration (reversing that pair's pass from within the previous 10 s), so a flip-flop nets 0.
    - Pit cycles: an OVTK within 20 s of either car's pit-lane time is a pit cycle, not a pass; it never counts as
      net (pit_cycle_passes reports them).
+   - held_suffered_net_2plus (B-0015's primary): net held passes ON this car on laps 2+ (same rules as made).
+   - train_s_behind (B-0015's secondary): seconds other cars spend within 1.0 s behind this car on laps 2+ without a
+     held pass on it before the end of their next lap: train time attributed to the car at the head of it.
    - held_passes_2plus: the #71 definition (as tools/b0014_check.py), where a restoration counts as held; kept for
      comparability with B-0014.
    - longest train: at each lap line of the leader (lap 2+), the longest run of consecutive cars each within 1.0 s of
@@ -142,6 +145,28 @@ def contact_outcome(before: dict, after: dict) -> dict:
     out = {"wing_hit": wing_add >= OUTCOME_WING, "spin": after["speed_ms"] < OUTCOME_SPIN_MS,
            "places_lost": max(0, after["pos"] - before["pos"]) >= OUTCOME_PLACES, "wing_added": wing_add}
     out["costly"] = out["wing_hit"] or out["spin"] or out["places_lost"]
+    return out
+
+
+def train_behind(samples: dict[int, list[tuple]], passes: list[dict], lap_starts: dict[int, dict[int, float]],
+                 gap: float = TRAIN_GAP_S) -> dict[int, float]:
+    """Seconds other cars spend stuck behind each car (B-0015's secondary): for every follower sample on laps 2+, not in
+    the pit lane, within `gap` of the car ahead and with no held pass on that car before the start of the follower's
+    lap L+2, the time is added to the car AHEAD. The same samples as train_time, attributed the other way round."""
+    held = defaultdict(list)
+    for p in passes:
+        if p["held"]:
+            held[(p["car"], p["other"])].append(p["t"])
+    out: dict[int, float] = defaultdict(float)
+    for car, rows in samples.items():
+        for i, (t, lap, g, ahead, pit) in enumerate(rows):
+            if lap < 2 or pit or g is None or g > gap or ahead is None:
+                continue
+            dt = min(rows[i + 1][0] - t, DT_CAP_S) if i + 1 < len(rows) else 0.0
+            horizon = lap_starts.get(car, {}).get(lap + 2, float("inf"))
+            if any(t <= pt < horizon for pt in held[(car, ahead)]):
+                continue
+            out[ahead] += dt
     return out
 
 
@@ -432,6 +457,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
                 order = [by_pos[p] for p in sorted(by_pos)]
                 trains.append(longest_train([None] + [gap_ahead(cars[c]) for c in order[1:]]))
     tt = train_time(samples, passes, lap_starts)
+    tb = train_behind(samples, passes, lap_starts)
 
     # sudden braking (2026-11-14 ruling): corner references from clean CORNER passes, own (>= 2) or field (>= 4)
     gap_samples = {c: [(t, cars[c][u.L_LAPDIST], gap_ahead(cars[c])) for t, cars in frames] for c in range(n)}
@@ -551,6 +577,8 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "held_passes_net_2plus": sum(1 for p in made if p["net"] and p["lap"] >= 2),
             "held_passes_2plus": sum(1 for p in made if p["held"] and p["lap"] >= 2),
             "held_suffered_2plus": sum(1 for p in passes if p["other"] == c and p["held"] and p["lap"] >= 2),
+            "held_suffered_net_2plus": sum(1 for p in passes if p["other"] == c and p["net"] and p["lap"] >= 2),
+            "train_s_behind": round(tb.get(c, 0.0), 2),
             "early_brakes_total": (phantoms[c]["own"] + phantoms[c]["field"]) if c in phantom_scored else "NA",
             "early_brakes_in_traffic": early_traffic[c] if c in phantom_scored else "NA",
             "phantom_brakes": clear_road[c] if c in phantom_scored else "NA",
@@ -645,6 +673,11 @@ def selftest() -> int:
     t2 = train_time({1: rows}, [{"t": 50.0, "car": 1, "other": 9, "held": True}], {1: {2: 0.0, 3: 70.0, 4: 140.0}})
     check("train time counts time stuck behind (5 s at the 0.5 s cap)", abs(t1[1][0] - 5.0) < 1e-9, t1)
     check("a held pass within 2 laps clears it", t2[1][0] == 0.0, t2)
+    # train behind: 5 s of car 1 stuck behind car 9 is attributed to car 9; a held pass on 9 clears it
+    b1 = train_behind({1: rows}, [], {1: {2: 0.0, 3: 70.0, 4: 140.0}})
+    b2 = train_behind({1: rows}, [{"t": 50.0, "car": 1, "other": 9, "held": True}], {1: {2: 0.0, 3: 70.0, 4: 140.0}})
+    check("train time behind is attributed to the car ahead", abs(b1.get(9, 0) - 5.0) < 1e-9 and 1 not in b1, dict(b1))
+    check("a held pass on the car ahead clears its train-behind time", b2.get(9, 0) == 0.0, dict(b2))
 
     # phantom brake: corner onset at 1000 m on clean laps; an onset 60 m early is phantom, 20 m early isn't
     cl = corners([998.0, 1000.0, 1003.0, 2500.0, 2510.0])
