@@ -11,9 +11,13 @@ Part 2, live (the supervisor's check h): the test starts FOREIGN dummies named F
 (copies of ping.exe in %TEMP%, not recorded as ours) plus one dummy of OURS with a child named swofty.exe. Then
 Ours-Stop, post_run_check, storage_sidestep, cleanup_test_profiles, sandbox_shell and safe_to_play are run against
 them, and the foreign dummies must all still be alive afterwards. Only then does the test end its own dummies, through
-the handles it holds. Refuses to run (exit 1) if a real F1 25 or Swofty process is up: the scripts would then (rightly)
-refuse for the real one, and the test must not confuse Tyler's session.
+the handles it holds.
+The live part SKIPS, exit 1 (= not passed), whenever Ours-Foreign isn't empty (a real F1 25 or Swofty process is up)
+or a PAUSE or hands-off is in force (%LOCALAPPDATA%\verve-f1-25\state\paused.txt exists; docs/process.md). Dummies
+named F1_25.exe / swofty*.exe could make the launcher or Steam think a game is running (supervisor, #107 review).
+-PureOnly runs part 1 alone (merge_pr does that outside a testing window or while paused, and says so).
 #>
+param([switch] $PureOnly)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'ours.ps1')
 $failed = 0
@@ -59,8 +63,13 @@ Check 'steam is never ours, even if recorded' (@(Get-OursTree $recSteam $snap2 |
 Check 'no fallback adoption exists (a game is ours only by a reported PID)' (-not (Get-Command Ours-AdoptNewGame -ErrorAction SilentlyContinue))
 
 # ---- part 2: live foreign dummies ----
-if (Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) {
+if ($PureOnly) { 'part 2 (live dummies) not run: -PureOnly'; exit ([int]($failed -gt 0)) }
+if (@(Get-ForeignProcs @() (Get-ProcSnapshot)).Count) {
     'SKIP part 2: a real F1 25 or Swofty process is running; run the selftests with both closed'
+    exit 1
+}
+if (Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')) {
+    'SKIP part 2: a PAUSE or hands-off is in force (state\paused.txt); no dummy processes while paused'
     exit 1
 }
 $ErrorActionPreference = 'Continue'   # the scripts under test refuse on stderr; in 5.1 that must not end this test

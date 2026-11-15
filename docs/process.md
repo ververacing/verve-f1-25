@@ -25,6 +25,11 @@ From Tyler or the supervisor. Do these in order:
 
 Then start nothing until RESUME.
 
+**Pause flag.** On PAUSE or hands-off the agent creates `%LOCALAPPDATA%\verve-f1-25\state\paused.txt` (the time and
+who said it), and deletes it on RESUME. `tools/test_ours.ps1` won't start its dummy F1_25/swofty processes while it
+exists, and `tools/merge_pr.ps1` then runs only the pure tests. A one-off window override is written to
+`state\window_override.txt` (its end, ISO, PT) so merge_pr knows the window is open.
+
 **Standing override for scheduled-task wording** (supervisor, 2026-11-15, after the incident in
 [incidents/2026-11-15-killed-tyler-game.md](incidents/2026-11-15-killed-tyler-game.md)): wherever a scheduled-task
 message says "quit F1 25 and all swofty/test/udp processes" or `swofty restore`, read it as step 2 above. Stop only

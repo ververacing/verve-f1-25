@@ -54,10 +54,21 @@ try {
         if ($LASTEXITCODE -ne 0) { $fails += 'test_post_run_check' } else { '  ok test_post_run_check' }
     }
     # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
-    foreach ($t in @(@('test_ours', 'tools/test_ours.ps1'))) {
-        if (Test-Path $t[1]) {
-            & powershell -NoProfile -ExecutionPolicy Bypass -File $t[1] *> $null
-            if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }
+    # the live part (dummy F1_25/swofty processes) only inside a testing window and not while paused (#107 review)
+    if (Test-Path 'tools/test_ours.ps1') {
+        $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
+        $pt = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
+        $inWin = $pt.Hour -lt 6 -or ($pt.Hour -ge 9 -and $pt.Hour -lt 17)
+        $ovr = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\window_override.txt'   # one line: the override's end, ISO, PT
+        if (-not $inWin -and (Test-Path $ovr)) { try { $inWin = $pt -lt [datetime](Get-Content $ovr -TotalCount 1) } catch { } }
+        $paused = Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')
+        if ($inWin -and -not $paused) {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_ours' } else { '  ok test_ours (pure + live)' }
+        } else {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 -PureOnly *> $null
+            $why = if ($paused) { 'paused' } else { "outside a testing window ($($pt.ToString('HH:mm')) PT)" }
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_ours (pure)' } else { "  ok test_ours (pure only: $why; live part not run)" }
         }
     }
     foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'))) {
