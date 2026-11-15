@@ -59,7 +59,12 @@ function Snapshot {
 # Write-Host, not output: Log runs inside Send/Screen/Step, whose output is their return value
 function Log([string] $s) { Write-Host $s; Add-Content $transcript $s -Encoding utf8 }
 
-if (Get-Process F1_25 -ErrorAction SilentlyContinue) { throw 'F1 25 is running; start sandbox runs with the game closed.' }
+# PID ownership (incident 2026-11-15): every process we start is recorded in <Out>\ours.csv, and every stop targets
+# only those (tools/ours.ps1). Nothing is ever stopped by name.
+. (Join-Path $PSScriptRoot 'ours.ps1')
+Ours-Init $Out
+$script:foreign = $false   # set once a game or launcher that isn't ours shows up: then no post-race Swofty steps at all
+if (@(Ours-Foreign).Count) { throw 'F1 25 or a Swofty process (launcher) is running that this run did not start; start sandbox runs with both closed.' }
 if ($ExpProfile -notlike 'verve-*') { throw "-ExpProfile $ExpProfile isn't one of ours (verve-*); never run a test on Tyler's profiles" }
 $profileFile = Join-Path $env:LOCALAPPDATA "Swofty\profiles\$ExpProfile.json"
 if (-not (Test-Path $profileFile)) { throw "no profile $ExpProfile ($profileFile)" }
@@ -99,6 +104,7 @@ if ($Udp) {
     $udpBin = Join-Path $udpWork 'udp.bin'; $udpStop = Join-Path $udpWork 'stop.flag'; $udpLog = Join-Path $udpWork 'capture.log'
     $cap = Start-Process -FilePath $Python -ArgumentList @('-I', "`"$udpWork\udp_capture.py`"", '--out', "`"$udpBin`"", '--seconds', '14400', '--stop-file', "`"$udpStop`"") `
         -RedirectStandardOutput $udpLog -RedirectStandardError "$udpLog.err" -WindowStyle Hidden -PassThru
+    Ours-Add $cap 'udp capture'
     Start-Sleep -Seconds 2
     if ($cap.HasExited) { Log 'ABORT: UDP capture failed to start; nothing launched'; exit 1 }
     Log "udp capture pid $($cap.Id)"
@@ -125,7 +131,7 @@ function PostCheck {
     $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1') -Out $Out
     if ($LASTEXITCODE -eq 2) { $script:urgent = $true }
     if ($LASTEXITCODE -eq 3) { Write-Host 'post-run: WAITING: launcher open, restore deferred (not urgent)' }
-    if ($LASTEXITCODE -eq 4) { Write-Host 'post-run: SKIPPED: F1 25 still running; check again when it has closed'; $script:urgent = $true }
+    if ($LASTEXITCODE -eq 4) { Write-Host 'post-run: SKIPPED: F1 25 or the launcher is running; check again when both have closed'; $script:urgent = $true }
     $o | ForEach-Object { Write-Host "post-run: $_" }
 }
 $result = 'not run'
@@ -133,12 +139,14 @@ $t0 = Get-Date   # also read after the loop, so set it even when nothing launche
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
-    Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
-        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
+    $trace = Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
+        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden -PassThru
+    Ours-Add $trace 'process trace'
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true
     $p = [Diagnostics.Process]::Start($psi)
+    Ours-Add $p "test shell (attempt $attempt)"
     $errTask = $p.StandardError.ReadToEndAsync()   # stderr is read from the run folder's files below, not here
     $outTask = $p.StandardOutput.ReadToEndAsync()
     $t0 = Get-Date; $run = $null; $seq = 0
@@ -151,7 +159,12 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             Select-Object -First 1
         Start-Sleep -Milliseconds 500
     }
-    if (-not $run) { Log 'ABORT: save sandbox not confirmed'; Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force; $result = 'no sandbox'; break }
+    if (-not $run) {
+        Log 'ABORT: save sandbox not confirmed'
+        Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
+        if (-not (Ours-Stop 'save sandbox not confirmed')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
+        $result = 'no sandbox'; break
+    }
     Log "sandbox: $($run.FullName) ($((Get-Content (Join-Path $run.FullName 'sandbox.json') -Raw).Trim()))"
     $results = Join-Path $run.FullName 'agent\results.jsonl'
 
@@ -196,11 +209,23 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
 
     $first = Send $steps[0]
-    if (-not $first) { Log 'ABORT: the agent never answered the first command'; $result = 'no agent'; Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force; break }
+    if (-not $first) {
+        Log 'ABORT: the agent never answered the first command'; $result = 'no agent'
+        Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
+        if (-not (Ours-Stop 'agent never answered')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
+        break
+    }
+    # the game is ours by the PID its test agent reports (it starts through Steam, so it isn't in the shell's tree)
+    $st = Send 'status' 30
+    $gpid = if ($st -and $st.value -and $st.value.pid) { [int]$st.value.pid } else { 0 }
+    $gname = if ($gpid) { (Get-Process -Id $gpid -ErrorAction SilentlyContinue).ProcessName } else { '' }
+    if ($gname -match '^F1_25') { Ours-AddId $gpid 'game (test agent pid)' | Out-Null; Log "game pid $gpid (test agent)" }
+    elseif (Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)') { Log 'game adopted as the one F1_25 started after our launch' }
+    else { Log 'game pid unknown: it will never be stopped by this run' }
     $ms = [int]$first.ms
     if ($ms -lt $SkippedIntroS * 1000) {
         Log "intro skipped (splash after $([math]::Round($ms / 1000)) s); relaunching"
-        Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force
+        if (-not (Ours-Stop 'intro skipped, relaunch')) { $script:foreign = $true; $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
         Start-Sleep -Seconds 3
         PostCheck
         & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
@@ -263,9 +288,19 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
     } catch { $result = "plan error: $_"; Log $result }
     try { if (-not $p.HasExited) { Send 'quit' 120 | Out-Null } } catch { Log "quit failed: $_" }
-    if (-not $p.WaitForExit(120000)) { Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force }
-    $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8
-    $errTask.Result | Set-Content (Join-Path $Out 'shell_stderr.txt') -Encoding utf8
+    # wait up to 120 s for the shell to finish its own restore; if a process that isn't ours appears meanwhile (Tyler
+    # opened the launcher or the game), stop waiting and touch nothing more (incident 2026-11-15)
+    $waitEnd = (Get-Date).AddSeconds(120)
+    while (-not $p.HasExited -and (Get-Date) -lt $waitEnd) {
+        if (@(Ours-Foreign).Count) { $script:foreign = $true; break }
+        Start-Sleep -Milliseconds 500
+    }
+    if (-not $p.HasExited -and -not $script:foreign) {
+        if (-not (Ours-Stop 'shell did not exit 120 s after quit')) { $script:foreign = $true }
+    }
+    if (-not $p.HasExited) { Log "shell (pid $($p.Id)) still running; left alone$(if ($script:foreign) { ': a process that is not ours is running' })" }
+    if ($outTask.Wait(5000)) { $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8 }
+    if ($errTask.Wait(5000)) { $errTask.Result | Set-Content (Join-Path $Out 'shell_stderr.txt') -Encoding utf8 }
     Log "run folder: $($run.Name)"
     # which addons this run really had, for checks that need to prove the arm
     Copy-Item (Join-Path $run.FullName 'addons.json') (Join-Path $Out 'addons.json') -ErrorAction SilentlyContinue
@@ -275,15 +310,29 @@ Log "result: $result"
 
 if ($cap) {
     New-Item -ItemType File -Force $udpStop | Out-Null
-    if (-not $cap.WaitForExit(15000)) { Stop-Process -Id $cap.Id -Force }
+    if (-not $cap.WaitForExit(15000)) { Ours-StopOne $cap 'udp capture did not stop on its flag' | Out-Null }
     Log "udp recording: $((Get-Item $udpBin -ErrorAction SilentlyContinue).Length) bytes"
     $parsed = Join-Path $udpWork 'udp'
     try { & $Python -I "$udpWork\udp_parse.py" $udpBin --out $parsed --launch-s '1,3,6' | Out-Null } catch { Log "udp parse failed: $_" }
     if (Test-Path $parsed) { $dest = Join-Path $Out 'udp'; New-Item -ItemType Directory -Force $dest | Out-Null; Copy-Item "$parsed\*" $dest -Force }
 }
-# the game's log, before the restore below can remove it (a session's copy appears when the game exits)
+
+# a game or launcher that isn't ours: NO post-race Swofty steps at all (no reads under Swofty, no doctor, no cleanup,
+# no saves check). Everything waits for the next pre-flight (supervisor, 2026-11-15).
+if ($script:foreign -or @(Ours-Foreign).Count) {
+    $who = (@(Ours-Foreign) | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', '
+    Set-Content (Join-Path $Out 'saves_diff_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "snapshot $snapId",
+        "reason: not ours running as the run ended ($who); post-race Swofty steps not run: loader.log copy (first session folder created after $($t0.ToString('s'))), post_run_check, cleanup_test_profiles, saves check",
+        'next: tools/preflight.ps1 (deferred_saves_check finishes the saves check; cleanup runs there), then copy the loader.log by hand')
+    Log "POST-RACE DEFERRED: a process that is not ours is running ($who); no Swofty steps run after the race"
+    if ($script:urgent) { Log 'URGENT: post_run_check reported URGENT earlier in this run (post_run_check.txt). Stop all testing.'; exit 7 }
+    exit 11
+}
+
+# the game's log, before the restore below can remove it (a session's copy appears when the game exits). Our
+# session is the FIRST one created after our launch: a later one belongs to someone else.
 $sessionLog = Get-ChildItem "$env:LOCALAPPDATA\Swofty\sessions" -Directory -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -ge $t0.AddSeconds(-5) } |
-    Sort-Object CreationTime -Descending | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'loader.log' }
+    Sort-Object CreationTime | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'loader.log' }
 if ($sessionLog -and (Test-Path $sessionLog)) { New-Item -ItemType Directory -Force (Join-Path $Out 'raw') | Out-Null; Copy-Item $sessionLog (Join-Path $Out 'raw\loader.log') -Force }
 
 Start-Sleep -Seconds 5
@@ -296,6 +345,8 @@ try { $after = Snapshot } catch {
     Set-Content (Join-Path $Out 'saves_diff_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "snapshot $snapId",
         'reason: F1 25 or the Swofty Launcher (not ours) was running when the run ended; tools/deferred_saves_check.ps1 finishes it')
     Write-Host 'SAVES CHECK DEFERRED: F1 25 or the Swofty Launcher is running; see saves_diff_deferred.txt'
+    # the deferral must never hide an URGENT post-run result (incident 2026-11-15: race 2's exit 2 became exit 11)
+    if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
     exit 11
 }
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {

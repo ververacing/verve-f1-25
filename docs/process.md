@@ -7,17 +7,30 @@ The rules for the local agent, the cloud supervisor and Tyler. Until 2026-11-03 
 From Tyler or the supervisor. Do these in order:
 
 1. Abort the current run. Losing it is fine.
-2. Quit F1 25 and every swofty, test and UDP process.
-3. If no such process remains, clear a stale `%LOCALAPPDATA%\swofty-game.lock.d`.
+2. Stop only OUR processes, by recorded PID (`ours.csv` in the run folder; `tools/ours.ps1`). Never stop a process we
+   didn't start. If Tyler's game or launcher is running, leave it, and finish the routine without Swofty commands
+   (steps 3, 4 and 7 then wait for the next pre-flight).
+3. If no F1 25 or swofty process remains, clear a stale `%LOCALAPPDATA%\swofty-game.lock.d`.
 4. Run `tools/post_run_check.ps1` (no drift, 0 open journals, no version.dll; if not clean it does one storage sidestep
-   and one `swofty restore`). Exit 2 = URGENT: tell the supervisor and Tyler at once, Tyler must not launch the game.
+   and one `swofty restore`). It skips (exit 4) before any swofty command while F1 25 or the launcher is up. Exit 2 =
+   URGENT: tell the supervisor and Tyler at once, Tyler must not launch the game.
 5. Check Tyler's `remote\` and Steam's records against the last-known-good snapshot. **Report** any difference and don't touch it.
 6. Report the Steam Cloud state. If it's off and the check passed, tell Tyler it's safe to turn on.
 7. Delete leftover `test-*` profiles where they're unlocked. Tyler's own profiles, addons, saves and settings stay untouched.
 8. Commit and push, naming explicit paths only.
 9. Message the supervisor `PAUSED` plus 2-3 lines: doctor, saves, Steam Cloud, active profile.
+10. Run `tools/safe_to_play.ps1` and pass its one line to Tyler through the supervisor: `SAFE TO PLAY` only once our
+    processes are gone and the post-run check, cleanup and deferred saves check have FINISHED. Until then it says
+    `WAIT: cleanup running` (or why it waits). Same after every window close.
 
 Then start nothing until RESUME.
+
+**Standing override for scheduled-task wording** (supervisor, 2026-11-15, after the incident in
+[incidents/2026-11-15-killed-tyler-game.md](incidents/2026-11-15-killed-tyler-game.md)): wherever a scheduled-task
+message says "quit F1 25 and all swofty/test/udp processes" or `swofty restore`, read it as step 2 above. Stop only
+our recorded PIDs, never a process we didn't start, and restore only through `post_run_check.ps1` when it is safe.
+Nothing in `tools/` stops a process by name; every stop goes through `tools/ours.ps1`, and `tools/test_ours.ps1`
+checks with foreign dummy processes that none of our scripts stop them.
 
 **While paused, and whenever F1 25 or the Swofty Launcher is running and the agent didn't start it** (standing rule,
 supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55; nothing was changed):
@@ -111,7 +124,9 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 |---|---|---|
 | 2026-11-14 20:42 | PAUSE ("Pause now"). B-0014 race 5 aborted before its session, marked invalid ("pause") on #71. | Tyler, in the agent's chat |
 | 2026-11-14 22:17 | RESUME ("you are good to resume"). Pre-flight OK after one `swofty restore` for the benign cache-file line; fresh LKG `20261114-221808-lkg-20261114-resume` (Steam remote unchanged since 17:21; Tyler's launcher save changed by his play). | Tyler, in the agent's chat (also relayed by the supervisor) |
-| 2026-11-15 08:28 | PAUSE AFTER THE CURRENT RACE ("Pause after the current race"). B-0016 race 2 runs to the end with its full checks; nothing launches after it. Race 2's game quit at 08:29:56; the Swofty Launcher (not ours) opened at 08:30:24, so its saves check and post-run check were deferred (exit 11) and the rest of the PAUSE routine waits for the standing rule to allow it. | Tyler, relayed by the supervisor |
+| 2026-11-15 08:28 | PAUSE AFTER THE CURRENT RACE ("Pause after the current race"). B-0016 race 2 runs to the end with its full checks; nothing launches after it. Race 2's game quit at 08:29:56; the Swofty Launcher (not ours) opened at 08:30:24, so its saves check was deferred (exit 11) and the rest of the PAUSE routine waited for the standing rule to allow it. [Corrected after the diagnosis: race 2's runner had force-killed Tyler's game by name at 08:31:59, and its post-run check had run `swofty doctor` (URGENT, no restore, no move); see incidents/2026-11-15-killed-tyler-game.md.] | Tyler, relayed by the supervisor |
+| 2026-11-15 after 08:34 | HANDS OFF ("Make sure neither of you are touching anything. Swofty just closed the game on its own without me."). No commands until cleared; scheduled tasks into the session disabled by the supervisor. | Tyler, relayed by the supervisor |
+| 2026-11-15 09:07 | RESUME ("resume"). Launcher closed (F1 25 was closed). Read-only diagnosis first; safety fixes (PID ownership) as one PR before any race; the 16:45 wrap-up is ignored today (the extended window runs to 05:45). | Tyler, relayed by the supervisor |
 
 ## Housekeeping log
 

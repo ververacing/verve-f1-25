@@ -4,7 +4,8 @@ command as the commit or PR create). It refuses unless ALL of these hold:
 - the PR is open, not a draft, and at least -MinAgeMinutes (5) old;
 - GitHub says it's mergeable, and no CI check failed or is still pending;
 - on the PR's exact head commit, checked out in a temporary worktree, the repo's selftests pass:
-  race_feel --selftest, test_udp_parse, b0014_check --selftest, test_post_run_check;
+  race_feel --selftest, test_udp_parse, b0014_check --selftest, test_post_run_check, test_ours (live foreign
+  dummies: needs F1 25 and Swofty closed), b0015_check / b0016_check --selftest;
 - the PR's added lines carry no user folder, Steam account id or 64-bit Steam id, add no image outside docs/ or
   harness/fixtures/frames/, and add no unfiltered process trace (the pre-commit hook's rules, re-checked on the PR).
 Then it merges with a merge commit, as its own step, and prints the merge commit.
@@ -51,6 +52,19 @@ try {
     if (Test-Path 'tools/test_post_run_check.ps1') {
         & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_post_run_check.ps1 *> $null
         if ($LASTEXITCODE -ne 0) { $fails += 'test_post_run_check' } else { '  ok test_post_run_check' }
+    }
+    # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
+    foreach ($t in @(@('test_ours', 'tools/test_ours.ps1'))) {
+        if (Test-Path $t[1]) {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File $t[1] *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }
+        }
+    }
+    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'))) {
+        if (Test-Path $t[1]) {
+            & $Python -I $t[1] --selftest *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }
+        }
     }
     # the hook's rules on the PR's added lines and files
     $base = (git merge-base origin/main $j.headRefOid).Trim()

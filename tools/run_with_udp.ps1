@@ -24,6 +24,10 @@ param(
     [string] $LaunchS = '1,3,6'
 )
 $ErrorActionPreference = 'Stop'
+# PID ownership (incident 2026-11-15): record what we start, stop only that (tools/ours.ps1)
+. (Join-Path $PSScriptRoot 'ours.ps1')
+Ours-Init $Out
+if (@(Ours-Foreign).Count) { 'F1 25 or a Swofty process (launcher) is running that this run did not start; not running'; exit 1 }
 $run = Get-Date -Format 'yyyyMMdd-HHmmss'
 $work = Join-Path $env:TEMP "verve-udp\$run"
 New-Item -ItemType Directory -Force $work | Out-Null
@@ -31,6 +35,7 @@ Copy-Item (Join-Path $PSScriptRoot 'udp_capture.py'), (Join-Path $PSScriptRoot '
 $bin = Join-Path $work 'udp.bin'; $stop = Join-Path $work 'stop.flag'; $log = Join-Path $work 'capture.log'
 $cap = Start-Process -FilePath $Python -ArgumentList @('-I', "`"$work\udp_capture.py`"", '--out', "`"$bin`"", '--seconds', '14400', '--stop-file', "`"$stop`"") `
     -RedirectStandardOutput $log -RedirectStandardError "$log.err" -WindowStyle Hidden -PassThru
+Ours-Add $cap 'udp capture'
 Start-Sleep -Seconds 2
 if ($cap.HasExited) { "capture failed to start:"; Get-Content "$log.err"; exit 1 }
 "capture pid $($cap.Id) -> $bin"
@@ -38,7 +43,7 @@ if ($cap.HasExited) { "capture failed to start:"; Get-Content "$log.err"; exit 1
 New-Item -ItemType Directory -Force $Out | Out-Null
 $guard = Join-Path $PSScriptRoot 'saves_guard.ps1'
 $saves = powershell -NoProfile -File $guard -Action Backup -Label (Split-Path $Out -Leaf)
-if ($LASTEXITCODE -ne 0 -or -not $saves) { Stop-Process -Id $cap.Id -Force; "save backup failed; not running"; exit 1 }
+if ($LASTEXITCODE -ne 0 -or -not $saves) { Ours-StopOne $cap 'save backup failed' | Out-Null; "save backup failed; not running"; exit 1 }
 "saves backed up -> $saves"
 $raw = Join-Path (Resolve-Path $Out).Path 'raw'
 & $Swofty test run $Test --out $raw --wait 0
@@ -51,7 +56,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 New-Item -ItemType File -Force $stop | Out-Null
-if (-not $cap.WaitForExit(15000)) { Stop-Process -Id $cap.Id -Force }
+if (-not $cap.WaitForExit(15000)) { Ours-StopOne $cap 'capture did not stop on its flag' | Out-Null }
 Get-Content $log -ErrorAction SilentlyContinue | Select-Object -Last 3
 "recording: $((Get-Item $bin -ErrorAction SilentlyContinue).Length) bytes"
 

@@ -1,0 +1,42 @@
+<#
+The last step of every PAUSE (and window close): tell Tyler, through the supervisor, whether he can play.
+Prints exactly one verdict line, either "SAFE TO PLAY" or "WAIT: <reason>" (supervisor, 2026-11-15, after the
+incident in docs/incidents/2026-11-15-killed-tyler-game.md).
+
+Usage:
+    powershell -File tools/safe_to_play.ps1        # exit 0 = SAFE TO PLAY, 1 = WAIT
+
+SAFE TO PLAY only once all of these have FINISHED:
+1. Nothing of ours is running: no runner or sandbox script (b00xx_run, sandbox_shell, sandbox_run, run_with_udp,
+   preflight, post_run_check, cleanup, deferred check) and no process recorded in a recent runs/**/ours.csv.
+2. No F1 25 or Swofty process is up (if Tyler's own game or launcher is up, he is already in; the checks wait).
+3. post_run_check.ps1 exits 0 (CLEAN), cleanup_test_profiles.ps1 exits 0, deferred_saves_check.ps1 has nothing
+   pending. These run only after 1 and 2 pass, so this script never runs a swofty command while a game or launcher is up.
+#>
+param([string] $Repo = (Split-Path $PSScriptRoot -Parent))
+$ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'ours.ps1')
+function Verdict([string] $s, [int] $code) { $s; exit $code }
+
+$snap = Get-ProcSnapshot
+# 1a. our scripts, by command line (never stopped here; only waited for)
+$me = $PID
+$scripts = @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe' OR Name = 'pwsh.exe' OR Name = 'python.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.ProcessId -ne $me -and $_.CommandLine -match '(b00\d\d_run|sandbox_shell|sandbox_run|run_with_udp|preflight|post_run_check|cleanup_test_profiles|deferred_saves_check|storage_sidestep|udp_capture)\.(ps1|py)' })
+if ($scripts.Count) { Verdict "WAIT: cleanup running ($(($scripts | ForEach-Object { ($_.CommandLine -replace '^.*\\', '') -replace '\s.*$', '' }) -join ', '))" 1 }
+# 1b. processes recorded as ours in the last two days
+$recs = @(Get-ChildItem (Join-Path $Repo 'runs') -Recurse -Filter 'ours.csv' -ErrorAction SilentlyContinue |
+    Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-2) } | ForEach-Object { Import-Csv $_.FullName })
+$ours = @(Get-OursTree $recs $snap)
+if ($ours.Count) { Verdict "WAIT: cleanup running (ours still up: $(($ours | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', '))" 1 }
+# 2. any game or Swofty process now is someone else's
+$up = @($snap | Where-Object { $_.Name -match '^F1_25' -or $_.Name -match '^swofty' })
+if ($up.Count) { Verdict "WAIT: F1 25 or the Swofty Launcher is open (not ours: $(($up | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', ')); the post-run checks run once it has closed" 1 }
+# 3. the checks themselves
+$pc = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1')
+if ($LASTEXITCODE -ne 0) { Verdict "WAIT: post-run check not clean (exit $LASTEXITCODE): $($pc | Select-Object -Last 1)" 1 }
+$cl = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1')
+if ($LASTEXITCODE -ne 0) { Verdict "WAIT: test profiles left over: $($cl | Select-Object -Last 1)" 1 }
+$dc = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'deferred_saves_check.ps1')
+if ($LASTEXITCODE -ne 0 -or ($dc | Where-Object { $_ -match 'CHANGED|still pending' })) { Verdict "WAIT: deferred saves check: $($dc | Select-Object -Last 1)" 1 }
+Verdict 'SAFE TO PLAY' 0

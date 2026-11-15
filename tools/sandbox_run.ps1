@@ -75,6 +75,15 @@ if ($Session -or $Fixture) {
     $hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'
     Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Pattern '<udp ' -ErrorAction SilentlyContinue | Select-Object -First 1).Line.Trim()) -Encoding utf8   # Tyler's choice (60 Hz since 2026-11-14); recorded, never changed
 }
+# PID ownership (incident 2026-11-15): record every process we start in <Out>\ours.csv; stop only those (tools/ours.ps1)
+. (Join-Path $PSScriptRoot 'ours.ps1')
+Ours-Init $Out
+if (@(Ours-Foreign).Count) { throw 'F1 25 or a Swofty process (launcher) is running that this run did not start; start sandbox runs with both closed.' }
+function KillOurs([string] $why) {
+    # our game started through Steam: adopt it only when that is certain (tools/ours.ps1); never stop by name
+    Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
+    if (-not (Ours-Stop $why)) { Write-Host "not stopping ($why): a process that is not ours is running" }
+}
 $before = Snapshot
 # keep the before-snapshot outside the repo (it names save files) for a deferred check (tools/deferred_saves_check.ps1)
 $outFull = (Resolve-Path $Out).Path
@@ -135,7 +144,7 @@ if ($Session) {
             $sr = New-Object IO.StreamReader $fs; $text = $sr.ReadToEnd(); $sr.Dispose(); return $text
         } catch { return '' }
     }
-    function KillGame { Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force }
+    function KillGame { KillOurs 'direct start: stop' }
     function GameLog {
         $live = FreshLiveLog $t0
         if ($live) { return $live }
@@ -152,6 +161,7 @@ if ($Session) {
         $udpBin = Join-Path $udpWork 'udp.bin'; $udpStop = Join-Path $udpWork 'stop.flag'; $udpLog = Join-Path $udpWork 'capture.log'
         $cap = Start-Process -FilePath $Python -ArgumentList @('-I', "`"$udpWork\udp_capture.py`"", '--out', "`"$udpBin`"", '--seconds', '14400', '--stop-file', "`"$udpStop`"") `
             -RedirectStandardOutput $udpLog -RedirectStandardError "$udpLog.err" -WindowStyle Hidden -PassThru
+        Ours-Add $cap 'udp capture'
         Start-Sleep -Seconds 2
         if ($cap.HasExited) { Log 'ABORT: UDP capture failed to start; nothing launched'; Get-Content "$udpLog.err"; exit 1 }
         Log "udp capture pid $($cap.Id)"
@@ -176,13 +186,15 @@ if ($Session) {
     for ($try = 1; $try -le $IntroTries; $try++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $planResult = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
-    Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
-        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
+    $trace = Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
+        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden -PassThru
+    Ours-Add $trace 'process trace'
     $t0 = Get-Date
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test session $Session --fixture $Fixture --wait 0"
     $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
     $psi.RedirectStandardInput = $true; $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true
     $job = [Diagnostics.Process]::Start($psi)
+    Ours-Add $job 'test session'
     Log "launched $($t0.ToString('HH:mm:ss.fff')): test session $Session (profile $ExpProfile, fixture $Fixture)"
     # stdin stays open and empty. stdout and stderr go to files as they arrive, so the checks below see them live.
     $errPath = Join-Path $OutFull 'test_stderr.txt'; $outPath = Join-Path $OutFull 'test_stdout.txt'
@@ -323,7 +335,7 @@ if ($Session) {
 
     if ($cap) {
         New-Item -ItemType File -Force $udpStop | Out-Null
-        if (-not $cap.WaitForExit(15000)) { Stop-Process -Id $cap.Id -Force }
+        if (-not $cap.WaitForExit(15000)) { Ours-StopOne $cap 'udp capture did not stop on its flag' | Out-Null }
         Log "udp recording: $((Get-Item $udpBin -ErrorAction SilentlyContinue).Length) bytes in $udpWork"
         $parsed = Join-Path $udpWork 'udp'
         try { & $Python -I "$udpWork\udp_parse.py" $udpBin --out $parsed --launch-s '1,3,6' } catch { Log "udp parse failed: $_" }
@@ -349,6 +361,7 @@ if ($Fixture) {
 } elseif ($Test) {
     $job = Start-Process -FilePath $Swofty -ArgumentList @('test', 'run', "`"$((Resolve-Path $Test).Path)`"", '--out', "`"$raw`"", '--wait', '0') @io
 } else { throw 'give -Test, or -Fixture with -Commands' }
+Ours-Add $job 'test run/shell'
 $null = $job.Handle   # cache the handle: without it Start-Process leaves ExitCode empty, and a failed test exits 0
 
 $verdict = 'unconfirmed'; $intro = 'unknown'; $log = $null   # $log is set below; never reuse the last attempt's
@@ -363,7 +376,7 @@ while (-not $job.HasExited) {
             $intro = if ($gap -lt 5) { 'skipped' } else { 'played' }
             "intro video $intro ($([math]::Round($gap, 1)) s), attempt $attempt"
             if ($intro -eq 'skipped') {
-                Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force
+                KillOurs 'intro skipped'
                 break
             }
         }
@@ -384,8 +397,8 @@ while (-not $job.HasExited) {
         }
     }
     if ($verdict -eq 'OFF' -or ($verdict -eq 'unconfirmed' -and ((Get-Date) - $t0).TotalSeconds -gt $ConfirmS)) {
-        "ABORT: save sandbox $verdict; killing the test and the game"
-        Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force
+        "ABORT: save sandbox $verdict; stopping our test and our game (recorded PIDs only)"
+        KillOurs "save sandbox $verdict"
         break
     }
     Start-Sleep -Milliseconds 500

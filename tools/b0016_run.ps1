@@ -75,7 +75,9 @@ $lines = @()
 $aj = Join-Path $out 'addons.json'
 $lines += if (Test-Path $aj) { "addons.json: $((Get-Content $aj -Raw) -replace '\s+', ' ')" } else { 'addons.json: MISSING' }
 $man = "$env:LOCALAPPDATA\Swofty\addons\swofty.lap1-ai\swofty.json"
-$lines += if (Test-Path $man) { "installed swofty.lap1-ai version: $((Get-Content $man -Raw | ConvertFrom-Json).version)" } else { 'installed swofty.lap1-ai: MISSING' }
+# no reads under Swofty while a game or Swofty process is up (incident 2026-11-15): the version is read later instead
+$busy = @(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue).Count -gt 0
+$lines += if ($busy) { 'installed swofty.lap1-ai version: not read (a game or Swofty process is running; read it at the next pre-flight)' } elseif (Test-Path $man) { "installed swofty.lap1-ai version: $((Get-Content $man -Raw | ConvertFrom-Json).version)" } else { 'installed swofty.lap1-ai: MISSING' }
 $ll = Join-Path $out 'raw\loader.log'
 if (Test-Path $ll) {
     $l1 = @(Get-Content $ll | Where-Object { $_ -match 'lap1-ai|lap1_ai' })
