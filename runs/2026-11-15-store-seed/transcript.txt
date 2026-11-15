@@ -1,0 +1,26 @@
+udp capture pid 27180
+launched 02:48:57.844: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5 (profile verve-test, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-104857-1, save sandbox)
+sandbox confirmed after 27 s: shell-20261115-104857-1
+attempt 1: intro video played (6.6 s)
+02:49:45 log: 2026-11-15 02:49:44.749 [25548] [direct] Grand Prix: the player drives for forceindia as lance_stroll (seat 9)
+02:50:04 log: 2026-11-15 02:50:03.538 [30692] [direct] race laps 18 -> 5 (session race)
+02:52:34 log: 2026-11-15 02:52:34.072 [ 6776] [test] screen garage_monitor_container
+02:52:42 > status  =>  {"seq":1,"status":"ok","value":{"v":1,"pid":808,"run":"shell-20261115-104857-1","ticks":10207,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+02:52:43 > ai_drives_player on  =>  {"seq":2,"status":"unavailable","error":"the player's car: no car is driven by a human (every CarLive.is_ai is set)","ms":0}
+02:52:44 > pad a 700  =>  {"seq":3,"status":"ok","ms":1406}
+02:52:45 > ai_drives_player on  =>  {"seq":4,"status":"unavailable","error":"the player's car: no car is driven by a human (every CarLive.is_ai is set)","ms":0}
+02:52:46 > ai_drives_player on  =>  {"seq":5,"status":"ok","value":{"vehicle":9},"ms":0}
+02:52:47 > ai_drives_player on  =>  {"seq":6,"status":"ok","value":{"vehicle":9},"ms":0}
+02:52:47 log: 2026-11-15 02:52:47.429 [  356] [game] RaceStarts: Reaction Time for driver with vehicle id 4: 0.220384
+02:52:48 > ai_drives_player on  =>  {"seq":7,"status":"ok","value":{"vehicle":9},"ms":0}
+02:52:50 > ai_drives_player on  =>  {"seq":8,"status":"ok","value":{"vehicle":9},"ms":0}
+02:52:52 > ai_drives_player on  =>  {"seq":9,"status":"ok","value":{"vehicle":9},"ms":0}
+02:53:23 > status  =>  {"seq":10,"status":"ok","value":{"v":1,"pid":808,"run":"shell-20261115-104857-1","ticks":12609,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+02:58:26 log: 2026-11-15 02:58:26.875 [31436] [test] screen session_results_container
+02:58:30 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":808,"run":"shell-20261115-104857-1","ticks":30818,"phase":"|session_results_container|#c56923a6|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+02:58:30 > quit  =>  {"seq":12,"status":"ok","value":{"windows":1},"ms":0}
+02:58:30 > quit  =>  {"seq":13,"status":"ok","value":{"windows":1},"ms":0}
+plan: plan done; test exit: 0; sandbox ON; took 584 s
+udp recording: 116476090 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261115-024855
+saves unchanged (32 entries)
