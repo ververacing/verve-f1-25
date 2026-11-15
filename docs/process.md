@@ -102,6 +102,13 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 
 Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_64-windows-gnu`). It's a portable download with no UAC. MSVC is a backup only. A UAC prompt can't be clicked over Parsec, so anything needing one waits until Tyler is at the PC.
 
+## Pause log
+
+| Date (PT) | Event | From |
+|---|---|---|
+| 2026-11-14 20:42 | PAUSE ("Pause now"). B-0014 race 5 aborted before its session, marked invalid ("pause") on #71. | Tyler, in the agent's chat |
+| 2026-11-14 22:17 | RESUME ("you are good to resume"). Pre-flight OK after one `swofty restore` for the benign cache-file line; fresh LKG `20261114-221808-lkg-20261114-resume` (Steam remote unchanged since 17:21; Tyler's launcher save changed by his play). | Tyler, in the agent's chat (also relayed by the supervisor) |
+
 ## Housekeeping log
 
 | Date (PT) | What | Who decided | Done |

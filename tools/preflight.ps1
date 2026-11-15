@@ -8,7 +8,8 @@ Checks, in order, and exits 1 on the first hard failure:
 - build: `swofty doctor` must report build id -Build (everything is pinned to it); a patch means stop and tell the
   supervisor.
 - journals: 0 open Swofty journals (state\journal\*.json), since an open one means a modded game folder.
-- drift: doctor must show `baseline no drift` or `drift: swofty is not part of the game` (the post-run state).
+- drift: doctor must show `baseline no drift`, or only benign drift lines: `swofty is not part of the game` (the
+  post-run state) and exactly `swofty/cache/exe-sha256.tsv is not part of the game` (Swofty's own cache file).
 - game lock and test profiles: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no
   F1_25 or swofty process is running and deletes leftover test-* profiles. Fails if any test-* profile is still left.
 - settings: warns if UDP is off, lists how `hardware_settings_config.xml` changed since the last pre-flight, then keeps
@@ -23,7 +24,10 @@ $doc = & $Swofty doctor
 $doc
 $bid = ($doc | Where-Object { $_ -match '^build id\s+(\S+)' } | ForEach-Object { $Matches[1] })
 if ($bid -ne $Build) { "PREFLIGHT FAIL: build $bid, pinned $Build. Stop and tell the supervisor."; exit 1 }
-if (-not ($doc | Where-Object { $_ -match 'baseline\s+no drift|drift\s+swofty is not part of the game' })) {
+# benign drift (post_run_check's rule): the post-run line, and exactly Swofty's own cache file
+$realDrift = @($doc | Where-Object { $_ -match '^drift\s+' -and $_ -notmatch '^drift\s+swofty is not part of the game\s*$' -and
+    $_ -notmatch '^drift\s+swofty/cache/exe-sha256\.tsv is not part of the game\s*$' })
+if ($realDrift.Count -or -not ($doc | Where-Object { $_ -match 'baseline\s+no drift|^drift\s+' })) {
     "PREFLIGHT FAIL: game folder drift. Run ``swofty restore`` and check again."; exit 1
 }
 $open = @($doc | Where-Object { $_ -match 'journal\s+\S+\s+is open' }) + @(Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Swofty\state\journal') -File -Force -ErrorAction SilentlyContinue)
