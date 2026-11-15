@@ -69,7 +69,7 @@ game` after a run. Both count as clean.
 
 ```powershell
 powershell -File tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5" `
-    -Fixture tyler-profile-20261031 -ExpProfile verve-exp-base -Plan harness/sessions/gp_race_ai.plan -Udp -Out runs/<id>
+    -Fixture tyler-profile-20261031 -ExpProfile verve-test -Plan harness/sessions/gp_race_ai.plan -Udp -Out runs/<id>
 ```
 
 `-Session` refuses to start without a fixture and an explicit profile, and kills the game if the sandbox isn't
@@ -77,7 +77,7 @@ confirmed within 120 s. The confirmed line, on stderr about 22 s after launch:
 `[test] starting F1 25 in test mode (run folder ..., save sandbox)`.
 
 **Experiment profile.** `test session` runs on a copy of `--profile`, or the active profile if none is given. Every
-experiment names an isolated profile. `verve-exp-base` (`%LOCALAPPDATA%\Swofty\profiles\verve-exp-base.json`) holds
+experiment names an isolated profile: since 2026-11-14 the only one is `verve-test` (see Swofty 1.9.51 above). Until then `verve-exp-base` (`%LOCALAPPDATA%\Swofty\profiles\verve-exp-base.json`) holds
 swofty.core and the always-on teamsimplified.mods. There's no CLI command to create a profile, so it's a hand-written
 file. A batch adds its addon with `--addon` or its own profile.
 
