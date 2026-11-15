@@ -40,6 +40,7 @@ param(
     [int] $SkippedIntroS = 40,
     [string[]] $Addon = @(),      # installed addons to switch on in the shell's minimal profile
     [string] $Channels = '',      # SWOFTY_GAME_LOG_CHANNELS for the game, when given
+    [switch] $SidestepDryRun,     # the storage sidestep only logs what it would move (pilot: is the Defender exclusion enough?)
     [switch] $Udp,                # record tools/udp_capture.py alongside and parse it into <Out>/udp/
     [string] $Python = 'python',
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
@@ -99,7 +100,11 @@ if ($Udp) {
 # does one sidestep + restore if it isn't). URGENT (exit 7 at the end) means stop all testing: Tyler mustn't launch.
 $script:urgent = $false
 function Sidestep {
-    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'storage_sidestep.ps1') -ExpProfile $ExpProfile -Addon (@($Addon) -join ',') -Log (Join-Path $Out 'storage_sidestep.txt')
+    # a switch can't be passed as -DryRun:$value through powershell -File (it arrives as a string), so add it only when set
+    $a = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'storage_sidestep.ps1'), '-ExpProfile', $ExpProfile,
+        '-Addon', (@($Addon) -join ','), '-Log', (Join-Path $Out 'storage_sidestep.txt'))
+    if ($SidestepDryRun) { $a += '-DryRun' }
+    $o = & powershell @a
     $code = $LASTEXITCODE
     $o | ForEach-Object { Write-Host "sidestep: $_" }
     return $code
