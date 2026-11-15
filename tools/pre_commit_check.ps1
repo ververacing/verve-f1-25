@@ -4,7 +4,8 @@ after b5eb3b0 pushed 276 frames, some showing the gamertag). The repo is public.
 
 Refuses when the staged changes:
 - add an image (.png .jpg .jpeg .gif .bmp .webp) outside harness/fixtures/frames/ and docs/ (checked crops only);
-- add a line containing the user folder, the Steam account id or the 64-bit Steam id (run tools/scrub_logs.ps1).
+- add a line containing the user folder, the Steam account id or the 64-bit Steam id (run tools/scrub_logs.ps1);
+- add a process trace other than a filtered process_trace_summary_*.txt (it would list what runs on the PC).
 
 Install in a local clone (once):
     powershell -File tools/pre_commit_check.ps1 -Install
@@ -27,6 +28,10 @@ foreach ($line in & $git diff --cached --name-status --diff-filter=ACMR) {
     $path = ($line -split "`t")[-1]
     if ($path -match '\.(png|jpe?g|gif|bmp|webp)$' -and $path -notmatch '^(harness/fixtures/frames|docs)/') {
         $problems += "image outside harness/fixtures/frames/ or docs/: $path"
+    }
+    # a process trace lists what runs on Tyler's PC: only the filtered summaries may be committed (supervisor, #81)
+    if ($path -notmatch '^tools/' -and (Split-Path $path -Leaf) -match '^(process_)?trace' -and (Split-Path $path -Leaf) -notmatch '^process_trace_summary') {
+        $problems += "unfiltered process trace: $path (commit only process_trace_summary_*.txt)"
     }
 }
 $account = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') -AccountId
