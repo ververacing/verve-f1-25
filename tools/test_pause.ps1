@@ -12,6 +12,18 @@ function Check([string] $label, [bool] $ok, $detail = '') {
     if (-not $ok) { $script:failed++ }
     "{0} {1}{2}" -f $(if ($ok) { 'ok  ' } else { 'FAIL' }), $label, $(if ($detail -and -not $ok) { " | $detail" } else { '' })
 }
+# Steam records, not the vdf's bytes (supervisor review of #110): pure, so these run even while Tyler plays
+. (Join-Path $PSScriptRoot 'steam_records.ps1')
+$lkgRows = @([pscustomobject]@{ name = 'savegame@profile#A.BWW'; size = '778568'; sha = 'bde2e3'; localtime = '1794553129' },
+             [pscustomobject]@{ name = 'savegame@profile#B'; size = '416'; sha = 'b8649c'; localtime = '1794553129' })
+$vdfA = "`"3059520`"`n{`n`t`"ChangeNumber`"`t`t`"41`"`n`t`"savegame@profile#A.BWW`"`n`t{`n`t`t`"size`"`t`t`"778568`"`n`t`t`"localtime`"`t`t`"1794553129`"`n`t`t`"time`"`t`t`"1794553100`"`n`t`t`"sha`"`t`t`"bde2e3`"`n`t}`n`t`"savegame@profile#B`"`n`t{`n`t`t`"size`"`t`t`"416`"`n`t`t`"localtime`"`t`t`"1794553129`"`n`t`t`"sha`"`t`t`"b8649c`"`n`t}`n}"
+$vdfB = ($vdfA -replace '"ChangeNumber"\t\t"41"', '"ChangeNumber"		"57"') -replace '"time"\t\t"1794553100"', '"time"		"1794560000"'   # Steam's rewrite on exit
+Check 'vdf bytes differ but the records are identical -> no difference (SAFE)' ($vdfA -ne $vdfB -and @(Compare-SteamRecords $vdfB $lkgRows).Count -eq 0)
+$vdfC = $vdfA -replace '"sha"\t\t"b8649c"', '"sha"		"ffffff"'
+Check 'a changed sha in a record -> a difference (WAIT)' (@(Compare-SteamRecords $vdfC $lkgRows).Count -eq 1)
+$vdfD = $vdfA -replace '(?s)\t"savegame@profile#B".*?\}', ''
+Check 'a record gone -> a difference (WAIT)' (@(Compare-SteamRecords $vdfD $lkgRows).Count -eq 1)
+
 if (@(Get-ForeignProcs @() (Get-ProcSnapshot)).Count) {
     # pause.ps1 (rightly) says WAIT and does nothing while Tyler's game or launcher is up, so the cases can't run
     'SKIP: a real F1 25 or Swofty process is running; run the selftests with both closed'; exit 1

@@ -34,6 +34,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'ours.ps1')
+. (Join-Path $PSScriptRoot 'steam_records.ps1')
 New-Item -ItemType Directory -Force $StateDir | Out-Null
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
 function PT { [TimeZoneInfo]::ConvertTime((Get-Date), $tz) }
@@ -146,9 +147,12 @@ if ($lkg) {
     $g = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'saves_guard.ps1') -Action Check -Backup $lkg.FullName -Log (Join-Path $StateDir 'pause_lkg')
     if ($LASTEXITCODE -ne 0) { Finish "WAIT, Tyler's Steam saves differ from the last-known-good ($($lkg.Name)); the supervisor must look first" 1 }
     $app = & (Join-Path $PSScriptRoot 'find_steam_app.ps1')
-    $rc = Get-ChildItem -Recurse -Filter remotecache.vdf $app -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($rc -and (Test-Path (Join-Path $lkg.FullName 'remotecache.vdf')) -and (Get-FileHash $rc.FullName).Hash -ne (Get-FileHash (Join-Path $lkg.FullName 'remotecache.vdf')).Hash) {
-        Finish "WAIT, Steam's remotecache.vdf differs from the last-known-good ($($lkg.Name)); the supervisor must look first" 1
+    # Steam's per-file RECORDS, never the vdf's raw bytes (Steam rewrites it on every game exit; guard_snapshot.ps1)
+    $vdf = Join-Path $app 'remotecache.vdf'
+    $lkgRec = Join-Path $lkg.FullName 'steam_records.csv'
+    if ((Test-Path $vdf) -and (Test-Path $lkgRec)) {
+        $diff = @(Compare-SteamRecords (Get-Content $vdf -Raw) (Import-Csv $lkgRec))
+        if ($diff.Count) { Finish "WAIT, Steam's records of Tyler's saves differ from the last-known-good ($($lkg.Name): $($diff.Count) record(s)); the supervisor must look first" 1 }
     }
     Say "saves = last-known-good ($($lkg.Name))"
 }
