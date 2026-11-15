@@ -22,6 +22,8 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
      horizon). CHOICE: samples in the pit lane don't count.
    - held_passes_net_2plus (primary): OVTK made on laps 2+ that the same pair doesn't reverse within 10 s AND that
      isn't itself a restoration (reversing that pair's pass from within the previous 10 s), so a flip-flop nets 0.
+   - Pit cycles: an OVTK within 20 s of either car's pit-lane time is a pit cycle, not a pass; it never counts as
+     net (pit_cycle_passes reports them).
    - held_passes_2plus: the #71 definition (as tools/b0014_check.py), where a restoration counts as held; kept for
      comparability with B-0014.
    - longest train: at each lap line of the leader (lap 2+), the longest run of consecutive cars each within 1.0 s of
@@ -37,6 +39,9 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
      frames either side of the event) differs by 3 to 12 m (CHOICE: under
      3 m is alongside, so a side-swipe; over 12 m isn't a rear-end). The car with less distance is the follower.
    - front_wing_increments / front_wing_added: CarDamage increases of the front-left or front-right wing.
+   - Contact outcome, 2 s after each COLL, per car: wing hit (any wing +8 % or more), spin (under 8 m/s), or 2+ places
+     lost; costly = any of them. Per car: costly_contacts, contact_wing_hits; the summary lists every contact with its
+     pair, kind and outcome.
 4. No-harm guards (summary): collisions, wing damage added (all three wings), DNFs, penalties, median green lap.
 """
 from __future__ import annotations
@@ -63,6 +68,11 @@ CORNER_AHEAD_M = 300.0
 REAR_MIN_M, REAR_MAX_M = 3.0, 12.0
 DT_CAP_S = 0.5
 GREEN_FACTOR = 1.10
+PIT_CYCLE_S = 20.0      # an OVTK within this of either car's pit-lane time is a pit cycle, not a pass
+OUTCOME_S = 2.0         # contact outcome judged this long after the COLL
+OUTCOME_WING = 8        # wing damage percent added (any wing) that counts as a wing hit
+OUTCOME_SPIN_MS = 8.0   # speed (m/s) under which the car counts as spun or stopped
+OUTCOME_PLACES = 2      # places lost that count as a costly contact
 L_FRONT_MS, L_FRONT_MIN = 6, 7
 FINISHED = 3  # FinalClassification result status
 
@@ -81,6 +91,42 @@ def held_passes(ovtk: list[tuple[float, int, int]], hold: float = HOLD_S) -> lis
         restore = any(a0 == b and b0 == a and 0 <= t - t0 <= hold for t0, a0, b0 in ovtk[:i])
         out.append({"t": t, "car": a, "other": b, "back": back, "held": back > hold, "restore": restore,
                     "net": back > hold and not restore})
+    return out
+
+
+def pit_intervals(samples: list[tuple[float, bool]]) -> list[tuple[float, float]]:
+    """samples = [(t, in_pit_lane)] in time order; returns the [start, end] times of each pit-lane visit."""
+    out, start, last = [], None, None
+    for t, pit in samples:
+        if pit and start is None:
+            start = t
+        if not pit and start is not None:
+            out.append((start, last if last is not None else t))
+            start = None
+        last = t
+    if start is not None:
+        out.append((start, last))
+    return out
+
+
+def near_pit(t: float, intervals: list[tuple[float, float]], window: float = PIT_CYCLE_S) -> bool:
+    return any(a - window <= t <= b + window for a, b in intervals)
+
+
+def mark_pit_cycles(passes: list[dict], pits: dict[int, list[tuple[float, float]]]) -> None:
+    """Sets p['pit_cycle'] (either car within PIT_CYCLE_S of a pit-lane visit) and narrows p['net'] to real passes."""
+    for p in passes:
+        p["pit_cycle"] = near_pit(p["t"], pits.get(p["car"], [])) or near_pit(p["t"], pits.get(p["other"], []))
+        p["net"] = p["net"] and not p["pit_cycle"]
+
+
+def contact_outcome(before: dict, after: dict) -> dict:
+    """One car's outcome of a contact. before/after: {'wings': (fl, fr, rear), 'speed_ms': float, 'pos': int}, taken
+    at the COLL and OUTCOME_S later. Returns the flags and whether the contact cost the car anything."""
+    wing_add = sum(max(0, b - a) for a, b in zip(before["wings"], after["wings"]))
+    out = {"wing_hit": wing_add >= OUTCOME_WING, "spin": after["speed_ms"] < OUTCOME_SPIN_MS,
+           "places_lost": max(0, after["pos"] - before["pos"]) >= OUTCOME_PLACES, "wing_added": wing_add}
+    out["costly"] = out["wing_hit"] or out["spin"] or out["places_lost"]
     return out
 
 
@@ -239,6 +285,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
                     pos_end_lap1[c] = cars[c][u.L_POS]
             last_lap[c] = lap
     grid = {c: u.grid_of(s, frames[0][1][c]) for c in range(n)}
+    pits = {c: pit_intervals([(t, bool(cars[c][u.L_PIT])) for t, cars in frames]) for c in range(n)}
 
     others = [lt for c in ai for lap, lt in lap_times[c].items() if lap >= 2 and lap not in pit_laps[c]]
     green_med = None
@@ -254,6 +301,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     passes = held_passes(ovtk)
     for p in passes:
         p["lap"] = lap_of(p["car"], p["t"]) if p["car"] < n else 0
+    mark_pit_cycles(passes, pits)
     coll = [(st, f["vehicle"], f["other"]) for st, _, code, f in s["events"] if code == "COLL" and "vehicle" in f]
     pena = defaultdict(int)
     for _, _, code, f in s["events"]:
@@ -312,6 +360,22 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     del btimes
 
     # contacts
+    ttimes = [t for t, _ in s["tel_frames"]]
+    dmg_by_car = defaultdict(list)
+    for t, c, rec in s["damage"]:
+        dmg_by_car[c].append((t, rec[:3]))
+
+    def state_at(car: int, t: float) -> dict:
+        i = max(bisect.bisect_right(ttimes, t) - 1, 0)
+        speed = s["tel_frames"][i][1][car] / 3.6 if s["tel_frames"] else 99.0
+        wings = (0, 0, 0)
+        for dt, w in dmg_by_car.get(car, []):
+            if dt > t:
+                break
+            wings = w
+        return {"wings": wings, "speed_ms": speed, "pos": frame_at(t)[car][u.L_POS]}
+
+    costly, wing_hits, contacts_out = defaultdict(int), defaultdict(int), []
     rear_f, rear_l, lap1_coll, coll_n = defaultdict(int), defaultdict(int), 0, defaultdict(int)
     for t, a, b in coll:
         if a >= n or b >= n:
@@ -322,6 +386,12 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         if cars[a][u.L_LAPNUM] == 1:
             lap1_coll += 1
         kind, who = contact_kind(dist_at(a, t), dist_at(b, t))
+        oc = {x: contact_outcome(state_at(x, t), state_at(x, t + OUTCOME_S)) for x in (a, b)}
+        for x in (a, b):
+            costly[x] += oc[x]["costly"]
+            wing_hits[x] += oc[x]["wing_hit"]
+        contacts_out.append({"t": round(t, 3), "cars": [a, b], "kind": kind,
+                             "outcome": {str(x): {k: v for k, v in oc[x].items()} for x in (a, b)}})
         if kind == "rear_end":
             follower, leader = (a, b) if who == 0 else (b, a)
             rear_f[follower] += 1
@@ -356,7 +426,9 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "phantom_brakes": phantoms[c] if c in phantom_scored else "NA", "phantom_scored": int(c in phantom_scored),
             "rear_end_as_follower": rear_f[c], "rear_end_as_leader": rear_l[c],
             "front_wing_increments": fw_n, "front_wing_added": fw_add, "wing_damage_added": all_add,
-            "collisions": coll_n[c], "penalties": pena[c], "dnf": int(bool(dnf)),
+            "collisions": coll_n[c], "costly_contacts": costly[c], "contact_wing_hits": wing_hits[c],
+            "pit_cycle_passes": sum(1 for p in made if p["pit_cycle"]),
+            "penalties": pena[c], "dnf": int(bool(dnf)),
         })
 
     starts2 = [lap_starts[c][2] for c in range(n) if 2 in lap_starts[c]]
@@ -381,6 +453,9 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         "phantom_brakes": sum(r["phantom_brakes"] for r in rows if r["phantom_scored"]),
         "phantom_cars_scored": sum(r["phantom_scored"] for r in rows),
         "rear_end_contacts": sum(r["rear_end_as_follower"] for r in rows),
+        "pit_cycle_passes": sum(1 for p in passes if p["pit_cycle"]),
+        "contacts": contacts_out,
+        "costly_contact_cars": sum(r["costly_contacts"] for r in rows),
         "front_wing_increments": sum(r["front_wing_increments"] for r in rows),
         "guards": {"collisions": len(coll), "wing_damage_added": sum(r["wing_damage_added"] for r in rows),
                    "dnfs": sum(r["dnf"] for r in rows), "penalties": sum(pena.values()),
@@ -437,6 +512,24 @@ def selftest() -> int:
     check("corner past the line wraps", phantom(4280.0, [40.0], 4300.0) is True, phantom(4280.0, [40.0], 4300.0))
     ons = brake_onsets([(0, 2, 900.0, 0.0), (1, 2, 940.0, 0.5), (2, 2, 960.0, 0.8), (3, 2, 990.0, 0.1), (4, 2, 1000.0, 0.6)])
     check("brake onsets on rising edges", [d for _, _, d in ons] == [940.0, 1000.0], ons)
+
+    # pit cycles: a pass 15 s after the overtaken car left the pit lane is a pit cycle; 25 s after is a pass
+    iv = pit_intervals([(100.0, False), (101.0, True), (120.0, True), (121.0, False)])
+    check("pit-lane interval", iv == [(101.0, 120.0)], iv)
+    pp = held_passes([(135.0, 1, 2), (145.5, 3, 2)])
+    mark_pit_cycles(pp, {2: iv})
+    check("pass 15 s after a pit visit is a pit cycle", pp[0]["pit_cycle"] and not pp[0]["net"], pp[0])
+    check("pass 25.5 s after it is a real pass", not pp[1]["pit_cycle"] and pp[1]["net"], pp[1])
+
+    # contact outcomes
+    calm = contact_outcome({"wings": (0, 0, 0), "speed_ms": 60.0, "pos": 5}, {"wings": (3, 0, 0), "speed_ms": 58.0, "pos": 5})
+    check("light touch is not costly", not calm["costly"], calm)
+    hit = contact_outcome({"wings": (0, 0, 0), "speed_ms": 60.0, "pos": 5}, {"wings": (12, 0, 0), "speed_ms": 55.0, "pos": 5})
+    check("front-wing +12 is a wing hit", hit["wing_hit"] and hit["costly"], hit)
+    spin = contact_outcome({"wings": (0, 0, 0), "speed_ms": 60.0, "pos": 5}, {"wings": (0, 0, 0), "speed_ms": 4.0, "pos": 6})
+    check("under 8 m/s is a spin", spin["spin"] and not spin["places_lost"], spin)
+    lost = contact_outcome({"wings": (0, 0, 0), "speed_ms": 60.0, "pos": 5}, {"wings": (0, 0, 0), "speed_ms": 50.0, "pos": 7})
+    check("2 places lost is costly", lost["places_lost"] and lost["costly"], lost)
 
     # rear-end vs side-swipe
     check("rear-end: follower 6 m behind", contact_kind(1000.0, 1006.0) == ("rear_end", 0), contact_kind(1000.0, 1006.0))
