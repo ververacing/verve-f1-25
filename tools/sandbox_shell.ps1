@@ -303,6 +303,7 @@ $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique)
 }
 # always written, empty when nothing changed: a missing file means the check never ran
 Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
+Remove-Item (Join-Path $snapDir "$snapId.json") -ErrorAction SilentlyContinue   # the check is done (supervisor: snapshots don't pile up)
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
 if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
