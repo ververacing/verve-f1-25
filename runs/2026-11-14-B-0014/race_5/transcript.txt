@@ -1,6 +1,70 @@
-saves before: 30 entries; profile verve-test (652BB5A0C51E2E620438EB15C4ECFD9E3124C7345391A40B156D7966CE987793) +addons verve.b0014a; active profile tyler
-udp capture pid 30876
-attempt 1 started 20:40:51
-sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-044051-1 ({"schema":1,"run":"shell-20261115-044051-1","state":"armed","pid":12768,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-044051-1\\saves\\remote","why":""})
-20:42:33 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":71734}
-intro played (splash after 72 s)
+saves before: 32 entries; profile verve-test (652BB5A0C51E2E620438EB15C4ECFD9E3124C7345391A40B156D7966CE987793) +addons verve.b0014a; active profile tyler
+udp capture pid 26492
+attempt 1 started 22:18:58
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-061858-1 ({"schema":1,"run":"shell-20261115-061858-1","state":"armed","pid":31276,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-061858-1\\saves\\remote","why":""})
+22:20:51 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":82782}
+intro played (splash after 83 s)
+22:21:12 > pad ls 15000  =>  {"seq":2,"status":"ok","ms":21156}
+22:21:12 > pad ls  =>  {"seq":3,"status":"ok","ms":250}
+22:21:16 > pad ls 2000  =>  {"seq":4,"status":"ok","ms":4000}
+22:21:17 > pad ls  =>  {"seq":5,"status":"ok","ms":250}
+22:21:22 > home  =>  {"seq":6,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4766}
+22:21:25 > @raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}  =>  {"seq":7,"status":"ok","value":{"from":"home"},"ms":469}
+22:21:31 > status  =>  {"seq":8,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":6357,"phase":"|fe_f1_world|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:21:36 > @raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}  =>  {"seq":9,"status":"ok","value":{"from":"screen"},"ms":5000}
+22:21:42 > status  =>  {"seq":10,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":7035,"phase":"|f1_world_activity_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:21:43 > pad a 250  =>  {"seq":11,"status":"ok","ms":500}
+22:21:50 > pad right 250  =>  {"seq":12,"status":"ok","ms":500}
+22:21:53 > pad a 250  =>  {"seq":13,"status":"ok","ms":500}
+22:22:00 > status  =>  {"seq":14,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":8030,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:22:00 > pad right 200  =>  {"seq":15,"status":"ok","ms":421}
+22:22:01 > pad right 200  =>  {"seq":16,"status":"ok","ms":406}
+22:22:02 > pad right 200  =>  {"seq":17,"status":"ok","ms":407}
+22:22:02 > pad right 200  =>  {"seq":18,"status":"ok","ms":438}
+22:22:03 > pad right 200  =>  {"seq":19,"status":"ok","ms":407}
+22:22:03 > pad right 200  =>  {"seq":20,"status":"ok","ms":422}
+22:22:04 > pad right 200  =>  {"seq":21,"status":"ok","ms":406}
+22:22:05 > pad right 200  =>  {"seq":22,"status":"ok","ms":406}
+22:22:05 > pad right 200  =>  {"seq":23,"status":"ok","ms":406}
+22:22:06 > pad right 200  =>  {"seq":24,"status":"ok","ms":407}
+22:22:09 > pad a 250  =>  {"seq":25,"status":"ok","ms":516}
+22:22:16 > status  =>  {"seq":26,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":8905,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:22:17 > pad right 200  =>  {"seq":27,"status":"ok","ms":422}
+22:22:17 > pad right 200  =>  {"seq":28,"status":"ok","ms":406}
+22:22:18 > pad right 200  =>  {"seq":29,"status":"ok","ms":437}
+22:22:18 > pad right 200  =>  {"seq":30,"status":"ok","ms":422}
+22:22:21 > pad a 250  =>  {"seq":31,"status":"ok","ms":516}
+22:22:28 > status  =>  {"seq":32,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":9572,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:22:29 > pad a 250  =>  {"seq":33,"status":"ok","ms":500}
+22:22:36 > status  =>  {"seq":34,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":10008,"phase":"|settings_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:22:37 > pad right 250  =>  {"seq":35,"status":"ok","ms":515}
+22:22:40 > pad down 250  =>  {"seq":36,"status":"ok","ms":500}
+22:22:42 > pad a 250  =>  {"seq":37,"status":"ok","ms":515}
+22:22:59 > pad right 6000  =>  {"seq":38,"status":"ok","ms":12000}
+22:23:01 > pad left 200  =>  {"seq":39,"status":"ok","ms":406}
+22:23:02 > pad left 200  =>  {"seq":40,"status":"ok","ms":406}
+22:23:02 > pad left 200  =>  {"seq":41,"status":"ok","ms":406}
+22:23:03 > pad left 200  =>  {"seq":42,"status":"ok","ms":406}
+22:23:04 > pad left 200  =>  {"seq":43,"status":"ok","ms":407}
+22:23:04 > pad left 200  =>  {"seq":44,"status":"ok","ms":422}
+22:23:05 > pad left 200  =>  {"seq":45,"status":"ok","ms":406}
+22:23:06 > pad left 200  =>  {"seq":46,"status":"ok","ms":406}
+22:23:06 > pad left 200  =>  {"seq":47,"status":"ok","ms":407}
+22:23:07 > pad left 200  =>  {"seq":48,"status":"ok","ms":407}
+22:23:10 > pad b 250  =>  {"seq":49,"status":"ok","ms":516}
+22:23:14 > pad left 250  =>  {"seq":50,"status":"ok","ms":500}
+22:23:18 > pad a 250  =>  {"seq":51,"status":"ok","ms":500}
+22:23:26 > status  =>  {"seq":52,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":12490,"phase":"|loading|StateLoadSession|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:25:52 > wait screen=garage_monitor_container 400  =>  {"seq":53,"status":"ok","value":{"phase":"garage_monitor_container"},"ms":145594}
+22:26:00 > status  =>  {"seq":54,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":21180,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:26:02 > pad a 700  =>  {"seq":55,"status":"ok","ms":1406}
+22:26:04 > @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}  =>  {"seq":56,"status":"ok","value":{"vehicle":19},"ms":0}
+22:26:06 > @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}  =>  {"seq":57,"status":"ok","value":{"vehicle":19},"ms":0}
+22:31:47 > status  =>  {"seq":58,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":41930,"phase":"|garage_monitor_container|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:33:19 > wait screen=session_results_container 200  =>  {"seq":59,"status":"ok","value":{"phase":"session_results_container"},"ms":92297}
+22:33:25 > status  =>  {"seq":60,"status":"ok","value":{"v":1,"pid":31276,"run":"shell-20261115-061858-1","ticks":47575,"phase":"|session_results_container|#c56923a6|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+22:33:25 > quit  =>  {"seq":61,"status":"ok","value":{"windows":1},"ms":0}
+run folder: shell-20261115-061858-1
+result: plan done
+udp recording: 153920240 bytes
+saves unchanged (32 entries)

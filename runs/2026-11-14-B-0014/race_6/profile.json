@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "name": "verve-test",
+  "addons": [
+    {
+      "id": "swofty.core",
+      "enabled": true
+    },
+    {
+      "id": "teamsimplified.mods",
+      "enabled": true
+    },
+    {
+      "id": "dromodf.skip-cutscenes",
+      "enabled": true
+    },
+    {
+      "id": "twilight.offline-quiet",
+      "enabled": true
+    },
+    {
+      "id": "swofty.lap1-ai",
+      "enabled": false
+    },
+    {
+      "id": "jonno.smarter-ai-strategies",
+      "enabled": false
+    },
+    {
+      "id": "jonno.team-orders",
+      "enabled": false
+    },
+    {
+      "id": "kizi.ai-driver-behaviour",
+      "enabled": false
+    },
+    {
+      "id": "verve.b0014a",
+      "enabled": false
+    },
+    {
+      "id": "verve.b0014b",
+      "enabled": false
+    }
+  ],
+  "options": {
+    "dromodf.skip-cutscenes": {
+      "mode": "remove"
+    }
+  }
+}

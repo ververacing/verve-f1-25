@@ -1,0 +1,6 @@
+﻿cleared stale game lock (swofty-test shell-20261115-093944 shell 09:39)
+deleted duplicate of Tyler's Steam file in test-shell-20261115-093944: savegame@profile#NXDSMWW.BWW sha256 F262B235B23AE5DA08E4356311F9CEEE2A163A7782F59A548C16FFDD55FA801C
+deleted duplicate of Tyler's Steam file in test-shell-20261115-093944: savegame@profile#QKRHMYXE sha256 A39D885ED85F9B95C33D742B9277AB1E47A02A1CCC613BE5EF4E54567B0AA606
+deleted career-vault\launcher-test-shell-20261115-093944 (7 file(s))
+deleted test-shell-20261115-093944
+active profile: tyler

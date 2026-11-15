@@ -1,0 +1,51 @@
+  race_1: OVTK raw 105, held at 10 s 50
+race_1 (order a): VALID
+  race_2: OVTK raw 98, held at 10 s 35
+race_2 (order b): VALID
+  race_3: OVTK raw 81, held at 10 s 40
+race_3 (order a): VALID
+  race_4: OVTK raw 93, held at 10 s 33
+race_4 (order b): VALID
+  race_5: OVTK raw 110, held at 10 s 40
+race_5 (order a): VALID
+  race_6: OVTK raw 74, held at 10 s 32
+race_6 (order b): VALID
+  race_7: OVTK raw 111, held at 10 s 44
+race_7 (order a): VALID
+  race_8: OVTK raw 118, held at 10 s 48
+race_8 (order b): VALID
+  race_9: OVTK raw 105, held at 10 s 42
+race_9 (order a): VALID
+  race_10: OVTK raw 129, held at 10 s 43
+race_10 (order b): VALID
+  race_11: OVTK raw 77, held at 10 s 31
+race_11 (order a): VALID
+  race_12: OVTK raw 123, held at 10 s 47
+race_12 (order b): VALID
+  race_13: OVTK raw 115, held at 10 s 45
+race_13 (order a): VALID
+  race_14: OVTK raw 107, held at 10 s 42
+race_14 (order b): VALID
+  race_15: OVTK raw 161, held at 10 s 53
+race_15 (order a): VALID
+  race_16: OVTK raw 64, held at 10 s 25
+race_16 (order b): VALID
+  race_17: OVTK raw 86, held at 10 s 41
+race_17 (order a): VALID
+  race_18: OVTK raw 94, held at 10 s 30
+race_18 (order b): VALID
+  race_19: OVTK raw 68, held at 10 s 28
+race_19 (order a): VALID
+  race_20: OVTK raw 141, held at 10 s 50
+race_20 (order b): VALID
+
+20 valid of 20 races
+Arm check: 4 keys at 1.0 in order a and 0.05 in order b; 4 the reverse (expect 4 and 4)
+
+Primary, held passes on laps 2-5, per race: condition coefficient +0.018, bootstrap SE 0.154
+Within-driver high minus low: held passes +0.000; net position change -0.187
+Sensitivity (not scored): coefficient at 5 s +0.085, at 20 s -0.069
+Secondary: raw OVTK laps 2-5 +0.250; flip-flops -0.275; made lap 1 -0.700; suffered laps 2-5 +0.275; collisions -0.263 (SE 0.145); penalties -0.038; DNFs +0.000
+NOTE: the coefficient's sign doesn't hold at both 5 s and 20 s, so treat the verdict with care
+
+RESULT: INCONCLUSIVE
