@@ -4,7 +4,10 @@ The rules for the local agent, the cloud supervisor and Tyler. Until 2026-11-03 
 
 ## PAUSE
 
-From Tyler or the supervisor. Do these in order:
+From Tyler or the supervisor. **Run `tools/pause.ps1`**: it does steps 1-7 and 10 in one go (target under 3 min)
+and shows Tyler a popup, "Verve: SAFE TO PLAY" or "Verve: WAIT, <reason>"; then do steps 8-9. A heads-up ("pause at
+14:30") is `tools/pause.ps1 -At 14:30`: the runners start no race that wouldn't end by then, and the race that runs
+into it calls pause.ps1 itself at its end. RESUME clears it with `tools/pause.ps1 -Clear`. The steps it covers:
 
 1. Abort the current run. Losing it is fine.
 2. Stop only OUR processes, by recorded PID (`ours.csv` in the run folder; `tools/ours.ps1`). Never stop a process we
@@ -43,6 +46,10 @@ supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55;
 - No reads or writes under `%LOCALAPPDATA%\Swofty` or the game folder, and no scripts that touch them.
   `storage_sidestep.ps1`, `cleanup_test_profiles.ps1`, `guard_snapshot.ps1` and `post_run_check.ps1` refuse or skip
   on their own when the game or the launcher is running.
+- No reads of Steam's userdata (Tyler's saves, `remotecache.vdf`) either (supervisor, 2026-11-15): repo files and our own
+  `%LOCALAPPDATA%erve-f1-25` only.
+- No live selftests (the dummy processes of `test_ours.ps1` / `test_pause.ps1`) while paused, even with the game and
+  launcher closed: paused is Tyler's PC time. Pure tests are fine. Live tests, and merges that need them, wait for RESUME.
 - Only repo, docs and analysis work on files already copied out.
 - The first Swofty-touching command after RESUME is `tools/preflight.ps1`.
 
@@ -132,6 +139,7 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 | 2026-11-15 08:28 | PAUSE AFTER THE CURRENT RACE ("Pause after the current race"). B-0016 race 2 runs to the end with its full checks; nothing launches after it. Race 2's game quit at 08:29:56; the Swofty Launcher (not ours) opened at 08:30:24, so its saves check was deferred (exit 11) and the rest of the PAUSE routine waited for the standing rule to allow it. [Corrected after the diagnosis: race 2's runner had force-killed Tyler's game by name at 08:31:59, and its post-run check had run `swofty doctor` (URGENT, no restore, no move); see incidents/2026-11-15-killed-tyler-game.md.] | Tyler, relayed by the supervisor |
 | 2026-11-15 after 08:34 | HANDS OFF ("Make sure neither of you are touching anything. Swofty just closed the game on its own without me."). No commands until cleared; scheduled tasks into the session disabled by the supervisor. | Tyler, relayed by the supervisor |
 | 2026-11-15 09:07 | RESUME ("resume"). Launcher closed (F1 25 was closed). Read-only diagnosis first; safety fixes (PID ownership) as one PR before any race; the 16:45 wrap-up is ignored today (the extended window runs to 05:45). | Tyler, relayed by the supervisor |
+| 2026-11-15 12:19 | PAUSE ("pause"). B-0016 race 12 quit through the test agent at about 12:20 (invalid, "pause"); the test shell stayed up after the game exited, so its recorded PID was stopped at 12:24 (scoped to that attempt). Checks done, SAFE TO PLAY sent at 12:24:47. Tyler's game started at 12:25:58. This pause led to `tools/pause.ps1`. | Tyler, relayed by the supervisor |
 
 ## Housekeeping log
 

@@ -191,6 +191,9 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         [IO.File]::AppendAllText($commands, "$json`n", (New-Object Text.UTF8Encoding $false))
         $deadline = (Get-Date).AddSeconds($timeoutS)
         while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
+            # our game gone (quit from outside, e.g. tools/pause.ps1, or a crash): stop waiting at once (the 12:19
+            # pause sat on 400 s step timeouts after the game had exited)
+            if ($script:gamePid -and -not (Get-Process -Id $script:gamePid -ErrorAction SilentlyContinue)) { $script:gameGone = $true; Log "> $cmd  =>  GAME EXITED"; return $null }
             if (Test-Path $results) {
                 # the agent is writing this file: a sharing clash here just means trying again
                 $line = $null
@@ -218,7 +221,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $st = Send 'status' 30
     $gpid = if ($st -and $st.value -and $st.value.pid) { [int]$st.value.pid } else { 0 }
     $gname = if ($gpid) { (Get-Process -Id $gpid -ErrorAction SilentlyContinue).ProcessName } else { '' }
-    if ($gname -match '^F1_25') { Ours-AddId $gpid "game (attempt $attempt, test agent pid)" | Out-Null; Log "game pid $gpid (test agent)" }
+    if ($gname -match '^F1_25') { Ours-AddId $gpid "game (attempt $attempt, test agent pid)" | Out-Null; Log "game pid $gpid (test agent)"; $script:gamePid = $gpid }
     else { Log 'game pid not reported by the test agent: the game stays foreign (never stopped by this run; left for pre-flight)' }
     $ms = [int]$first.ms
     if ($ms -lt $SkippedIntroS * 1000) {
@@ -267,6 +270,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     try {
     foreach ($s in $steps | Select-Object -Skip 1) {
         if ($p.HasExited) { $result = 'shell exited'; break }
+        if ($script:gameGone) { $result = 'game exited'; break }
         if ($s -match '^@control (\d+)$') {
             # live control: take further steps from <Out>/control.txt as lines are appended, until `@end` or
             # <idle> seconds without a new line. Lets a screen be mapped from frames before it is put in a plan.
@@ -292,12 +296,13 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             Log 'control: ended'; continue
         }
         Step $s; if ($script:stop) { $result = $script:stop; break }
+        if ($script:gameGone) { $result = 'game exited'; break }
     }
     } catch { $result = "plan error: $_"; Log $result }
-    try { if (-not $p.HasExited) { Send 'quit' 120 | Out-Null } } catch { Log "quit failed: $_" }
+    try { if (-not $p.HasExited -and -not $script:gameGone) { Send 'quit' 120 | Out-Null } } catch { Log "quit failed: $_" }
     # wait up to 120 s for the shell to finish its own restore; if a process that isn't ours appears meanwhile (Tyler
     # opened the launcher or the game), stop waiting and touch nothing more (incident 2026-11-15)
-    $waitEnd = (Get-Date).AddSeconds(120)
+    $waitEnd = (Get-Date).AddSeconds($(if ($script:gameGone) { 30 } else { 120 }))   # the game is already gone: the shell gets 30 s
     while (-not $p.HasExited -and (Get-Date) -lt $waitEnd) {
         if (@(Ours-Foreign).Count) { $script:foreign = $true; break }
         Start-Sleep -Milliseconds 500
@@ -320,7 +325,10 @@ if ($cap) {
     if (-not $cap.WaitForExit(15000)) { Ours-StopOne $cap 'udp capture did not stop on its flag' | Out-Null }
     Log "udp recording: $((Get-Item $udpBin -ErrorAction SilentlyContinue).Length) bytes"
     $parsed = Join-Path $udpWork 'udp'
-    try { & $Python -I "$udpWork\udp_parse.py" $udpBin --out $parsed --launch-s '1,3,6' | Out-Null } catch { Log "udp parse failed: $_" }
+    # while paused the race is invalid anyway: skip the parse so the pause finishes fast (the capture stays in %TEMP%)
+    $pausedNow = Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')
+    if ($pausedNow) { Log 'udp parse skipped: paused' }
+    else { try { & $Python -I "$udpWork\udp_parse.py" $udpBin --out $parsed --launch-s '1,3,6' | Out-Null } catch { Log "udp parse failed: $_" } }
     if (Test-Path $parsed) { $dest = Join-Path $Out 'udp'; New-Item -ItemType Directory -Force $dest | Out-Null; Copy-Item "$parsed\*" $dest -Force }
 }
 

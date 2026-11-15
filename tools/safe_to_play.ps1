@@ -20,9 +20,11 @@ function Verdict([string] $s, [int] $code) { $s; exit $code }
 
 $snap = Get-ProcSnapshot
 # 1a. our scripts, by command line (never stopped here; only waited for)
-$me = $PID
+# ourselves and our ancestors don't count (tools/pause.ps1 calls this, and a runner calls pause.ps1 at its race's end)
+$mine = @{}; $cur = $PID
+while ($cur -and -not $mine.ContainsKey($cur)) { $mine[$cur] = $true; $cur = ($snap | Where-Object { $_.Id -eq $cur } | Select-Object -First 1).ParentId }
 $scripts = @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe' OR Name = 'pwsh.exe' OR Name = 'python.exe'" -ErrorAction SilentlyContinue |
-    Where-Object { $_.ProcessId -ne $me -and $_.CommandLine -match '(b00\d\d_run|sandbox_shell|sandbox_run|run_with_udp|preflight|post_run_check|cleanup_test_profiles|deferred_saves_check|storage_sidestep|udp_capture)\.(ps1|py)' })
+    Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match '(b00\d\d_run|sandbox_shell|sandbox_run|run_with_udp|preflight|post_run_check|cleanup_test_profiles|deferred_saves_check|storage_sidestep|udp_capture)\.(ps1|py)' })
 if ($scripts.Count) { Verdict "WAIT: cleanup running ($(($scripts | ForEach-Object { ($_.CommandLine -replace '^.*\\', '') -replace '\s.*$', '' }) -join ', '))" 1 }
 # 1b. processes recorded as ours in the last two days
 $recs = @(Get-ChildItem (Join-Path $Repo 'runs') -Recurse -Filter 'ours.csv' -ErrorAction SilentlyContinue |
