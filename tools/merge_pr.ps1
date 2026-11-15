@@ -4,7 +4,8 @@ command as the commit or PR create). It refuses unless ALL of these hold:
 - the PR is open, not a draft, and at least -MinAgeMinutes (5) old;
 - GitHub says it's mergeable, and no CI check failed or is still pending;
 - on the PR's exact head commit, checked out in a temporary worktree, the repo's selftests pass:
-  race_feel --selftest, test_udp_parse, b0014_check --selftest, test_post_run_check;
+  race_feel --selftest, test_udp_parse, b0014_check --selftest, test_post_run_check, test_ours (live foreign
+  dummies: needs F1 25 and Swofty closed), b0015_check / b0016_check --selftest;
 - the PR's added lines carry no user folder, Steam account id or 64-bit Steam id, add no image outside docs/ or
   harness/fixtures/frames/, and add no unfiltered process trace (the pre-commit hook's rules, re-checked on the PR).
 Then it merges with a merge commit, as its own step, and prints the merge commit.
@@ -51,6 +52,30 @@ try {
     if (Test-Path 'tools/test_post_run_check.ps1') {
         & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_post_run_check.ps1 *> $null
         if ($LASTEXITCODE -ne 0) { $fails += 'test_post_run_check' } else { '  ok test_post_run_check' }
+    }
+    # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
+    # the live part (dummy F1_25/swofty processes) only inside a testing window and not while paused (#107 review)
+    if (Test-Path 'tools/test_ours.ps1') {
+        $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
+        $pt = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
+        $inWin = $pt.Hour -lt 6 -or ($pt.Hour -ge 9 -and $pt.Hour -lt 17)
+        $ovr = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\window_override.txt'   # one line: the override's end, ISO, PT
+        if (-not $inWin -and (Test-Path $ovr)) { try { $inWin = $pt -lt [datetime](Get-Content $ovr -TotalCount 1) } catch { } }
+        $paused = Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')
+        if ($inWin -and -not $paused) {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_ours' } else { '  ok test_ours (pure + live)' }
+        } else {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 -PureOnly *> $null
+            $why = if ($paused) { 'paused' } else { "outside a testing window ($($pt.ToString('HH:mm')) PT)" }
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_ours (pure)' } else { "  ok test_ours (pure only: $why; live part not run)" }
+        }
+    }
+    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'))) {
+        if (Test-Path $t[1]) {
+            & $Python -I $t[1] --selftest *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }
+        }
     }
     # the hook's rules on the PR's added lines and files
     $base = (git merge-base origin/main $j.headRefOid).Trim()

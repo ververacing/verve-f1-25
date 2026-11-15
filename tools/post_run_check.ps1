@@ -16,10 +16,11 @@ If not clean: tools/storage_sidestep.ps1 for the open journal's addons, ONE `swo
 
 Usage:
     powershell -File tools/post_run_check.ps1 [-Out runs/<id>]     # exit 0 clean, 2 URGENT, 3 WAITING (launcher open),
-                                                                    # 4 SKIPPED (F1 25 running: Tyler may be playing)
+                                                                    # 4 SKIPPED (F1 25 or the launcher running)
 
-While F1 25 is running the game folder is in use (if it isn't our run, it's Tyler playing through Swofty, and an
-open journal and installed overlay are expected): the check only reports, exit 4, and never sidesteps or restores.
+While F1 25 or the Swofty Launcher is running (incident 2026-11-15: treat the launcher exactly like the game), the
+check runs NO swofty command at all, `doctor` included: it says SKIPPED and exits 4. Run it again once both are closed.
+Exit 3 (WAITING) is left for a sidestep that refuses only because some other swofty process is up.
     powershell -File tools/test_post_run_check.ps1                 # the selftests
 #>
 param(
@@ -27,6 +28,7 @@ param(
     [string] $DoctorFile = '',   # test only: read doctor's output from this file instead of running it
     [string] $JournalDir = '',   # test only: look for journals here
     [ValidateSet('', 'ok', 'launcher', 'files')] [string] $SimulateSidestep = '',   # test only: the sidestep's outcome
+    [ValidateSet('', 'game', 'launcher')] [string] $SimulateRunning = '',   # test only: pretend F1 25 / the launcher is up
     [string] $ExpProfile = 'verve-test',   # fallback addon list when doctor names an open journal but its file isn't found
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe"
 )
@@ -34,8 +36,12 @@ $ErrorActionPreference = 'Stop'
 $log = if ($Out) { New-Item -ItemType Directory -Force $Out | Out-Null; Join-Path $Out 'post_run_check.txt' } else { '' }
 function L([string] $s) { $s = $s.Replace($env:USERPROFILE, '%USERPROFILE%'); $s; if ($log) { Add-Content $log $s -Encoding utf8 } }
 $journals = if ($JournalDir) { $JournalDir } else { Join-Path $env:LOCALAPPDATA 'Swofty\state\journal' }
-if (-not $DoctorFile -and (Get-Process F1_25 -ErrorAction SilentlyContinue)) {
-    L 'SKIPPED: F1 25 is running (the game folder is in use; if this isn''t our run, Tyler is playing). Nothing checked or changed; run again once the game is closed.'
+# before ANY swofty command: a live process check always (even in test mode), plus the test hook
+$running = @(Get-Process F1_25, swofty-launcher -ErrorAction SilentlyContinue | ForEach-Object { $_.ProcessName })
+if ($SimulateRunning -eq 'game') { $running += 'F1_25' }
+if ($SimulateRunning -eq 'launcher') { $running += 'swofty-launcher' }
+if ($running.Count) {
+    L "SKIPPED: $(($running | Select-Object -Unique) -join ' and ') running (the game folder may be in use; if it isn't our run, Tyler is playing). No swofty command run, nothing checked or changed; run again once both are closed."
     exit 4
 }
 
