@@ -1,0 +1,6 @@
+﻿post-run: NOT CLEAN (drift lines 1, doctor's open journals 0 [], journal files 0, version.dll absent)
+  drift              swofty/cache/exe-sha256.tsv is not part of the game
+no readable journal file: using verve-test's addons
+sidestep for: swofty.core, teamsimplified.mods, dromodf.skip-cutscenes, twilight.offline-quiet
+REFUSE: a swofty or F1 25 process is running
+URGENT: the sidestep refused (see above); restore not tried. Stop all testing; Tyler must not launch the game.
