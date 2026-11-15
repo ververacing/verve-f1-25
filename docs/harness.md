@@ -32,6 +32,13 @@ emote`, a UI toggle only ("Use launcher saves", ticked by default). The
 - **Launches fail while the Swofty Launcher window is open** (2 of 2, 2026-11-14 17:29 and 17:31): `addon storage:
   <addon>: recovery failed ... addon-profiles\<addon>\.saved-old ... os error 32`, then "the game exited before the test
   agent said hello" about 22 s in. The core never writes `sandbox.json`, and saves are unchanged. Tyler closes it.
+- **Swofty's addon-storage swap fails with os error 32 here** (`addon_storage.rs` `finish()` renames an existing
+  `addon-profiles\<id>\<label>` to `.saved-old`, then `remove_tree` fails). It aborts the wrapper before the game starts,
+  and it aborts `swofty restore`'s rollback, which leaves the game folder modded. Draft report:
+  `docs/upstream/swofty_addon_storage_lock.md`. **Sidestep** (supervisor's standing authorisation, EMPTY folders only):
+  `tools/storage_sidestep.ps1` moves the empty targets to `Documentserve-f1-25-recovery\<stamp>\` before every launch,
+  and refuses if any holds a file. `tools/post_run_check.ps1` checks the game folder after every run and in PAUSE.
+  **Never run `swofty apply` as a probe.**
 - **The hash guard** (`tools/guard_snapshot.ps1`) now also covers the launcher saves and the addon data of every profile
   that isn't ours (not `verve-*`, not `test-*`), so `tyler`'s.
 - **Community addons installed** (Tyler, 2026-11-14): dromodf.skip-cutscenes 1.9.4, twilight.offline-quiet 1.0.1,

@@ -88,6 +88,22 @@ function FreshLiveLog([datetime] $since) {
     return $null
 }
 
+
+# Swofty 1.9.51 addon-storage bug (docs/upstream/swofty_addon_storage_lock.md): move EMPTY rename targets aside before
+# every launch (storage_sidestep.ps1), and check the game folder is stock after every run (post_run_check.ps1, which
+# does one sidestep + restore if it isn't). URGENT (exit 7 at the end) means stop all testing: Tyler mustn't launch.
+$script:urgent = $false
+function Sidestep {
+    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'storage_sidestep.ps1') -ExpProfile $ExpProfile -Addon (@() -join ',') -Log (Join-Path $Out 'storage_sidestep.txt')
+    $code = $LASTEXITCODE
+    $o | ForEach-Object { Write-Host "sidestep: $_" }
+    return $code
+}
+function PostCheck {
+    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1') -Out $Out
+    if ($LASTEXITCODE -eq 2) { $script:urgent = $true }
+    $o | ForEach-Object { Write-Host "post-run: $_" }
+}
 if ($Session) {
     # direct start: fail closed before anything launches
     if (-not $Fixture) { throw '-Session needs -Fixture: a new Grand Prix overwrites the profile save''s Grand Prix' }
@@ -136,13 +152,14 @@ if ($Session) {
         $job.WaitForExit(30000) | Out-Null
         CloseStreams
         Start-Sleep -Seconds 5
-        & $Swofty restore | Out-Null
+        PostCheck
         & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
         Start-Sleep -Seconds 20   # file locks (addon-profiles, overlay cache) hold on for a while after the game exits
     }
     $planResult = 'not run'
     # relaunch on a skipped intro (the title then ignores the virtual pad) or a transient lock, up to -IntroTries
     for ($try = 1; $try -le $IntroTries; $try++) {
+    if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $planResult = 'sidestep refused'; break }
     $t0 = Get-Date
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test session $Session --fixture $Fixture --wait 0"
     $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
@@ -294,13 +311,14 @@ if ($Session) {
     }
     # the shell leaves its game lock and test profile behind even after a clean quit
     Start-Sleep -Seconds 5
-    & $Swofty restore | Out-Null
+    PostCheck
     & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
     if ($planResult -ne 'plan done') { $verdict = if ($verdict -eq 'ON') { 'ON, plan failed' } else { $verdict } }
     $IntroTries = 0   # the suite and shell loop below doesn't run; the hash check after it does
 }
 
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
+if ($ExpProfile -and (Sidestep) -ne 0) { 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; break }
 $t0 = Get-Date
 $io = @{ NoNewWindow = $true; PassThru = $true; RedirectStandardOutput = (Join-Path $Out 'test_stdout.txt')
          RedirectStandardError = (Join-Path $Out 'test_stderr.txt') }
@@ -363,11 +381,12 @@ $locked = ($stdoutNow -match 'still locked') -or ((Test-Path $launcherLog) -and 
 if ($verdict -eq 'unconfirmed' -and $locked) { $intro = 'skipped'; "attempt ${attempt}: transient lock; waiting, then retrying" }
 if ($intro -ne 'skipped' -or $verdict -eq 'OFF') { break }
 # killed for a skipped intro, or stopped on a lock: put the game folder back and free the lock before relaunching
-& $Swofty restore | Out-Null
+PostCheck
 & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
 Start-Sleep -Seconds 20
 }
 
+PostCheck   # every path: the game folder must be stock before the hash check and the exit
 $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }
@@ -377,5 +396,6 @@ Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 if ($diff) { 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 "saves unchanged ($($after.Count) entries)"
 if ($Session) { Log "saves unchanged ($($after.Count) entries)" }
+if ($script:urgent) { 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
 if ($verdict -ne 'ON') { exit 6 }
 exit $job.ExitCode
