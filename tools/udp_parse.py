@@ -10,6 +10,8 @@ Writes, per session found in the capture (keyed by sessionUID):
                             laps, best lap, pit stops, result status, overtakes made / suffered, collisions,
                             penalties, and the launch metrics below
     laps.csv                one row per session, car and completed lap: lap time, position at the line
+    damage.csv              one row per CarDamage change: session time, car, lap, and the wing / floor / diffuser /
+                            sidepod damage (percent) plus total tyre and brake damage, written only when one changes
     events.csv              every event packet: time, code, the fields that code carries
 
 Launch metrics (the behavioural side of F-38's bad-start draw and F-06's reaction time), relative to the
@@ -51,6 +53,12 @@ L_GRID, L_DSTATUS, L_RSTATUS = 24, 25, 26
 # CarTelemetry car entry: 60 bytes; speed u16, throttle f32, steer f32, brake f32, clutch u8, gear i8 lead.
 TEL_LEAD = struct.Struct("<HfffBb")
 TEL_SIZE = 60
+# CarDamage car entry (F1 25 spec: 46 bytes): tyresWear f32[4], tyresDamage u8[4], brakesDamage u8[4],
+# tyreBlisters u8[4], then frontLeftWing, frontRightWing, rearWing, floor, diffuser, sidepod (u8 percent), drsFault,
+# ersFault, gearBox, engine, six engine wear bytes, engineBlown, engineSeized. F1 24's 42-byte entry has no blisters.
+# The entry size is taken from the packet (body = cars * entry), so any other size is reported, never misread.
+DAMAGE_PARTS = ("fl_wing", "fr_wing", "rear_wing", "floor", "diffuser", "sidepod")
+DAMAGE_PART_OFF = {46: 28, 42: 24}   # entry size -> offset of frontLeftWingDamage
 # Participants entry: aiControlled, driverId, networkId, teamId, myTeam, raceNumber, nationality, name[32] lead.
 PART_LEAD = struct.Struct("<BBBBBBB32s")
 
@@ -112,7 +120,8 @@ def event_fields(code: str, d: bytes) -> dict:
 def new_session():
     return {"format": None, "version": "", "counts": defaultdict(int), "type": None, "track": None, "laps": None,
             "participants": None, "n_active": None, "lap_frames": [], "tel_frames": [], "events": [], "final": None,
-            "bad_sizes": {}, "grid_votes": [0, 0]}
+            "bad_sizes": {}, "grid_votes": [0, 0], "damage": [], "damage_last": {}, "brake_frames": [],
+            "track_length": None}
 
 
 def parse(path: Path, launch_offsets: list[float]):
@@ -134,6 +143,7 @@ def parse(path: Path, launch_offsets: list[float]):
         body = p[HEADER.size:]
         if pid == 1 and len(body) >= 9:
             s["laps"], s["type"], s["track"] = body[3], body[6], struct.unpack_from("<b", body, 7)[0]
+            s["track_length"] = struct.unpack_from("<H", body, 4)[0]
             # the AI difficulty: checked against the menu's 19 on three recordings, 2026-11-03. The first packets read 0
             if len(body) > 640 and body[640]:
                 s["ai_difficulty"] = body[640]
@@ -165,7 +175,24 @@ def parse(path: Path, launch_offsets: list[float]):
             if len(body) != n_cars * tel + lay["tel_trailer"]:
                 s["bad_sizes"]["car_telemetry"] = len(body)
                 continue
-            s["tel_frames"].append((stime, [TEL_LEAD.unpack_from(body, c * tel)[0] for c in range(n_cars)]))
+            lead = [TEL_LEAD.unpack_from(body, c * tel) for c in range(n_cars)]
+            s["tel_frames"].append((stime, [x[0] for x in lead]))
+            s["brake_frames"].append((stime, [round(x[3], 3) for x in lead]))
+        elif pid == 10:
+            if len(body) % n_cars or len(body) // n_cars not in DAMAGE_PART_OFF:
+                s["bad_sizes"]["car_damage"] = len(body)
+                continue
+            size = len(body) // n_cars
+            off = DAMAGE_PART_OFF[size]
+            for c in range(n_cars):
+                o = c * size
+                parts = tuple(body[o + off:o + off + 6])
+                tyres = sum(body[o + 16:o + 20])
+                brakes = sum(body[o + 20:o + 24])
+                rec = parts + (tyres, brakes)
+                if s["damage_last"].get(c) != rec:
+                    s["damage_last"][c] = rec
+                    s["damage"].append((stime, c, rec))
         elif pid == 8 and len(body) >= 1:
             size = (len(body) - 1) // n_cars
             if size not in (45, 46):
@@ -253,9 +280,17 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                     if c in last and n == last[c] + 1 and car[L_LAST] > 0:
                         w.writerow([uid, c, last[c], car[L_LAST], car[L_POS]])
                     last[c] = n
+    with (out / "damage.csv").open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["session_uid", "session_time", "car", "lap"] + list(DAMAGE_PARTS) + ["tyres_damage_sum", "brakes_damage_sum"])
+        for uid, s in sessions.items():
+            for st, c, rec in s["damage"]:
+                _, lap = at_or_after(s["lap_frames"], st)
+                w.writerow([uid, round(st, 3), c, lap[c][L_LAPNUM] if lap else "NA"] + list(rec))
     head = ["session_uid", "car", "name", "team_id", "ai", "race_number", "grid", "final_position", "laps",
             "best_lap_ms", "pit_stops", "result_status", "overtakes_made", "overtakes_suffered", "collisions",
-            "penalties", "first_position", "last_position"]
+            "penalties", "first_position", "last_position", "wing_damage_max", "wing_damage_final",
+            "damage_increases"]
     for off in offsets:
         head += [f"speed_kph_at_{off:g}s", f"lap_distance_m_at_{off:g}s", f"position_at_{off:g}s"]
     with (out / "cars.csv").open("w", newline="") as f:
@@ -274,6 +309,17 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                     ev[fields.get("other")]["coll"] += 1
                 elif code == "PENA":
                     ev[fields.get("vehicle")]["pen"] += 1
+            # wing damage: the highest of the three wings at any time, and at the last CarDamage packet; increases
+            # counts the CarDamage changes in which any part's damage went up (a proxy for contact)
+            dmg = defaultdict(lambda: {"max": 0, "final": 0, "inc": 0, "prev": None})
+            for _, c, rec in s["damage"]:
+                d = dmg[c]
+                wing = max(rec[0], rec[1], rec[2])
+                d["max"] = max(d["max"], wing)
+                d["final"] = wing
+                if d["prev"] is not None and any(a > b for a, b in zip(rec[:6], d["prev"][:6])):
+                    d["inc"] += 1
+                d["prev"] = rec
             first = s["lap_frames"][0][1] if s["lap_frames"] else None
             final = s["lap_frames"][-1][1] if s["lap_frames"] else None
             for c in range(n):
@@ -287,6 +333,7 @@ def write(sessions: dict, out: Path, offsets: list[float]) -> None:
                        fin["result_status"] if fin else "NA",
                        ev[c]["made"], ev[c]["suffered"], ev[c]["coll"], ev[c]["pen"],
                        first[c][L_POS] if first else "NA", final[c][L_POS] if final else "NA"]
+                row += [dmg[c]["max"], dmg[c]["final"], dmg[c]["inc"]] if s["damage"] else ["NA", "NA", "NA"]
                 for off in offsets:
                     m = s["launch"].get(off)
                     if not m or m["speed"] is None:
