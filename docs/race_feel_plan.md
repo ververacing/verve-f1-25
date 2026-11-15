@@ -22,11 +22,11 @@ Method: measure stock first, change one lever group at a time, pre-register ever
    - field spread at the end of lap 1 (leader to last, in seconds)
    - lap-1 collisions (COLL events with lap == 1)
 2. Trains:
-   - "train time": the share of AI car-time on laps 2+ spent within 1.0 s of the car ahead WITHOUT making a held pass on that car within the next 2 laps. Sample at the UDP rate and weight by time, not samples.
-   - held passes per race on laps 2+: a position gain on car X that isn't reversed within 10 s
+   - "train time": the share of AI car-time on laps 2+ spent within 1.0 s of the car ahead WITHOUT making a held pass on that car within the next 2 laps. Sample at the UDP rate and weight by time, not samples. Implementation choice: "within the next 2 laps" runs from the sample to the end of the car's next lap (the start of lap L+2, for a sample on lap L); samples in the pit lane don't count.
+   - held passes per race on laps 2+: a position gain on car X that isn't reversed within 10 s. Primary (2026-11-14 review): `held_passes_net`, which also leaves out restorations (a pass that reverses the same pair's pass from within the previous 10 s), so a flip-flop nets 0. The #71 definition, where a restoration counts as held, is kept alongside for comparability with B-0014.
    - longest train: the max number of consecutive cars each within 1.0 s of the car ahead, sampled once per lap at the line; report per-race median and max
 3. Sudden braking:
-   - "phantom brake": an AI car with brake > 0.3 starting more than 50 m (lap distance) before where that same car starts braking for that corner on its own clean laps (median of laps with no car within 2.0 s ahead), while a car is within 1.0 s behind it. Corners are found from the car's own clean-lap brake onsets (cluster within 30 m). Count per car per race. Validate the detector on 2 races by eye with telemetry plots before trusting it.
+   - "phantom brake": an AI car with brake > 0.3 starting more than 50 m (lap distance) before where that same car starts braking for that corner on its own clean laps (median of laps with no car within 2.0 s ahead), while a car is within 1.0 s behind it. Corners are found from the car's own clean-lap brake onsets (cluster within 30 m). Count per car per race; a car with no clean laps (so no corners) reports NA, not 0, and the summary counts the cars scored. Validate the detector on 2 races by eye with telemetry plots before trusting it.
    - rear-end contacts: COLL events where the follower (behind by lap distance at the time) hits the leader
    - front-wing damage increments per car per race (CarDamage, front left/right wing: done)
 4. No-harm guards (every batch): total collisions, wing damage, DNFs, penalties, field pace (median green lap). A lever that fixes its target but raises a guard by >= 2 SE is rejected or toned down.

@@ -20,7 +20,10 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
    - train_s / laps2_s: time on laps 2+ within 1.0 s of the car ahead (LapData deltaToCarInFront), weighted by the
      time between frames (capped at 0.5 s), WITHOUT a held pass on that car before the end of the next lap (the 2-lap
      horizon). CHOICE: samples in the pit lane don't count.
-   - held_passes_2plus: OVTK made on laps 2+ that the same pair doesn't reverse within 10 s (as #71).
+   - held_passes_net_2plus (primary): OVTK made on laps 2+ that the same pair doesn't reverse within 10 s AND that
+     isn't itself a restoration (reversing that pair's pass from within the previous 10 s), so a flip-flop nets 0.
+   - held_passes_2plus: the #71 definition (as tools/b0014_check.py), where a restoration counts as held; kept for
+     comparability with B-0014.
    - longest train: at each lap line of the leader (lap 2+), the longest run of consecutive cars each within 1.0 s of
      the car ahead, in cars. Summary: the per-race median and max.
 3. Sudden braking
@@ -28,8 +31,10 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
      onset for that corner, while a car is within 1.0 s behind it. Corners: the car's onsets on clean laps (2+, no car
      within 2.0 s ahead for the whole lap), clustered within 30 m; a corner's onset is the cluster median. CHOICE: the
      onset belongs to the next corner ahead within 300 m; an onset with no corner within 300 m ahead isn't scored.
-     Validate on 2 races by eye before trusting it (the plan).
-   - rear_end_as_follower / as_leader: COLL where the two cars' total distance differs by 3 to 12 m (CHOICE: under
+     Validate on 2 races by eye before trusting it (the plan). A car with no clean-lap corner (always in traffic)
+     reports NA with phantom_scored 0, never 0; the summary gives phantom_cars_scored.
+   - rear_end_as_follower / as_leader: COLL where the two cars' total distance (interpolated between the LapData
+     frames either side of the event) differs by 3 to 12 m (CHOICE: under
      3 m is alongside, so a side-swipe; over 12 m isn't a rear-end). The car with less distance is the follower.
    - front_wing_increments / front_wing_added: CarDamage increases of the front-left or front-right wing.
 4. No-harm guards (summary): collisions, wing damage added (all three wings), DNFs, penalties, median green lap.
@@ -65,12 +70,17 @@ FINISHED = 3  # FinalClassification result status
 # ---------- pure metric functions (the selftest calls these directly) ----------
 
 def held_passes(ovtk: list[tuple[float, int, int]], hold: float = HOLD_S) -> list[dict]:
-    """OVTK (time, overtaker, overtaken), with the time until the same pair swaps back and whether it's held."""
+    """OVTK (time, overtaker, overtaken), with the time until the same pair swaps back, whether it's held (as #71 and
+    tools/b0014_check.py: a reversal that isn't itself reversed counts as held), whether it restores a pass from the
+    previous `hold` s, and `net` = held and not a restoration (the Race Feel primary)."""
     ovtk = sorted(ovtk)
     out = []
     for i, (t, a, b) in enumerate(ovtk):
         back = next((t2 - t for t2, a2, b2 in ovtk[i + 1:] if a2 == b and b2 == a), float("inf"))
-        out.append({"t": t, "car": a, "other": b, "back": back, "held": back > hold})
+        # a restoration undoes the same pair's pass from within the previous `hold` s (the flip-flop's second half)
+        restore = any(a0 == b and b0 == a and 0 <= t - t0 <= hold for t0, a0, b0 in ovtk[:i])
+        out.append({"t": t, "car": a, "other": b, "back": back, "held": back > hold, "restore": restore,
+                    "net": back > hold and not restore})
     return out
 
 
@@ -199,6 +209,17 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         i = bisect.bisect_right(ftimes, t) - 1
         return frames[max(i, 0)][1]
 
+    def dist_at(car: int, t: float) -> float:
+        """Total distance at time t, interpolated between the neighbouring LapData frames."""
+        i = bisect.bisect_right(ftimes, t) - 1
+        if i < 0:
+            return frames[0][1][car][u.L_TOTDIST]
+        if i + 1 >= len(frames):
+            return frames[i][1][car][u.L_TOTDIST]
+        t0, t1 = ftimes[i], ftimes[i + 1]
+        d0, d1 = frames[i][1][car][u.L_TOTDIST], frames[i + 1][1][car][u.L_TOTDIST]
+        return d0 + (d1 - d0) * ((t - t0) / (t1 - t0) if t1 > t0 else 0.0)
+
     # lap starts, lap times, positions at the end of lap 1, grid
     lap_starts: dict[int, dict[int, float]] = defaultdict(dict)
     lap_times: dict[int, dict[int, float]] = defaultdict(dict)
@@ -265,6 +286,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             if g is not None and g <= CLEAN_GAP_S:
                 dirty_laps[c].add(cars[c][u.L_LAPNUM])
     phantoms = defaultdict(int)
+    phantom_scored = set()   # cars with at least one clean-lap corner; the rest report NA, not 0
     for c in ai:
         rows = []
         for t, brakes in s["brake_frames"]:
@@ -275,6 +297,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         cl = corners(clean)
         if not cl:
             continue
+        phantom_scored.add(c)
         for t, lap, d in ons:
             if lap < 1 or d < 0:
                 continue
@@ -298,7 +321,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         cars = frame_at(t)
         if cars[a][u.L_LAPNUM] == 1:
             lap1_coll += 1
-        kind, who = contact_kind(cars[a][u.L_TOTDIST], cars[b][u.L_TOTDIST])
+        kind, who = contact_kind(dist_at(a, t), dist_at(b, t))
         if kind == "rear_end":
             follower, leader = (a, b) if who == 0 else (b, a)
             rear_f[follower] += 1
@@ -327,9 +350,11 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "lap1_held_changes": sum(1 for p in made if p["held"] and p["lap"] == 1),
             "train_s": round(train_s, 2), "laps2_s": round(laps2_s, 2),
             "train_share": round(train_s / laps2_s, 4) if laps2_s else "NA",
+            "held_passes_net_2plus": sum(1 for p in made if p["net"] and p["lap"] >= 2),
             "held_passes_2plus": sum(1 for p in made if p["held"] and p["lap"] >= 2),
             "held_suffered_2plus": sum(1 for p in passes if p["other"] == c and p["held"] and p["lap"] >= 2),
-            "phantom_brakes": phantoms[c], "rear_end_as_follower": rear_f[c], "rear_end_as_leader": rear_l[c],
+            "phantom_brakes": phantoms[c] if c in phantom_scored else "NA", "phantom_scored": int(c in phantom_scored),
+            "rear_end_as_follower": rear_f[c], "rear_end_as_leader": rear_l[c],
             "front_wing_increments": fw_n, "front_wing_added": fw_add, "wing_damage_added": all_add,
             "collisions": coll_n[c], "penalties": pena[c], "dnf": int(bool(dnf)),
         })
@@ -348,11 +373,13 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         "lap1_spread_s": round(max(starts2) - min(starts2), 3) if len(starts2) > 1 else None,
         "lap1_collisions": lap1_coll,
         "train_time_share": round(tot_train / tot_laps2, 4) if tot_laps2 else None,
-        "held_passes_2plus": sum(r["held_passes_2plus"] for r in rows),
+        "held_passes_net_2plus": sum(r["held_passes_net_2plus"] for r in rows),
+        "held_passes_2plus_as_71": sum(r["held_passes_2plus"] for r in rows),
         "ovtk_raw": len(passes),
         "longest_train_median": statistics.median(trains) if trains else None,
         "longest_train_max": max(trains) if trains else None,
-        "phantom_brakes": sum(r["phantom_brakes"] for r in rows),
+        "phantom_brakes": sum(r["phantom_brakes"] for r in rows if r["phantom_scored"]),
+        "phantom_cars_scored": sum(r["phantom_scored"] for r in rows),
         "rear_end_contacts": sum(r["rear_end_as_follower"] for r in rows),
         "front_wing_increments": sum(r["front_wing_increments"] for r in rows),
         "guards": {"collisions": len(coll), "wing_damage_added": sum(r["wing_damage_added"] for r in rows),
@@ -386,6 +413,10 @@ def selftest() -> int:
     p = held_passes([(100.0, 1, 2), (109.0, 2, 1), (200.0, 3, 4), (211.0, 4, 3)])
     check("pass reversed at 9 s is not held", not p[0]["held"] and p[1]["held"] is True, [x["held"] for x in p])
     check("pass reversed at 11 s is held", p[2]["held"] and p[3]["held"], [x["held"] for x in p])
+    check("a pass plus its reversal at 9 s nets 0", sum(x["net"] for x in p[:2]) == 0 and p[1]["restore"],
+          [(x["held"], x["restore"], x["net"]) for x in p[:2]])
+    check("a reversal after 11 s is a new held pass, not a restoration",
+          p[2]["net"] and p[3]["net"] and not p[3]["restore"], [(x["held"], x["restore"], x["net"]) for x in p[2:]])
 
     # a train of 4: leader, then three cars each within 1.0 s, then a gap, then two close cars
     check("longest train of 4", longest_train([None, 0.6, 0.9, 0.4, 2.5, 0.8]) == 4,
