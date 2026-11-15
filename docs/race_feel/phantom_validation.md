@@ -49,3 +49,14 @@ car behind is the one at risk. But it isn't "unexplained".
   the "unexplained" case, and rare in stock: 1 per race in both races.
 
 Until the ruling, don't use phantom counts in any screen.
+
+## Ruling (supervisor, 2026-11-15): split adopted, both kept
+
+The likely source of Tyler's front-wing damage is the accordion effect in trains, not only true phantoms. So both are
+kept, and the Race Feel braking primary is their sum, `early_brakes_total`, read alongside rear-end and costly
+contacts.
+- `early_brakes_in_traffic`: a car within 1.0 s ahead.
+- `phantom_brakes`: clear road, no car within 1.0 s ahead. `phantom_brakes_clear2s` is the 2.0 s variant.
+
+Onsets within 0.5 s or 20 m of the last one are merged as well (selftest added). Stock 4b after the split: 32 total =
+31 in traffic + 1 phantom (1 at 2 s); 1 lap-1 costly contact.

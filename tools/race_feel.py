@@ -29,7 +29,11 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
    - longest train: at each lap line of the leader (lap 2+), the longest run of consecutive cars each within 1.0 s of
      the car ahead, in cars. Summary: the per-race median and max.
 3. Sudden braking
-   - phantom_brakes: a brake onset (brake rising above 0.3), while a car is within 1.0 s behind, that starts more
+   - Braking (supervisor ruling 2026-11-15; by-eye validation in docs/race_feel/phantom_validation.md):
+     early_brakes_total = early_brakes_in_traffic (a car within 1.0 s ahead) + phantom_brakes (clear road ahead;
+     phantom_brakes_clear2s uses 2.0 s). The Race Feel braking primary is early_brakes_total. Onsets: one per
+     braking zone (released >= 1 s before), and pulses within 0.5 s / 20 m of the last onset are merged into it.
+     Each counted onset: a brake onset (brake rising above 0.3), while a car is within 1.0 s behind, that starts more
      than 50 m before the reference onset of the next corner ahead (within 300 m). Corner rule (supervisor ruling,
      2026-11-14): a CLEAN corner pass has no car within 2.0 s ahead at any sample in the 300 m before its onset
      (laps 2+, no pit lap). Corners are clusters (30 m) of all cars' clean onsets. A car's own reference is the median
@@ -68,6 +72,8 @@ CLEAN_GAP_S = 2.0
 BRAKE_ON = 0.3
 BRAKE_OFF = 0.05         # the brake counts as released below this
 RELEASE_S = 1.0          # a new braking zone needs the brake released for at least this long (the AI pulses the brake)
+MERGE_S, MERGE_M = 0.5, 20.0   # onsets this close (time or distance, same lap) to the previous one are the same onset
+CLEAR_AHEAD_S = 1.0      # phantom_brake = clear road: no car within this ahead (2.0 s reported as a variant)
 PHANTOM_M = 50.0
 CLUSTER_M = 30.0
 CORNER_AHEAD_M = 300.0
@@ -189,7 +195,10 @@ def brake_onsets(rows: list[tuple[float, int, float, float]], on: float = BRAKE_
         else:
             released_since = None
         if armed and b > on:
-            out.append((t, lap, d))
+            if out and out[-1][1] == lap and (t - out[-1][0] <= MERGE_S or abs(d - out[-1][2]) <= MERGE_M):
+                pass   # a pulse right after the last onset: the same onset (supervisor ruling, 2026-11-15)
+            else:
+                out.append((t, lap, d))
             armed = False
     return out
 
@@ -438,7 +447,10 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             if lap >= 2 and lap not in pit_laps[c] and d >= 0 and clean_before(gap_samples[c], t, d, track_len=track_len):
                 clean[c].append(d)
     table = corner_table(clean)
-    phantoms = defaultdict(lambda: {"own": 0, "field": 0})
+    phantoms = defaultdict(lambda: {"own": 0, "field": 0})   # all early onsets with a follower (the braking primary)
+    early_traffic = defaultdict(int)   # car within CLEAR_AHEAD_S ahead: early braking in a train
+    clear_road = defaultdict(int)      # no car within CLEAR_AHEAD_S ahead: the "unexplained" phantom
+    clear_road_2s = defaultdict(int)   # variant: no car within 2.0 s ahead
     scored = defaultdict(int)
     with_follower = defaultdict(int)
     ref_count = {"own": 0, "field": 0}
@@ -463,6 +475,13 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             ref_count[kind] += 1
             if is_ph:
                 phantoms[c][kind] += 1
+                ga = gap_ahead(cars[c])
+                if ga is not None and ga <= CLEAR_AHEAD_S:
+                    early_traffic[c] += 1
+                else:
+                    clear_road[c] += 1
+                if ga is None or ga > 2.0:
+                    clear_road_2s[c] += 1
     phantom_scored = {c for c in ai if scored[c]}
 
     # contacts
@@ -482,6 +501,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         return {"wings": wings, "speed_ms": speed, "pos": frame_at(t)[car][u.L_POS]}
 
     costly, wing_hits, contacts_out = defaultdict(int), defaultdict(int), []
+    lap1_costly = 0
     rear_f, rear_l, lap1_coll, coll_n = defaultdict(int), defaultdict(int), 0, defaultdict(int)
     for t, a, b in coll:
         if a >= n or b >= n:
@@ -496,6 +516,8 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         for x in (a, b):
             costly[x] += oc[x]["costly"]
             wing_hits[x] += oc[x]["wing_hit"]
+        if cars[a][u.L_LAPNUM] == 1 and (oc[a]["costly"] or oc[b]["costly"]):
+            lap1_costly += 1
         contacts_out.append({"t": round(t, 3), "cars": [a, b], "kind": kind,
                              "outcome": {str(x): {k: v for k, v in oc[x].items()} for x in (a, b)}})
         if kind == "rear_end":
@@ -529,7 +551,10 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "held_passes_net_2plus": sum(1 for p in made if p["net"] and p["lap"] >= 2),
             "held_passes_2plus": sum(1 for p in made if p["held"] and p["lap"] >= 2),
             "held_suffered_2plus": sum(1 for p in passes if p["other"] == c and p["held"] and p["lap"] >= 2),
-            "phantom_brakes": (phantoms[c]["own"] + phantoms[c]["field"]) if c in phantom_scored else "NA",
+            "early_brakes_total": (phantoms[c]["own"] + phantoms[c]["field"]) if c in phantom_scored else "NA",
+            "early_brakes_in_traffic": early_traffic[c] if c in phantom_scored else "NA",
+            "phantom_brakes": clear_road[c] if c in phantom_scored else "NA",
+            "phantom_brakes_clear2s": clear_road_2s[c] if c in phantom_scored else "NA",
             "phantom_brakes_own_ref": phantoms[c]["own"] if c in phantom_scored else "NA",
             "phantom_brakes_field_ref": phantoms[c]["field"] if c in phantom_scored else "NA",
             "onsets_with_follower": with_follower[c], "onsets_scored": scored[c],
@@ -560,7 +585,10 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         "ovtk_raw": len(passes),
         "longest_train_median": statistics.median(trains) if trains else None,
         "longest_train_max": max(trains) if trains else None,
+        "early_brakes_total": sum(r["early_brakes_total"] for r in rows if r["phantom_scored"]),
+        "early_brakes_in_traffic": sum(r["early_brakes_in_traffic"] for r in rows if r["phantom_scored"]),
         "phantom_brakes": sum(r["phantom_brakes"] for r in rows if r["phantom_scored"]),
+        "phantom_brakes_clear2s": sum(r["phantom_brakes_clear2s"] for r in rows if r["phantom_scored"]),
         "phantom_cars_scored": sum(r["phantom_scored"] for r in rows),
         "phantom_onsets_scored_share": round(sum(scored.values()) / sum(with_follower.values()), 3) if sum(with_follower.values()) else None,
         "phantom_ref_counts": ref_count,
@@ -570,6 +598,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         "pit_cycle_passes": sum(1 for p in passes if p["pit_cycle"]),
         "contacts": contacts_out,
         "costly_contact_cars": sum(r["costly_contacts"] for r in rows),
+        "lap1_costly_contacts": lap1_costly,
         "front_wing_increments": sum(r["front_wing_increments"] for r in rows),
         "guards": {"collisions": len(coll), "wing_damage_added": sum(r["wing_damage_added"] for r in rows),
                    "dnfs": sum(r["dnf"] for r in rows), "penalties": sum(pena.values()),
@@ -628,6 +657,8 @@ def selftest() -> int:
     check("pulses inside one zone are one onset", [d for _, _, d in ons] == [940.0], ons)
     zone2 = brake_onsets([(0, 2, 900.0, 0.0), (1, 2, 940.0, 0.5), (2, 2, 960.0, 0.0), (3.5, 2, 1100.0, 0.0), (4, 2, 1150.0, 0.6)])
     check("a new zone after >= 1 s released", [d for _, _, d in zone2] == [940.0, 1150.0], zone2)
+    near = brake_onsets([(0, 2, 900.0, 0.0), (1.2, 2, 940.0, 0.6), (1.3, 2, 945.0, 0.0), (2.4, 2, 950.0, 0.0), (2.6, 2, 955.0, 0.7)])
+    check("an onset within 20 m of the last is merged", [d for _, _, d in near] == [940.0], near)
     tb = corner_table({1: [400.0, 402.0], 2: [398.0], 3: [401.0]})
     k4 = classify_onset(1, 430.0, tb, 4318.0)
     check("onset 30 m after the corner isn't wrapped to a lap early", k4 == ("own", False), k4)
