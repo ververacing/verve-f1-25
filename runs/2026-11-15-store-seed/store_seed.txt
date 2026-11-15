@@ -3,3 +3,8 @@ seeded verve-test store: savegame@midsessions0#KOSFIDKYNVC0.RBQ 9374792 bytes sh
 seeded verve-test store: savegame@midsessions0#QKRHMYXE 416 bytes sha256 6E106B8079A6B73D2E8A7FFF182D78F5A0FC6FAF465EA5056468761DAFEA2502 (from fixture tyler-profile-20261031)
 seeded verve-test store: savegame@profile#NXDSMWW.BWW 519704 bytes sha256 DD9B65BCD12B1BE087A9F7AD54CFB4D54D2B4138B44BEACE9D4434C6C63DA21C (from fixture tyler-profile-20261031)
 seeded verve-test store: savegame@profile#QKRHMYXE 416 bytes sha256 90F4A3FAB157ED8701A67B727CC9AEF01734AC437670ED229AA0980C6B9179B6 (from fixture tyler-profile-20261031)
+--- 2026-11-15T03:07:47 supervisor ruling: seeded store removed
+removed savegame@midsessions0#KOSFIDKYNVC0.RBQ sha256 9B2873D17D016C63065014D981ACA70BBFF1828188011F367C24D9A88C760DCA (identical to the fixture copy, which stays)
+removed savegame@midsessions0#QKRHMYXE sha256 6E106B8079A6B73D2E8A7FFF182D78F5A0FC6FAF465EA5056468761DAFEA2502 (identical to the fixture copy, which stays)
+removed savegame@profile#NXDSMWW.BWW sha256 DD9B65BCD12B1BE087A9F7AD54CFB4D54D2B4138B44BEACE9D4434C6C63DA21C (identical to the fixture copy, which stays)
+removed savegame@profile#QKRHMYXE sha256 90F4A3FAB157ED8701A67B727CC9AEF01734AC437670ED229AA0980C6B9179B6 (identical to the fixture copy, which stays)
