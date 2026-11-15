@@ -1,0 +1,6 @@
+saves before: 30 entries; profile verve-test (652BB5A0C51E2E620438EB15C4ECFD9E3124C7345391A40B156D7966CE987793) +addons verve.b0014a; active profile tyler
+udp capture pid 30876
+attempt 1 started 20:40:51
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-044051-1 ({"schema":1,"run":"shell-20261115-044051-1","state":"armed","pid":12768,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-044051-1\\saves\\remote","why":""})
+20:42:33 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":71734}
+intro played (splash after 72 s)
