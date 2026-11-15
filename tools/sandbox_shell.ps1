@@ -161,7 +161,6 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
     if (-not $run) {
         Log 'ABORT: save sandbox not confirmed'
-        Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
         if (-not (Ours-Stop 'save sandbox not confirmed')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
         $result = 'no sandbox'; break
     }
@@ -211,7 +210,6 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $first = Send $steps[0]
     if (-not $first) {
         Log 'ABORT: the agent never answered the first command'; $result = 'no agent'
-        Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
         if (-not (Ours-Stop 'agent never answered')) { $script:foreign = $true; Log 'not stopping: a process that is not ours is running' }
         break
     }
@@ -220,8 +218,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $gpid = if ($st -and $st.value -and $st.value.pid) { [int]$st.value.pid } else { 0 }
     $gname = if ($gpid) { (Get-Process -Id $gpid -ErrorAction SilentlyContinue).ProcessName } else { '' }
     if ($gname -match '^F1_25') { Ours-AddId $gpid 'game (test agent pid)' | Out-Null; Log "game pid $gpid (test agent)" }
-    elseif (Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)') { Log 'game adopted as the one F1_25 started after our launch' }
-    else { Log 'game pid unknown: it will never be stopped by this run' }
+    else { Log 'game pid not reported by the test agent: the game stays foreign (never stopped by this run; left for pre-flight)' }
     $ms = [int]$first.ms
     if ($ms -lt $SkippedIntroS * 1000) {
         Log "intro skipped (splash after $([math]::Round($ms / 1000)) s); relaunching"

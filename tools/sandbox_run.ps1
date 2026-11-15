@@ -80,8 +80,8 @@ if ($Session -or $Fixture) {
 Ours-Init $Out
 if (@(Ours-Foreign).Count) { throw 'F1 25 or a Swofty process (launcher) is running that this run did not start; start sandbox runs with both closed.' }
 function KillOurs([string] $why) {
-    # our game started through Steam: adopt it only when that is certain (tools/ours.ps1); never stop by name
-    Ours-AdoptNewGame $t0 'game (new F1_25 after our launch)' | Out-Null
+    # our game started through Steam and no test agent reports its PID here, so it stays foreign: Ours-Stop then
+    # stops nothing, and the game is left for pre-flight (supervisor review of #107: no fallback adoption)
     if (-not (Ours-Stop $why)) { Write-Host "not stopping ($why): a process that is not ours is running" }
 }
 $before = Snapshot

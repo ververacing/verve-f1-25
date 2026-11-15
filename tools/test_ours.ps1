@@ -42,6 +42,21 @@ Check "Tyler's launcher, its swofty and his game are foreign" (($for -join ',') 
 $reused = @([pscustomobject]@{ Id = 300; Start = $t.ToString('o') })   # a record whose PID now belongs to Tyler's launcher
 Check 'a reused PID (start time differs) is not ours' (@(Get-OursTree $reused $snap).Count -eq 0)
 Check 'no records: nothing is ours' (@(Get-OursTree @() $snap).Count -eq 0)
+# barriers (supervisor review of #107): a Steam our shell started, and a game launched through it, are never ours
+$snap2 = $snap + @(
+    [pscustomobject]@{ Id = 600; ParentId = 100; Name = 'steam'; Start = $t.AddSeconds(5) }
+    [pscustomobject]@{ Id = 601; ParentId = 600; Name = 'steamwebhelper'; Start = $t.AddSeconds(6) }
+    [pscustomobject]@{ Id = 700; ParentId = 600; Name = 'F1_25'; Start = $t.AddMinutes(20) }          # Tyler's, via that Steam
+    [pscustomobject]@{ Id = 710; ParentId = 100; Name = 'F1_25'; Start = $t.AddSeconds(8) }           # a child F1_25, never recorded
+    [pscustomobject]@{ Id = 720; ParentId = 200; Name = 'werfault'; Start = $t.AddSeconds(30) }       # a child of our recorded game
+)
+$tree2 = @(Get-OursTree $rec $snap2 | ForEach-Object { $_.Id } | Sort-Object)
+Check 'descent never enters steam, its children, or an unrecorded F1_25' (($tree2 -join ',') -eq '100,101,102,200') ($tree2 -join ',')
+$for2 = @(Get-ForeignProcs $rec $snap2 | ForEach-Object { $_.Id })
+Check 'a game launched through a Steam our shell started is foreign' ($for2 -contains 700 -and $for2 -contains 710) ($for2 -join ',')
+$recSteam = $rec + @([pscustomobject]@{ Id = 600; Start = $t.AddSeconds(5).ToString('o') })
+Check 'steam is never ours, even if recorded' (@(Get-OursTree $recSteam $snap2 | Where-Object { $_.Name -match '^steam' }).Count -eq 0)
+Check 'no fallback adoption exists (a game is ours only by a reported PID)' (-not (Get-Command Ours-AdoptNewGame -ErrorAction SilentlyContinue))
 
 # ---- part 2: live foreign dummies ----
 if (Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) {
@@ -53,18 +68,32 @@ $dir = Join-Path $env:TEMP ("verve-foreign-test-" + (Get-Date -Format 'HHmmss'))
 New-Item -ItemType Directory -Force $dir | Out-Null
 $ping = Join-Path $env:WINDIR 'System32\PING.EXE'
 foreach ($n in 'F1_25.exe', 'swofty-launcher.exe', 'swofty.exe') { Copy-Item $ping (Join-Path $dir $n) }
+New-Item -ItemType Directory -Force (Join-Path $dir 'steamdir') | Out-Null
+Copy-Item (Join-Path $env:WINDIR 'System32\cmd.exe') (Join-Path $dir 'steamdir\steam.exe')   # a "Steam" that can start a child
 $fGame = Start-Process (Join-Path $dir 'F1_25.exe') -ArgumentList '-n', '300', '127.0.0.1' -WindowStyle Hidden -PassThru
 $fLaunch = Start-Process (Join-Path $dir 'swofty-launcher.exe') -ArgumentList '-n', '300', '127.0.0.1' -WindowStyle Hidden -PassThru
 $run = Join-Path $dir 'run'
 Ours-Init $run
 $oursCmd = Start-Process cmd -ArgumentList '/c', "`"$(Join-Path $dir 'swofty.exe')`" -n 300 127.0.0.1" -WindowStyle Hidden -PassThru
 Ours-Add $oursCmd 'test dummy (ours)'
+# our recorded shell starts "Steam", which starts an "F1_25" (as if Tyler launched through a Steam our shell started)
+# (a .cmd file avoids cmd's nested-quote rules: shell cmd -> steam.exe (a cmd copy) -> F1_25.exe)
+$chain = Join-Path $dir 'chain.cmd'
+Set-Content $chain -Encoding ascii -Value ('@"{0}" /d /c "{1}" -n 300 127.0.0.1' -f (Join-Path $dir 'steamdir\steam.exe'), (Join-Path $dir 'F1_25.exe'))
+$oursShell2 = Start-Process cmd -ArgumentList '/d', '/c', "`"$chain`"" -WindowStyle Hidden -PassThru
+Ours-Add $oursShell2 'test dummy shell that starts steam (ours)'
 Start-Sleep -Seconds 2
+$st2 = @(Get-ProcSnapshot | Where-Object { $_.Name -eq 'steam' -and $_.ParentId -eq $oursShell2.Id })
+$g2 = @(Get-ProcSnapshot | Where-Object { $_.Name -eq 'F1_25' -and $st2.Count -and $_.ParentId -eq $st2[0].Id })
 try {
     $foreign = @(Ours-Foreign | ForEach-Object { $_.Id })
     Check 'the foreign dummies are seen as foreign' ($foreign -contains $fGame.Id -and $foreign -contains $fLaunch.Id) ($foreign -join ',')
     $oursChild = @(Get-OursTree (Ours-Records) (Get-ProcSnapshot) | Where-Object { $_.Name -eq 'swofty' })
     Check "our dummy's swofty child is ours, not foreign" ($oursChild.Count -eq 1 -and $foreign -notcontains $oursChild[0].Id)
+    Check 'the steam -> F1_25 chain under our shell exists' ($st2.Count -eq 1 -and $g2.Count -eq 1)
+    $treeNow = @(Get-OursTree (Ours-Records) (Get-ProcSnapshot) | ForEach-Object { $_.Id })
+    Check 'that steam and its F1_25 are not in our tree' ($treeNow -notcontains $st2[0].Id -and $treeNow -notcontains $g2[0].Id)
+    Check 'and that F1_25 is listed as foreign' (@(Ours-Foreign | ForEach-Object { $_.Id }) -contains $g2[0].Id)
     Check 'Ours-Stop refuses while something foreign runs' (-not (Ours-Stop 'selftest'))
     Check 'and our own dummy is left running too' (-not $oursCmd.HasExited)
 
@@ -82,14 +111,20 @@ try {
 
     Check 'the foreign F1_25 dummy is still alive' (-not $fGame.HasExited)
     Check 'the foreign launcher dummy is still alive' (-not $fLaunch.HasExited)
+    Check 'the steam dummy and its F1_25 are still alive' (@(Get-ProcSnapshot | Where-Object { $_.Id -in @($st2[0].Id, $g2[0].Id) }).Count -eq 2)
 
     # foreign gone: now Ours-Stop stops our dummy and its child, and nothing else
     $fGame.Kill(); $fLaunch.Kill(); $fGame.WaitForExit(5000) | Out-Null; $fLaunch.WaitForExit(5000) | Out-Null   # the test's own handles
+    # the steam chain is the test's own too: end it by the PIDs found under the test's shell handle, then that shell
+    foreach ($id in @($g2[0].Id, $st2[0].Id)) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }
+    if (-not $oursShell2.HasExited) { $oursShell2.Kill() }
+    Start-Sleep -Milliseconds 500
     Check 'with nothing foreign, Ours-Stop stops our tree' ((Ours-Stop 'selftest') -and $oursCmd.WaitForExit(5000))
     Start-Sleep -Milliseconds 500
     Check "our dummy's child is gone too" (-not @(Get-ProcSnapshot | Where-Object { $_.Name -eq 'swofty' -and $_.ParentId -eq $oursCmd.Id }).Count)
 } finally {
-    foreach ($h in $fGame, $fLaunch, $oursCmd) { if ($h -and -not $h.HasExited) { $h.Kill() } }   # by the test's own handles only
+    foreach ($id in @($g2 | ForEach-Object { $_.Id }) + @($st2 | ForEach-Object { $_.Id })) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }   # the test's own chain
+    foreach ($h in $fGame, $fLaunch, $oursCmd, $oursShell2) { if ($h -and -not $h.HasExited) { $h.Kill() } }   # by the test's own handles only
     Get-ProcSnapshot | Where-Object { $_.Name -eq 'swofty' -and $_.ParentId -eq $oursCmd.Id } | ForEach-Object { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue }
     Start-Sleep -Milliseconds 500
     Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue

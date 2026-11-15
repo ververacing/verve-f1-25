@@ -57,9 +57,12 @@ while the shell was still restoring it.
   and the post-run check, cleanup and deferred check have finished; otherwise "WAIT: cleanup running".
 - (d), (f) PID ownership everywhere (`tools/ours.ps1`): every process we start (test shell, test session, UDP
   capture, process trace) is recorded with its start time in `<run>\ours.csv`. The game, which starts through Steam,
-  is adopted by the PID its test agent reports, or only when exactly one F1_25 started after our launch with no
-  launcher up. Every stop targets only those PIDs and their child trees, with the start time checked (a reused PID
-  doesn't count). Nothing stops while anything foreign runs. No script stops a process by name.
+  is adopted ONLY by the PID its test agent reports; there is no fallback (a game whose PID wasn't reported stays
+  foreign, is never stopped, and waits for pre-flight). Every stop targets only those PIDs and their child trees,
+  with the start time checked (a reused PID doesn't count). The descent never enters or passes steam*,
+  swofty-launcher*, explorer or F1_25*, and Steam, the launcher and explorer are never ours even if recorded, so a
+  Steam our shell started can't make Tyler's later games "ours". Nothing stops while anything foreign runs. No
+  script stops a process by name.
 - (e) An URGENT post-run result is never hidden by a deferral: the runner exits 7.
 - (g) docs/process.md: PAUSE step 2 reworded, plus the standing override for scheduled-task wording.
 - (h) `tools/test_ours.ps1`: starts foreign dummies named F1_25.exe and swofty-launcher.exe and checks that

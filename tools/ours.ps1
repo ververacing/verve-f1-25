@@ -14,10 +14,17 @@ Rules (supervisor, 2026-11-15):
   started at or after its parent.
 - Ours-Stop does nothing at all while a foreign F1_25 or swofty process is running (returns $false and says so): if
   Tyler's game or launcher is up, ours are left for the next pre-flight rather than risk his session.
+- Barriers (supervisor review of #107): the tree descent never enters or goes through steam*, swofty-launcher*,
+  explorer or F1_25*. If our shell ever starts Steam, Steam and every game launched through it stay foreign. Steam,
+  the launcher and explorer are never ours, even if recorded.
+- An F1_25 is ours ONLY when explicitly recorded, by the PID our test agent reports. There is no fallback adoption:
+  a game whose PID the agent never reported stays foreign, is never stopped, and is left for pre-flight.
 The pure functions (Get-OursTree, Get-ForeignProcs) take a process snapshot so tools/test_ours.ps1 can test them.
 #>
 
 $script:OursFile = $null
+$script:NeverOurs = '^(steam|swofty-launcher|explorer$)'      # never ours, recorded or not
+$script:Barrier = '^(steam|swofty-launcher|explorer$|F1_25)'   # the descent never enters or passes these
 
 function Get-ProcSnapshot {
     # one row per process: Id, ParentId, Name (no .exe), Start (local datetime)
@@ -42,13 +49,16 @@ function Get-OursTree($records, $snapshot) {
     $queue = New-Object System.Collections.Queue
     foreach ($r in $records) {
         $p = $live[[int]$r.Id]
-        if ($p -and (Same-Start $p.Start ([datetime]$r.Start))) { $out[$p.Id] = $p; $queue.Enqueue($p) }
+        if ($p -and $p.Name -notmatch $script:NeverOurs -and (Same-Start $p.Start ([datetime]$r.Start))) {
+            $out[$p.Id] = $p
+            if ($p.Name -notmatch $script:Barrier) { $queue.Enqueue($p) }   # a recorded game is ours, its children aren't searched
+        }
     }
     while ($queue.Count) {
         $parent = $queue.Dequeue()
         foreach ($c in @($byParent[$parent.Id])) {
-            if ($c -and -not $out.ContainsKey($c.Id) -and $c.Id -ne $parent.Id -and $c.Start -and $parent.Start -and
-                ([datetime]$c.Start) -ge ([datetime]$parent.Start).AddSeconds(-1)) {
+            if ($c -and -not $out.ContainsKey($c.Id) -and $c.Id -ne $parent.Id -and $c.Name -notmatch $script:Barrier -and
+                $c.Start -and $parent.Start -and ([datetime]$c.Start) -ge ([datetime]$parent.Start).AddSeconds(-1)) {
                 $out[$c.Id] = $c; $queue.Enqueue($c)
             }
         }
@@ -78,26 +88,13 @@ function Ours-AddId([int] $id, [string] $role) {
     if (-not $script:OursFile) { throw 'Ours-Init first' }
     $p = Get-ProcSnapshot | Where-Object { $_.Id -eq $id } | Select-Object -First 1
     if (-not $p) { return $false }
+    if ($p.Name -match $script:NeverOurs) { Write-Host "ours: refusing to record $($p.Name) $($p.Id): never ours"; return $false }
     Add-Content $script:OursFile ('{0},{1},{2},"{3}",{4}' -f $p.Id, ([datetime]$p.Start).ToString('o'), $p.Name, $role, (Get-Date).ToString('o')) -Encoding utf8
     $true
 }
 
 function Ours-Add($proc, [string] $role) {
     if ($proc) { Ours-AddId ([int]$proc.Id) $role | Out-Null }
-}
-
-function Ours-AdoptNewGame([datetime] $since, [string] $role) {
-    # fallback when the test agent never named its pid: the game our shell started goes through Steam, so it isn't in
-    # the shell's tree. Adopt it only if exactly one F1_25 started after our launch, no launcher is running, and our
-    # recorded shell is still alive; anything less certain stays foreign (and so is never stopped).
-    $snap = Get-ProcSnapshot
-    $rec = Ours-Records
-    if (@($snap | Where-Object { $_.Name -match '^swofty-launcher' }).Count) { return $false }
-    if (-not @(Get-OursTree $rec $snap).Count) { return $false }
-    $ours = @{}; foreach ($p in (Get-OursTree $rec $snap)) { $ours[$p.Id] = $true }
-    $new = @($snap | Where-Object { $_.Name -match '^F1_25' -and -not $ours.ContainsKey($_.Id) -and $_.Start -and ([datetime]$_.Start) -ge $since.AddSeconds(-2) })
-    if ($new.Count -ne 1) { return $false }
-    Ours-AddId $new[0].Id $role
 }
 
 function Ours-Foreign {
