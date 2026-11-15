@@ -28,6 +28,9 @@ if (@(Get-ForeignProcs @() (Get-ProcSnapshot)).Count) {
     # pause.ps1 (rightly) says WAIT and does nothing while Tyler's game or launcher is up, so the cases can't run
     'SKIP: a real F1 25 or Swofty process is running; run the selftests with both closed'; exit 1
 }
+if (Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')) {
+    'SKIP: paused (state\paused.txt): it is Tyler''s PC time, so no live dummy processes; pure cases above only'; exit ([int]($failed -gt 0) + 1)
+}
 $tmp = Join-Path $env:TEMP ("verve-pause-test-" + (Get-Date -Format 'HHmmss'))
 $state = Join-Path $tmp 'state'; $repo = Join-Path $tmp 'repo'
 New-Item -ItemType Directory -Force $state, (Join-Path $repo 'runs') | Out-Null

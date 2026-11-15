@@ -46,6 +46,10 @@ supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55;
 - No reads or writes under `%LOCALAPPDATA%\Swofty` or the game folder, and no scripts that touch them.
   `storage_sidestep.ps1`, `cleanup_test_profiles.ps1`, `guard_snapshot.ps1` and `post_run_check.ps1` refuse or skip
   on their own when the game or the launcher is running.
+- No reads of Steam's userdata (Tyler's saves, `remotecache.vdf`) either (supervisor, 2026-11-15): repo files and our own
+  `%LOCALAPPDATA%erve-f1-25` only.
+- No live selftests (the dummy processes of `test_ours.ps1` / `test_pause.ps1`) while paused, even with the game and
+  launcher closed: paused is Tyler's PC time. Pure tests are fine. Live tests, and merges that need them, wait for RESUME.
 - Only repo, docs and analysis work on files already copied out.
 - The first Swofty-touching command after RESUME is `tools/preflight.ps1`.
 
