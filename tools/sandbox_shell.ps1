@@ -80,6 +80,12 @@ Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Patt
 $steps = Get-Content $Plan | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') } | ForEach-Object { $_.Trim() }
 if ($steps[0] -notmatch '^wait screen=splash') { throw 'the plan must start with `wait screen=splash <s>` (skipped-intro check)' }
 $before = Snapshot
+# keep the before-snapshot outside the repo (it names save files) for a deferred check (tools/deferred_saves_check.ps1)
+$outFull = (Resolve-Path $Out).Path
+$snapId = "$(Split-Path (Split-Path $outFull) -Leaf)_$(Split-Path $outFull -Leaf)"
+$snapDir = Join-Path $env:LOCALAPPDATA 'verve-f1-25\snapshots'
+New-Item -ItemType Directory -Force $snapDir | Out-Null
+$before | ConvertTo-Json | Set-Content (Join-Path $snapDir "$snapId.json") -Encoding utf8
 Log "saves before: $($before.Count) entries; profile $ExpProfile ($settingsHash) +addons $($Addon -join ','); active profile $activeProfile"
 
 if ($Channels) { $env:SWOFTY_GAME_LOG_CHANNELS = $Channels }
@@ -284,7 +290,14 @@ Start-Sleep -Seconds 5
 # the shell leaves its game lock and test profile behind even after a clean quit; free them for the next run
 PostCheck
 & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
-$after = Snapshot
+try { $after = Snapshot } catch {
+    if ("$_" -notmatch 'SKIPPED') { throw }
+    # F1 25 or Tyler's launcher was running as the run ended: the save check waits (supervisor, 2026-11-14)
+    Set-Content (Join-Path $Out 'saves_diff_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "snapshot $snapId",
+        'reason: F1 25 or the Swofty Launcher (not ours) was running when the run ended; tools/deferred_saves_check.ps1 finishes it')
+    Write-Host 'SAVES CHECK DEFERRED: F1 25 or the Swofty Launcher is running; see saves_diff_deferred.txt'
+    exit 11
+}
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
     if ($before[$k] -ne $after[$k]) { "{0}: {1} -> {2}" -f $k, $before[$k], $after[$k] }
 }

@@ -30,6 +30,8 @@ $open = @($doc | Where-Object { $_ -match 'journal\s+\S+\s+is open' }) + @(Get-C
 if ($open.Count) { "PREFLIGHT FAIL: $($open.Count) open Swofty journal(s): the game folder may be modded. Run tools/post_run_check.ps1."; exit 1 }
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Swofty $Swofty
 if ($LASTEXITCODE -ne 0) { "PREFLIGHT FAIL: test-* profiles are left over (above). Every run deletes its own; find out why before testing."; exit 1 }
+# runs whose save check had to wait (F1 25 or the launcher was running as they ended): finish them now
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'deferred_saves_check.ps1')
 $d = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings'
 $cur = Join-Path $d 'hardware_settings_config.xml'
 if (Test-Path $cur) {
