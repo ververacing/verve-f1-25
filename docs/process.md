@@ -40,6 +40,13 @@ Game testing runs every day in two windows, Pacific time: **09:00-17:00** and **
 - No single blocking command may run past a wrap-up. Split long batches into per-race calls, so control comes back between races.
 - If a window turns out to have closed unnoticed, do the PAUSE routine at once.
 
+**Window override log.** One-off changes to the windows, each with Tyler's words and the time. Every run in an
+override window also gets a `window_override.txt` in its folder.
+
+| Date | Window | Wrap-up | From | Tyler's words |
+|---|---|---|---|---|
+| 2026-11-14 | about 17:27 to 20:30 PT | 20:15 | Tyler, relayed by the supervisor about 17:27 PT | "Also you are good to start running tests from now till 8:30pm, exception for tonight" |
+
 The supervisor's scheduled tasks post into the local session: "Verve testing window opens" (09:03 PT), "Verve night testing window opens" (00:00 PT), "Verve testing window wrap-up" (05:45 and 16:45 PT) and "Verve hourly heartbeat (window-aware)" (:37 every hour).
 
 ## Messages to the supervisor
@@ -54,6 +61,20 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 - Generator, addon, test-file and tools changes wait for the supervisor's review.
 - "DO NOT MERGE" from the supervisor holds until it's resolved.
 - Tyler's word overrides all of these.
+
+## Profiles (2026-11-14)
+
+- **`tyler` is Tyler's** racing profile, with his community addons and his own launcher save. Never select, build,
+  edit or clean it. The same goes for any profile Tyler makes himself.
+- **`verve-test` is the agent's only profile.** Profile names allow letters, digits, `-` and `_` only, so it can't be
+  "Verve Test". Arms switch addons and settings inside it (or with `--addon` on the run), with no copies. Every run
+  logs the exact profile file (`profile.json`) and its hash (`settings_hash.txt`) in its folder.
+- `swofty test` makes a throwaway `test-*` profile per run. Every run script deletes it when the run ends
+  (`tools/cleanup_test_profiles.ps1`), and pre-flight fails if any is left over.
+- **`swofty addons install` writes the new id into every profile,** Tyler's included (as a disabled entry). Install only
+  when a batch needs it, and say so in the batch's PR.
+- **Never press Play on `verve-test` in the launcher** until it has its own save: with launcher saves on and an empty
+  store, the launcher copies the Steam save in at the first Play.
 
 ## Guardrails
 

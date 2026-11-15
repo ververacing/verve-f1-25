@@ -6,6 +6,38 @@ Working rules (PAUSE, RESUME, messages, merging, testing windows) are in [proces
 `docs/design/std-2/test-suite.md` and `docs/reference/std/telemetry.md` in the Swofty repo, plus the smoke runs in
 `runs/2026-10-30-smoke/` (issue #3).
 
+## Swofty 1.9.51 (checked 2026-11-14)
+
+Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
+0.2.13, F1 25 build 25251167** (Steam copy 1.0.141.7865), unchanged, so the pin holds.
+
+- **New drift after the update:** doctor showed `drift swofty/cache/exe-sha256.tsv is not part of the game`, which
+  pre-flight doesn't accept. `swofty restore` cleared it (`baseline no drift`).
+- **`test shell` and `test session` run on a copy of `--profile`, or of the ACTIVE profile when none is given.** The
+  active profile is Tyler's `tyler`, with his community AI addons on. So both run scripts now require `-ExpProfile
+  verve-*` and refuse the active profile.
+- **`test session` still doesn't apply `weather=` or `ai_difficulty=`** (its own help text).
+- **Leftover test profiles:** `profile delete` fails with os error 32 on the empty `saves\<profile>
+emote` and on
+  `addon-profiles\<addon>\<profile>`, while a plain delete of those empty folders works. The cleanup does that first.
+- **Launcher saves** (docs: f1.swofty.net/using/career-saves.html, /reference/saves.html): a profile's own save in
+  `%LOCALAPPDATA%\Swofty\saves\<profile>
+emote`, a UI toggle only ("Use launcher saves", ticked by default). The
+  game never reaches Steam or Steam Cloud while it's on. An empty store gets the Steam save copied in at its first
+  Play. Tyler's `tyler` has run on launcher saves since 2026-11-14 16:31.
+- **`swofty test` stores addon data under the ACTIVE profile's name** (`addon-profiles\<addon>\<active>`), even on an
+  isolated `--profile`: it swaps that storage aside (`.saved-old`) for the run. The active profile is `tyler`. So the
+  guard hashes `addon-profiles\*	yler`, and `tools/addon_storage_check.ps1` refuses a launch if any addon the run
+  switches on has data there. On 2026-11-14 the three verve-test addons had none.
+- **Launches fail while the Swofty Launcher window is open** (2 of 2, 2026-11-14 17:29 and 17:31): `addon storage:
+  <addon>: recovery failed ... addon-profiles\<addon>\.saved-old ... os error 32`, then "the game exited before the test
+  agent said hello" about 22 s in. The core never writes `sandbox.json`, and saves are unchanged. Tyler closes it.
+- **The hash guard** (`tools/guard_snapshot.ps1`) now also covers the launcher saves and the addon data of every profile
+  that isn't ours (not `verve-*`, not `test-*`), so `tyler`'s.
+- **Community addons installed** (Tyler, 2026-11-14): dromodf.skip-cutscenes 1.9.4, twilight.offline-quiet 1.0.1,
+  swofty.lap1-ai 1.0.0, kizi.ai-driver-behaviour 0.1.9, jonno.smarter-ai-strategies 1.2.0, jonno.team-orders 0.2.5.
+  teamsimplified.mods is 0.13.9.
+
 ## Swofty 1.8.4 (checked 2026-11-03)
 
 Tyler updated Swofty on 2026-11-03. Doctor: build 25251167, `baseline no drift`, or `drift swofty is not part of the

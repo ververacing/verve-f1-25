@@ -1,0 +1,30 @@
+# Direct-start race, quit at the results (brief v3 step 4a/4c, Swofty 1.9.51): Start Race once its prompt is up, the AI
+# takes the player car, and the session ends as soon as the results screen is up (FinalClassification arrives with it).
+# Use with tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5"
+#   -Fixture <fixture> -ExpProfile verve-test -Udp
+@waitlog the player drives for forceindia as lance_stroll 300
+@waitlog \[direct\] race laps \d+ -> 5 400
+@waitlog \[test\] screen garage_monitor_container 400
+@sleep 8
+status
+ai_drives_player on
+pad a 700
+# on the grid every car reads as AI, so the first try is refused: keep asking until the player car shows up
+ai_drives_player on
+@sleep 1
+ai_drives_player on
+@sleep 1
+ai_drives_player on
+@waitlog RaceStarts: Reaction Time for driver with vehicle id 180
+ai_drives_player on
+@sleep 2
+ai_drives_player on
+@sleep 2
+ai_drives_player on
+@sleep 30
+status
+# 5 laps: the flag at about 354 s after lights out
+@waitlog \[test\] screen session_results_container 900
+@sleep 3
+status
+quit
