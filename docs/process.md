@@ -42,6 +42,7 @@ Game testing runs every day in two windows, Pacific time: **09:00-17:00** and **
 - **Outside the windows:** non-game work only (analysis, verve.skip with Zig, docs, PRs). Never launch F1 25, and keep the CPU load light.
 - **If F1 25 or another game is running that the agent didn't start, Tyler is playing:** don't launch, even inside a window.
 - **Tyler's PAUSE inside a window** holds until RESUME or the next window opening.
+- **A batch approved while a window is open starts right away** unless the supervisor says otherwise. Don't hold it for the next window (standing rule, supervisor, 2026-11-15, after the 00:00-06:00 window sat idle with B-0016 approved).
 - **Planning:** the day window suits shorter batches and tooling checks. The night window suits long unattended batches (20-30 start replications, multi-race behavioural batches). Size every batch to finish 15 minutes before its wrap-up.
 
 **Scheduled messages only reach the agent between turns, so these rules can't depend on one arriving on time:**
