@@ -4,7 +4,13 @@ conditions (docs/harness.md, "Save sandbox"). Unlike `sandbox_run.ps1 -Commands`
 and waits for each command's result, so steps can check the screen before acting.
 
 Usage:
-    powershell -File tools/sandbox_shell.ps1 -Fixture <name> -Plan <plan file> -Out runs/<id>
+    powershell -File tools/sandbox_shell.ps1 -Fixture <name> -ExpProfile verve-test -Plan <plan file> -Out runs/<id>
+
+-ExpProfile is required. Since 1.9.x `test shell` runs on a copy of --profile, or of the ACTIVE profile when none is
+given, which is Tyler's `tyler` with his community addons. So the shell always gets an explicit profile of ours
+(verve-*), and refuses the active one. -Addon switches extra addons on in the shell's copy. Every run writes
+<Out>/profile.json (the profile file as launched) and <Out>/settings_hash.txt, so each arm's addon list and settings
+are on record.
 
 Plan file, one step per line ('#' comments):
     <shell command>              sent as is; waits for its result (e.g. `tile career`, `wait screen=fe_career 60`)
@@ -26,6 +32,7 @@ Writes <Out>/transcript.txt (every command and result) and <Out>/saves_diff.txt.
 param(
     [Parameter(Mandatory)] [string] $Fixture,
     [Parameter(Mandatory)] [string] $Plan,
+    [Parameter(Mandatory)] [string] $ExpProfile,   # an isolated profile of ours (verve-*); never the active one
     [Parameter(Mandatory)] [string] $Out,
     [int] $ConfirmS = 120,
     [int] $IntroTries = 3,
@@ -44,25 +51,27 @@ $Out = (Resolve-Path $Out).Path
 $transcript = Join-Path $Out 'transcript.txt'
 
 function Snapshot {
-    $h = [ordered]@{}
-    foreach ($f in Get-ChildItem (Join-Path $SteamApp 'remote') -File) {
-        $h["file $($f.Name)"] = "{0} {1} {2}" -f $f.Length, $f.LastWriteTimeUtc.Ticks, (Get-FileHash $f.FullName -Algorithm SHA256).Hash
-    }
-    $rc = Get-Content (Join-Path $SteamApp 'remotecache.vdf') -Raw
-    foreach ($m in [regex]::Matches($rc, '"([^"]+)"\s*\{([^{}]*)\}')) {
-        $fields = foreach ($k in 'size', 'sha', 'localtime') { [regex]::Match($m.Groups[2].Value, "`"$k`"\s*`"([^`"]*)`"").Groups[1].Value }
-        if ($fields[1]) { $h["steam $($m.Groups[1].Value)"] = $fields -join ' ' }
-    }
-    $h
+    # Steam's remote\ files, Steam's records of them, and the launcher saves of every profile that isn't ours
+    & (Join-Path $PSScriptRoot 'guard_snapshot.ps1') -SteamApp $SteamApp
 }
 # Write-Host, not output: Log runs inside Send/Screen/Step, whose output is their return value
 function Log([string] $s) { Write-Host $s; Add-Content $transcript $s -Encoding utf8 }
 
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { throw 'F1 25 is running; start sandbox runs with the game closed.' }
+if ($ExpProfile -notlike 'verve-*') { throw "-ExpProfile $ExpProfile isn't one of ours (verve-*); never run a test on Tyler's profiles" }
+$profileFile = Join-Path $env:LOCALAPPDATA "Swofty\profiles\$ExpProfile.json"
+if (-not (Test-Path $profileFile)) { throw "no profile $ExpProfile ($profileFile)" }
+$activeProfile = (Get-Content (Join-Path $env:LOCALAPPDATA 'Swofty\config.json') -Raw | ConvertFrom-Json).active_profile
+if ($ExpProfile -eq $activeProfile) { throw "-ExpProfile $ExpProfile is the active profile; experiments run on an isolated one" }
+Copy-Item $profileFile (Join-Path $Out 'profile.json') -Force
+$settingsHash = (Get-FileHash $profileFile -Algorithm SHA256).Hash
+Set-Content (Join-Path $Out 'settings_hash.txt') -Value "$ExpProfile $settingsHash addons+=$($Addon -join ',')" -Encoding utf8
+$hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'
+Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Pattern '<udp ' -ErrorAction SilentlyContinue | Select-Object -First 1).Line.Trim()) -Encoding utf8   # Tyler's choice (60 Hz since 2026-11-14); recorded, never changed
 $steps = Get-Content $Plan | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') } | ForEach-Object { $_.Trim() }
 if ($steps[0] -notmatch '^wait screen=splash') { throw 'the plan must start with `wait screen=splash <s>` (skipped-intro check)' }
 $before = Snapshot
-Log "saves before: $($before.Count) entries"
+Log "saves before: $($before.Count) entries; profile $ExpProfile ($settingsHash) +addons $($Addon -join ',')"
 
 if ($Channels) { $env:SWOFTY_GAME_LOG_CHANNELS = $Channels }
 $addonArgs = ($Addon | ForEach-Object { "--addon $_" }) -join ' '
@@ -81,7 +90,7 @@ if ($Udp) {
 }
 $result = 'not run'
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
-    $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "test shell --fixture $Fixture --wait 0 $addonArgs"
+    $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true
     $p = [Diagnostics.Process]::Start($psi)

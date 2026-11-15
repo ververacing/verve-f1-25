@@ -10,7 +10,7 @@ Run a `swofty test` suite in the save sandbox (career fixture), with the supervi
 
 Usage:
     powershell -File tools/sandbox_run.ps1 -Test harness/tests/<suite>.test.json -Out runs/<id>
-    powershell -File tools/sandbox_run.ps1 -Fixture <name> -Commands <file> -Out runs/<id>   # `swofty test shell`
+    powershell -File tools/sandbox_run.ps1 -Fixture <name> -ExpProfile verve-test -Commands <file> -Out runs/<id>   # `swofty test shell`
                                                                                                 # fed from the file
     powershell -File tools/sandbox_run.ps1 -Session "grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5" `
         -Fixture <name> -ExpProfile <isolated profile> -Plan <file> [-Udp] -Out runs/<id>            # direct start
@@ -48,23 +48,27 @@ $ErrorActionPreference = 'Stop'
 if (-not $SteamApp) { $SteamApp = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') }
 
 function Snapshot {
-    # every file in remote\ (size, mtime, sha256), plus Steam's record of each file in remotecache.vdf (size, sha,
-    # localtime). Steam rewrites remotecache.vdf on every game exit, so its raw bytes aren't compared.
-    $h = [ordered]@{}
-    foreach ($f in Get-ChildItem (Join-Path $SteamApp 'remote') -File) {
-        $h["file $($f.Name)"] = "{0} {1} {2}" -f $f.Length, $f.LastWriteTimeUtc.Ticks, (Get-FileHash $f.FullName -Algorithm SHA256).Hash
-    }
-    $rc = Get-Content (Join-Path $SteamApp 'remotecache.vdf') -Raw
-    foreach ($m in [regex]::Matches($rc, '"([^"]+)"\s*\{([^{}]*)\}')) {
-        $body = $m.Groups[2].Value
-        $fields = foreach ($k in 'size', 'sha', 'localtime') { [regex]::Match($body, "`"$k`"\s*`"([^`"]*)`"").Groups[1].Value }
-        if ($fields[1]) { $h["steam $($m.Groups[1].Value)"] = $fields -join ' ' }
-    }
-    $h
+    # Steam's remote\ files, Steam's records of them, and the launcher saves of every profile that isn't ours
+    & (Join-Path $PSScriptRoot 'guard_snapshot.ps1') -SteamApp $SteamApp
 }
 
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { throw 'F1 25 is running; start sandbox runs with the game closed.' }
 New-Item -ItemType Directory -Force $Out | Out-Null
+# Since 1.9.x `test shell` and `test session` run on a copy of --profile, or of the ACTIVE profile (Tyler's) when none
+# is given. So both need an isolated profile of ours, and each run records it (profile.json, settings_hash.txt).
+if ($Session -or $Fixture) {
+    if (-not $ExpProfile) { throw 'test shell / test session need -ExpProfile: never run an experiment on the active profile' }
+    if ($ExpProfile -notlike 'verve-*') { throw "-ExpProfile $ExpProfile isn't one of ours (verve-*)" }
+    $profileFile = Join-Path $env:LOCALAPPDATA "Swofty\profiles\$ExpProfile.json"
+    if (-not (Test-Path $profileFile)) { throw "no profile $ExpProfile ($profileFile)" }
+    if ($ExpProfile -eq (Get-Content (Join-Path $env:LOCALAPPDATA 'Swofty\config.json') -Raw | ConvertFrom-Json).active_profile) {
+        throw "-ExpProfile $ExpProfile is the active profile; experiments run on an isolated one"
+    }
+    Copy-Item $profileFile (Join-Path $Out 'profile.json') -Force
+    Set-Content (Join-Path $Out 'settings_hash.txt') -Value "$ExpProfile $((Get-FileHash $profileFile -Algorithm SHA256).Hash)" -Encoding utf8
+    $hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'
+    Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Pattern '<udp ' -ErrorAction SilentlyContinue | Select-Object -First 1).Line.Trim()) -Encoding utf8   # Tyler's choice (60 Hz since 2026-11-14); recorded, never changed
+}
 $before = Snapshot
 "saves before: $($before.Count) entries (remote\ + remotecache.vdf)"
 
@@ -297,7 +301,7 @@ $io = @{ NoNewWindow = $true; PassThru = $true; RedirectStandardOutput = (Join-P
          RedirectStandardError = (Join-Path $Out 'test_stderr.txt') }
 if ($Fixture) {
     if (-not $Commands) { throw '-Fixture needs -Commands (the shell reads its commands from that file)' }
-    $job = Start-Process -FilePath $Swofty -ArgumentList @('test', 'shell', '--fixture', $Fixture, '--wait', '0') `
+    $job = Start-Process -FilePath $Swofty -ArgumentList @('--profile', $ExpProfile, 'test', 'shell', '--fixture', $Fixture, '--wait', '0') `
         -RedirectStandardInput (Resolve-Path $Commands).Path @io
 } elseif ($Test) {
     $job = Start-Process -FilePath $Swofty -ArgumentList @('test', 'run', "`"$((Resolve-Path $Test).Path)`"", '--out', "`"$raw`"", '--wait', '0') @io

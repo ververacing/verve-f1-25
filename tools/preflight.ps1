@@ -8,8 +8,8 @@ Checks, in order, and exits 1 on the first hard failure:
 - build: `swofty doctor` must report build id -Build (everything is pinned to it); a patch means stop and tell the
   supervisor.
 - drift: doctor must show `baseline no drift` or `drift: swofty is not part of the game` (the post-run state).
-- game lock: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no F1_25 or swofty
-  process is running, and deletes leftover test profiles.
+- game lock and test profiles: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no
+  F1_25 or swofty process is running and deletes leftover test-* profiles. Fails if any test-* profile is still left.
 - settings: warns if UDP is off, lists how `hardware_settings_config.xml` changed since the last pre-flight, then keeps
   this copy as the next reference (%LOCALAPPDATA%\verve-f1-25\settings-snapshots). Changes are reported, never undone.
 #>
@@ -26,6 +26,7 @@ if (-not ($doc | Where-Object { $_ -match 'baseline\s+no drift|drift\s+swofty is
     "PREFLIGHT FAIL: game folder drift. Run ``swofty restore`` and check again."; exit 1
 }
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Swofty $Swofty
+if ($LASTEXITCODE -ne 0) { "PREFLIGHT FAIL: test-* profiles are left over (above). Every run deletes its own; find out why before testing."; exit 1 }
 $d = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings'
 $cur = Join-Path $d 'hardware_settings_config.xml'
 if (Test-Path $cur) {
