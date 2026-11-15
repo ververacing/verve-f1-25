@@ -92,3 +92,10 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 ## Toolchain
 
 Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_64-windows-gnu`). It's a portable download with no UAC. MSVC is a backup only. A UAC prompt can't be clicked over Parsec, so anything needing one waits until Tyler is at the PC.
+
+## Housekeeping log
+
+| Date (PT) | What | Who decided | Done |
+|---|---|---|---|
+| 2026-11-14 19:11 | Deleted 31 `career-vault\launcher-test-*` folders (test profiles of 31 Oct to 4 Nov; Swofty's backups of the Steam-save copies imported into them): 208 files, 16.9 MB. Other vault folders unchanged (`launcher-tyler` 11 files, the Steam vault folder 10 files). | Tyler ("Yeah you can delete those"), via the supervisor | between B-0014 races 1 and 2, no swofty or F1 25 process running |
+| 2026-11-14 from 18:54 | Each test profile's imported copy of the Steam save is deleted after the run only if every file is sha256-identical to Tyler's current Steam file (`tools/cleanup_test_profiles.ps1`, logged per run in `cleanup.txt`). | Supervisor, ruling A | automatic |
