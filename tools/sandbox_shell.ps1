@@ -64,6 +64,10 @@ if (-not (Test-Path $profileFile)) { throw "no profile $ExpProfile ($profileFile
 $activeProfile = (Get-Content (Join-Path $env:LOCALAPPDATA 'Swofty\config.json') -Raw | ConvertFrom-Json).active_profile
 if ($ExpProfile -eq $activeProfile) { throw "-ExpProfile $ExpProfile is the active profile; experiments run on an isolated one" }
 Copy-Item $profileFile (Join-Path $Out 'profile.json') -Force
+# 1.9.x stores addon data under the ACTIVE profile's name, so refuse if any of this run's addons has data there
+$chk = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'addon_storage_check.ps1') -ExpProfile $ExpProfile -Addon ($Addon -join ',')
+$chk | Set-Content (Join-Path $Out 'addon_storage_check.txt') -Encoding utf8
+if ($LASTEXITCODE -ne 0) { $chk; throw 'addon storage check refused the run (see addon_storage_check.txt)' }
 $settingsHash = (Get-FileHash $profileFile -Algorithm SHA256).Hash
 Set-Content (Join-Path $Out 'settings_hash.txt') -Value "$ExpProfile $settingsHash addons+=$($Addon -join ',')" -Encoding utf8
 $hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'

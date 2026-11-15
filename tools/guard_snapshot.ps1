@@ -37,4 +37,17 @@ if (Test-Path $LauncherSaves) {
         }
     }
 }
+# Addon data stored for those same profiles (addon-profiles\<addon>\<profile>). On 1.9.x `swofty test` swaps addon
+# storage under the ACTIVE profile's name, so a run can reach Tyler's addon data even on an isolated profile.
+$addonStore = Join-Path (Split-Path $LauncherSaves) 'addon-profiles'
+if (Test-Path $addonStore) {
+    foreach ($a in Get-ChildItem $addonStore -Directory | Sort-Object Name) {
+        foreach ($d in Get-ChildItem $a.FullName -Directory -Force | Where-Object { $_.Name -notlike '.*' -and $_.Name -notlike 'test-*' -and $_.Name -notlike 'verve-*' } | Sort-Object Name) {
+            foreach ($f in Get-ChildItem $d.FullName -File -Recurse -Force | Sort-Object FullName) {
+                $h["addon $($a.Name)\$($d.Name)\$($f.FullName.Substring($d.FullName.Length + 1))"] =
+                    "{0} {1} {2}" -f $f.Length, $f.LastWriteTimeUtc.Ticks, (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+            }
+        }
+    }
+}
 $h
