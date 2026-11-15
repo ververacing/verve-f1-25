@@ -571,6 +571,19 @@
       "implications": "Don't run pace or aggression batches in benchmark. Benchmark stays useful for race-start draws (F-39 work, from RaceStarts lines, unaffected), for the vehicle-to-driver map (LAPTIMES names every car) and for build checks. Whether benchmark ignores the racecraft rows, or only masks them behind the train, is open. Behavioural measurement needs a real race session, i.e. a save sandbox (career fixture).",
       "related_questions": ["Q-02"],
       "status": "decoded (observed), benchmark only"
+    },
+    {
+      "id": "F-42",
+      "claim": "Per-driver aggression at the extremes (row driver_characteristics.aggression 0.05 vs 1.0, 4+4 drivers, within-driver crossover, AI difficulty 100, Austria, 5 laps, 20 races) produced no detectable change in held passes on laps 2-5. Coefficient +0.018 per driver-race, 2-SE interval about -0.29..+0.33, against a baseline of about 2 held passes per driver-race, so any real effect is at most about 15%. Secondaries are mixed and none is significant: collisions -0.26 (SE 0.145), lap-1 passes made -0.70 (an unregistered direction). Consistent with Swofty's AI map: aggression only feeds follow_speed_factor (5%) and alongside_space_factor (15%).",
+      "confidence": "pre-registered on #71 (model, bootstrap and validity fixed before any data; Amendments 1-4). Verdict INCONCLUSIVE by the registered criterion (not PASS: coefficient far below 2 SE; not FAIL-NULL: the 2-SE interval just exceeds +-0.3). 20/20 races valid, arm check 4+4 keys flipping, saves unchanged in every race. The held-pass sign doesn't hold at both 5 s and 20 s (sensitivity).",
+      "evidence": [
+        "runs/2026-11-14-B-0014/score.txt and race_1..race_20 (#71, #85, #97)",
+        "tools/b0014_check.py",
+        "docs/community/swofty_19_ai_learnings.md (which keys the game re-reads)"
+      ],
+      "implications": "The aggression characteristic is not Verve's lever for passing. No extension of B-0014 (more races on a pre-registered null would be optional stopping). Next: per-driver tick-read racecraft keys (B-0015: blocking.max_blocking_distance, overtake.overlap_percentage) and the community screens (B-0016: stock vs swofty.lap1-ai), measured with race_feel primaries.",
+      "related_questions": [],
+      "status": "inconclusive (pre-registered); practical null: effect at most about 15% of baseline"
     }
   ]
 }
