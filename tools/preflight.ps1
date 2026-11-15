@@ -7,6 +7,7 @@ Usage:
 Checks, in order, and exits 1 on the first hard failure:
 - build: `swofty doctor` must report build id -Build (everything is pinned to it); a patch means stop and tell the
   supervisor.
+- journals: 0 open Swofty journals (state\journal\*.json), since an open one means a modded game folder.
 - drift: doctor must show `baseline no drift` or `drift: swofty is not part of the game` (the post-run state).
 - game lock and test profiles: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no
   F1_25 or swofty process is running and deletes leftover test-* profiles. Fails if any test-* profile is still left.
@@ -25,6 +26,8 @@ if ($bid -ne $Build) { "PREFLIGHT FAIL: build $bid, pinned $Build. Stop and tell
 if (-not ($doc | Where-Object { $_ -match 'baseline\s+no drift|drift\s+swofty is not part of the game' })) {
     "PREFLIGHT FAIL: game folder drift. Run ``swofty restore`` and check again."; exit 1
 }
+$open = @($doc | Where-Object { $_ -match 'journal\s+\S+\s+is open' }) + @(Get-ChildItem (Join-Path $env:LOCALAPPDATA 'Swofty\state\journal') -File -Force -ErrorAction SilentlyContinue)
+if ($open.Count) { "PREFLIGHT FAIL: $($open.Count) open Swofty journal(s): the game folder may be modded. Run tools/post_run_check.ps1."; exit 1 }
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Swofty $Swofty
 if ($LASTEXITCODE -ne 0) { "PREFLIGHT FAIL: test-* profiles are left over (above). Every run deletes its own; find out why before testing."; exit 1 }
 $d = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings'

@@ -24,6 +24,15 @@ $hits = foreach ($id in $ids) {
         $f = @(Get-ChildItem $d -Recurse -File -Force)
         if ($f.Count) { "$id`: $($f.Count) file(s) under addon-profiles\$id\$active" }
     }
+    # the LIVE data: while .current names a profile that isn't ours (tyler, or one Tyler makes), that profile's files
+    # are in addon-storage\<id>\ (addon_storage.rs Holder::Storage). Swofty's top-level dot-files are markers.
+    $cur = Join-Path $data "addon-profiles\$id\.current"
+    $label = if (Test-Path $cur) { (Get-Content $cur -Raw).Trim() } else { '' }
+    $live = Join-Path $data "addon-storage\$id"
+    if ($label -notlike 'verve-*' -and $label -notlike 'test-*' -and (Test-Path $live)) {
+        $f = @(Get-ChildItem $live -Recurse -File -Force | Where-Object { -not ($_.DirectoryName -eq $live -and $_.Name.StartsWith('.')) })
+        if ($f.Count) { "$id`: $($f.Count) file(s) of live data under addon-storage\$id (.current = '$label')" }
+    }
 }
 if ($hits) { "REFUSE: addons in this run have data under the active profile ($active):"; $hits; exit 1 }
 "addon storage clear: none of $($ids.Count) addon(s) has data under the active profile ($active)"

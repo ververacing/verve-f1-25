@@ -1,0 +1,7 @@
+udp capture pid 24512
+launched 17:31:44.633: test session grand_prix f1_2025 austria team=forceindia driver=stroll session=race laps=5 (profile verve-test, fixture tyler-profile-20261031)
+sandbox line: [test] starting F1 25 in test mode (run folder %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-013144-1, save sandbox)
+ABORT: save sandbox ON, run folder missing; killing the test and the game
+plan: no sandbox; test exit: 2; sandbox unconfirmed; took 22 s
+udp recording: 0 bytes in %USERPROFILE%\AppData\Local\Temp\verve-udp\20261114-173142
+saves unchanged (26 entries)

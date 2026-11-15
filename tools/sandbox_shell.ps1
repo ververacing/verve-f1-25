@@ -27,7 +27,8 @@ Safety:
 - The game skips its intro video on every other launch, and then the title ignores the virtual pad. The plan's
   first step must be `wait screen=splash 180`. If that returns in under -SkippedIntroS seconds, the intro was
   skipped: kill, `swofty restore`, clean up, relaunch (up to -IntroTries).
-Writes <Out>/transcript.txt (every command and result) and <Out>/saves_diff.txt.
+Writes <Out>/transcript.txt (every command and result) and <Out>/saves_diff.txt, plus storage_sidestep.txt and
+post_run_check.txt (exit 7 = URGENT: the game folder isn't stock after the run).
 #>
 param(
     [Parameter(Mandatory)] [string] $Fixture,
@@ -92,8 +93,25 @@ if ($Udp) {
     if ($cap.HasExited) { Log 'ABORT: UDP capture failed to start; nothing launched'; exit 1 }
     Log "udp capture pid $($cap.Id)"
 }
+
+# Swofty 1.9.51 addon-storage bug (docs/upstream/swofty_addon_storage_lock.md): move EMPTY rename targets aside before
+# every launch (storage_sidestep.ps1), and check the game folder is stock after every run (post_run_check.ps1, which
+# does one sidestep + restore if it isn't). URGENT (exit 7 at the end) means stop all testing: Tyler mustn't launch.
+$script:urgent = $false
+function Sidestep {
+    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'storage_sidestep.ps1') -ExpProfile $ExpProfile -Addon (@($Addon) -join ',') -Log (Join-Path $Out 'storage_sidestep.txt')
+    $code = $LASTEXITCODE
+    $o | ForEach-Object { Write-Host "sidestep: $_" }
+    return $code
+}
+function PostCheck {
+    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1') -Out $Out
+    if ($LASTEXITCODE -eq 2) { $script:urgent = $true }
+    $o | ForEach-Object { Write-Host "post-run: $_" }
+}
 $result = 'not run'
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
+    if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true
@@ -161,7 +179,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         Log "intro skipped (splash after $([math]::Round($ms / 1000)) s); relaunching"
         Get-Process swofty, F1_25 -ErrorAction SilentlyContinue | Stop-Process -Force
         Start-Sleep -Seconds 3
-        & $Swofty restore | Out-Null
+        PostCheck
         & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
         $result = 'intro skipped'; continue
     }
@@ -247,7 +265,7 @@ if ($sessionLog -and (Test-Path $sessionLog)) { New-Item -ItemType Directory -Fo
 
 Start-Sleep -Seconds 5
 # the shell leaves its game lock and test profile behind even after a clean quit; free them for the next run
-& $Swofty restore | Out-Null
+PostCheck
 & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') | Out-Null
 $after = Snapshot
 $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique) {
@@ -257,5 +275,6 @@ $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique)
 Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
+if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
 if ($result -ne 'plan done') { exit 6 }
 exit 0
