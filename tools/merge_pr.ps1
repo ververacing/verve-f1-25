@@ -71,6 +71,10 @@ try {
             if ($LASTEXITCODE -ne 0) { $fails += 'test_ours (pure)' } else { "  ok test_ours (pure only: $why; live part not run)" }
         }
     }
+    if (Test-Path 'tools/test_pause.ps1') {
+        & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 *> $null
+        if ($LASTEXITCODE -ne 0) { $fails += 'test_pause' } else { '  ok test_pause' }
+    }
     foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'))) {
         if (Test-Path $t[1]) {
             & $Python -I $t[1] --selftest *> $null

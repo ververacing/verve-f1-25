@@ -39,6 +39,11 @@ $next = $wrapups | Where-Object { $_ -gt $now } | Select-Object -First 1
 # #71's stopping rule: complete pairs only, so an odd race starts only if its even partner also fits
 $need = if (($Race % 2) -eq 1) { 2 * $RaceMinutes } else { $RaceMinutes }
 if ($now.AddMinutes($need + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and $need min of racing wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
+# PAUSE (tools/pause.ps1): no launch while paused; a pause-at that this race wouldn't finish before pauses now
+$pauseFlag = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt'
+if (Test-Path $pauseFlag) { "race ${Race}: paused ($((Get-Content $pauseFlag -TotalCount 1))); not launching"; exit 12 }
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($RaceMinutes + 5)
+if ($LASTEXITCODE -ne 2) { "race ${Race}: pause-at reached; paused instead of launching"; exit 12 }
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "race ${Race}: a game is running that this batch didn't start; not launching"; exit 9 }
 if (Get-Process swofty-launcher -ErrorAction SilentlyContinue) { "race ${Race}: the Swofty Launcher is open; not launching"; exit 9 }
 # ruling A (2026-11-14): clean up after the last race, and refuse while any test-* profile is left over

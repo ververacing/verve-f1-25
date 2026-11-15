@@ -39,6 +39,11 @@ if (-not $inWindow) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, outside 
 $next = $wrapups | Where-Object { $_ -gt $now } | Select-Object -First 1
 $need = if (($Race % 2) -eq 1) { 2 * $RaceMinutes } else { $RaceMinutes }   # complete pairs only
 if ($now.AddMinutes($need + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and $need min of racing wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
+# PAUSE (tools/pause.ps1): no launch while paused; a pause-at that this race wouldn't finish before pauses now
+$pauseFlag = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt'
+if (Test-Path $pauseFlag) { "race ${Race}: paused ($((Get-Content $pauseFlag -TotalCount 1))); not launching"; exit 12 }
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($RaceMinutes + 5)
+if ($LASTEXITCODE -ne 2) { "race ${Race}: pause-at reached; paused instead of launching"; exit 12 }
 if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "race ${Race}: a game is running that this batch didn't start; not launching"; exit 9 }
 if (Get-Process swofty-launcher -ErrorAction SilentlyContinue) { "race ${Race}: the Swofty Launcher is open; not launching"; exit 9 }
 $cleanup = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1')
@@ -93,7 +98,9 @@ $t0 = [TimeZoneInfo]::ConvertTime($now, $tz, [TimeZoneInfo]::Local)
 $bin = Get-ChildItem (Join-Path $env:TEMP 'verve-udp') -Directory -Filter 'shell-*' -ErrorAction SilentlyContinue |
     Where-Object { $_.CreationTime -ge $t0.AddSeconds(-5) } | Sort-Object CreationTime -Descending | Select-Object -First 1 |
     ForEach-Object { Join-Path $_.FullName 'udp.bin' }
-if ($bin -and (Test-Path $bin)) {
+$cut = (Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)
+if ($cut) { 'race_feel: skipped (paused; this race is invalid and rerun on RESUME)' }
+elseif ($bin -and (Test-Path $bin)) {
     New-Item -ItemType Directory -Force (Join-Path $out 'raw') | Out-Null
     Copy-Item $bin (Join-Path $out 'raw\udp.bin') -Force
     $ErrorActionPreference = 'Continue'
@@ -102,4 +109,9 @@ if ($bin -and (Test-Path $bin)) {
     $ErrorActionPreference = 'Stop'
 } else { 'race_feel: no UDP capture found for this race' }
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
+# a pause-at the next race wouldn't make: pause now, at the end of this race (no turn of the agent needed)
+if (-not (Test-Path $pauseFlag)) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($RaceMinutes + 5)
+    if ($LASTEXITCODE -ne 2) { 'pause-at reached after this race: paused' }
+}
 exit $code
