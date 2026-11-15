@@ -108,6 +108,8 @@ function Sidestep {
 function PostCheck {
     $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1') -Out $Out
     if ($LASTEXITCODE -eq 2) { $script:urgent = $true }
+    if ($LASTEXITCODE -eq 3) { Write-Host 'post-run: WAITING: launcher open, restore deferred (not urgent)' }
+    if ($LASTEXITCODE -eq 4) { Write-Host 'post-run: SKIPPED: F1 25 still running; check again when it has closed'; $script:urgent = $true }
     $o | ForEach-Object { Write-Host "post-run: $_" }
 }
 if ($Session) {
