@@ -29,10 +29,13 @@ Metrics, as the plan defines them (the choices the plan leaves open are marked C
    - longest train: at each lap line of the leader (lap 2+), the longest run of consecutive cars each within 1.0 s of
      the car ahead, in cars. Summary: the per-race median and max.
 3. Sudden braking
-   - phantom_brakes: a brake onset (brake rising above 0.3) that starts more than 50 m before the car's own clean-lap
-     onset for that corner, while a car is within 1.0 s behind it. Corners: the car's onsets on clean laps (2+, no car
-     within 2.0 s ahead for the whole lap), clustered within 30 m; a corner's onset is the cluster median. CHOICE: the
-     onset belongs to the next corner ahead within 300 m; an onset with no corner within 300 m ahead isn't scored.
+   - phantom_brakes: a brake onset (brake rising above 0.3), while a car is within 1.0 s behind, that starts more
+     than 50 m before the reference onset of the next corner ahead (within 300 m). Corner rule (supervisor ruling,
+     2026-11-14): a CLEAN corner pass has no car within 2.0 s ahead at any sample in the 300 m before its onset
+     (laps 2+, no pit lap). Corners are clusters (30 m) of all cars' clean onsets. A car's own reference is the median
+     of its >= 2 clean passes of that corner; otherwise the FIELD median is used (ref=field). A corner with < 4 clean
+     passes field-wide is unscored (NA). Phantoms are reported by ref (own / field); the summary gives cars scored,
+     the share of onsets scored and the ref counts.
      Validate on 2 races by eye before trusting it (the plan). A car with no clean-lap corner (always in traffic)
      reports NA with phantom_scored 0, never 0; the summary gives phantom_cars_scored.
    - rear_end_as_follower / as_leader: COLL where the two cars' total distance (interpolated between the LapData
@@ -65,6 +68,9 @@ BRAKE_ON = 0.3
 PHANTOM_M = 50.0
 CLUSTER_M = 30.0
 CORNER_AHEAD_M = 300.0
+CLEAN_WINDOW_M = 300.0   # a clean corner pass: no car within CLEAN_GAP_S ahead in this distance before the onset
+OWN_MIN_PASSES = 2       # a car's own corner reference needs this many clean passes; else the field's
+FIELD_MIN_PASSES = 4     # a corner with fewer clean passes field-wide is unscored (NA)
 REAR_MIN_M, REAR_MAX_M = 3.0, 12.0
 DT_CAP_S = 0.5
 GREEN_FACTOR = 1.10
@@ -185,6 +191,77 @@ def corners(clean_onsets: list[float], cluster: float = CLUSTER_M) -> list[float
     if group:
         out.append(statistics.median(group))
     return out
+
+
+def clean_before(samples: list[tuple[float, float, float | None]], t: float, d: float,
+                 window: float = CLEAN_WINDOW_M, gap: float = CLEAN_GAP_S, track_len: float | None = None) -> bool:
+    """samples = [(t, lap_distance, gap_ahead_s)] of one car in time order. True if no sample in the `window` metres
+    before the onset at (t, d) has a car within `gap` s ahead (gap None = leader or no data: clear)."""
+    i = bisect.bisect_right([x[0] for x in samples], t) - 1
+    covered = 0.0
+    prev_d = d
+    while i >= 0:
+        st, sd, sg = samples[i]
+        back = prev_d - sd
+        if track_len and back < -track_len / 2:
+            back += track_len      # crossed the line going backwards in time
+        if back < 0:
+            break                  # a reset or a new lap we can't follow
+        covered += back
+        if covered > window:
+            break
+        if sg is not None and sg <= gap:
+            return False
+        prev_d = sd
+        i -= 1
+    return True
+
+
+def corner_table(clean: dict[int, list[float]], cluster: float = CLUSTER_M) -> list[dict]:
+    """clean[car] = onset distances of that car's clean corner passes (laps 2+). Corners are clusters of all cars'
+    clean onsets within `cluster` m. Each corner: field median, field count, and own medians for cars with
+    >= OWN_MIN_PASSES passes. Corners with < FIELD_MIN_PASSES are kept but flagged unscored."""
+    allpts = sorted((d, c) for c, ds in clean.items() for d in ds)
+    groups, cur = [], []
+    for d, c in allpts:
+        if cur and d - cur[-1][0] > cluster:
+            groups.append(cur)
+            cur = []
+        cur.append((d, c))
+    if cur:
+        groups.append(cur)
+    out = []
+    for g in groups:
+        by_car = defaultdict(list)
+        for d, c in g:
+            by_car[c].append(d)
+        out.append({"field": statistics.median(d for d, _ in g), "count": len(g),
+                    "scored": len(g) >= FIELD_MIN_PASSES,
+                    "own": {c: statistics.median(ds) for c, ds in by_car.items() if len(ds) >= OWN_MIN_PASSES}})
+    return out
+
+
+def classify_onset(car: int, onset_d: float, table: list[dict], track_len: float | None) -> tuple[str, bool | None]:
+    """('own'|'field', phantom?) for an onset, against the next corner ahead (within CORNER_AHEAD_M), or ('NA', None)
+    when no corner is near enough or that corner is unscored."""
+    best = None
+    for corner in table:
+        ahead = corner["field"] - onset_d
+        if track_len and ahead < -CLUSTER_M:
+            ahead += track_len
+        if -CLUSTER_M <= ahead <= CORNER_AHEAD_M and (best is None or ahead < best[0]):
+            best = (ahead, corner)
+    if best is None or not best[1]["scored"]:
+        return "NA", None
+    corner = best[1]
+    if car in corner["own"]:
+        ref, kind = corner["own"][car], "own"
+    else:
+        ref, kind = corner["field"], "field"
+    ahead = ref - onset_d
+    if track_len and ahead < -CLUSTER_M:
+        ahead += track_len
+    return kind, ahead > PHANTOM_M
 
 
 def phantom(onset_d: float, corner_list: list[float], track_len: float | None) -> bool | None:
@@ -325,28 +402,26 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
                 trains.append(longest_train([None] + [gap_ahead(cars[c]) for c in order[1:]]))
     tt = train_time(samples, passes, lap_starts)
 
-    # sudden braking: onsets per car, corners from its clean laps
-    btimes = [t for t, _ in s["brake_frames"]]
-    dirty_laps: dict[int, set] = defaultdict(set)
-    for t, cars in frames:
-        for c in range(n):
-            g = gap_ahead(cars[c])
-            if g is not None and g <= CLEAN_GAP_S:
-                dirty_laps[c].add(cars[c][u.L_LAPNUM])
-    phantoms = defaultdict(int)
-    phantom_scored = set()   # cars with at least one clean-lap corner; the rest report NA, not 0
+    # sudden braking (2026-11-14 ruling): corner references from clean CORNER passes, own (>= 2) or field (>= 4)
+    gap_samples = {c: [(t, cars[c][u.L_LAPDIST], gap_ahead(cars[c])) for t, cars in frames] for c in range(n)}
+    onsets = {}
+    clean = defaultdict(list)
     for c in ai:
         rows = []
         for t, brakes in s["brake_frames"]:
             car = frame_at(t)[c]
             rows.append((t, car[u.L_LAPNUM], car[u.L_LAPDIST], brakes[c]))
-        ons = brake_onsets(rows)
-        clean = [d for t, lap, d in ons if lap >= 2 and lap not in dirty_laps[c] and lap not in pit_laps[c]]
-        cl = corners(clean)
-        if not cl:
-            continue
-        phantom_scored.add(c)
-        for t, lap, d in ons:
+        onsets[c] = brake_onsets(rows)
+        for t, lap, d in onsets[c]:
+            if lap >= 2 and lap not in pit_laps[c] and d >= 0 and clean_before(gap_samples[c], t, d, track_len=track_len):
+                clean[c].append(d)
+    table = corner_table(clean)
+    phantoms = defaultdict(lambda: {"own": 0, "field": 0})
+    scored = defaultdict(int)
+    with_follower = defaultdict(int)
+    ref_count = {"own": 0, "field": 0}
+    for c in ai:
+        for t, lap, d in onsets[c]:
             if lap < 1 or d < 0:
                 continue
             cars = frame_at(t)
@@ -355,9 +430,15 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             gb = gap_ahead(cars[behind]) if behind is not None else None
             if gb is None or gb > TRAIN_GAP_S:
                 continue
-            if phantom(d, cl, track_len):
-                phantoms[c] += 1
-    del btimes
+            with_follower[c] += 1
+            kind, is_ph = classify_onset(c, d, table, track_len)
+            if kind == "NA":
+                continue
+            scored[c] += 1
+            ref_count[kind] += 1
+            if is_ph:
+                phantoms[c][kind] += 1
+    phantom_scored = {c for c in ai if scored[c]}
 
     # contacts
     ttimes = [t for t, _ in s["tel_frames"]]
@@ -423,7 +504,11 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "held_passes_net_2plus": sum(1 for p in made if p["net"] and p["lap"] >= 2),
             "held_passes_2plus": sum(1 for p in made if p["held"] and p["lap"] >= 2),
             "held_suffered_2plus": sum(1 for p in passes if p["other"] == c and p["held"] and p["lap"] >= 2),
-            "phantom_brakes": phantoms[c] if c in phantom_scored else "NA", "phantom_scored": int(c in phantom_scored),
+            "phantom_brakes": (phantoms[c]["own"] + phantoms[c]["field"]) if c in phantom_scored else "NA",
+            "phantom_brakes_own_ref": phantoms[c]["own"] if c in phantom_scored else "NA",
+            "phantom_brakes_field_ref": phantoms[c]["field"] if c in phantom_scored else "NA",
+            "onsets_with_follower": with_follower[c], "onsets_scored": scored[c],
+            "phantom_scored": int(c in phantom_scored),
             "rear_end_as_follower": rear_f[c], "rear_end_as_leader": rear_l[c],
             "front_wing_increments": fw_n, "front_wing_added": fw_add, "wing_damage_added": all_add,
             "collisions": coll_n[c], "costly_contacts": costly[c], "contact_wing_hits": wing_hits[c],
@@ -452,6 +537,10 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
         "longest_train_max": max(trains) if trains else None,
         "phantom_brakes": sum(r["phantom_brakes"] for r in rows if r["phantom_scored"]),
         "phantom_cars_scored": sum(r["phantom_scored"] for r in rows),
+        "phantom_onsets_scored_share": round(sum(scored.values()) / sum(with_follower.values()), 3) if sum(with_follower.values()) else None,
+        "phantom_ref_counts": ref_count,
+        "phantom_by_ref": {"own": sum(v["own"] for v in phantoms.values()), "field": sum(v["field"] for v in phantoms.values())},
+        "corners": {"total": len(table), "scored": sum(1 for x in table if x["scored"])},
         "rear_end_contacts": sum(r["rear_end_as_follower"] for r in rows),
         "pit_cycle_passes": sum(1 for p in passes if p["pit_cycle"]),
         "contacts": contacts_out,
@@ -530,6 +619,24 @@ def selftest() -> int:
     check("under 8 m/s is a spin", spin["spin"] and not spin["places_lost"], spin)
     lost = contact_outcome({"wings": (0, 0, 0), "speed_ms": 60.0, "pos": 5}, {"wings": (0, 0, 0), "speed_ms": 50.0, "pos": 7})
     check("2 places lost is costly", lost["places_lost"] and lost["costly"], lost)
+
+    # clean corner window: a car within 2.0 s ahead 200 m before the onset makes it unclean; 350 m before doesn't
+    samp = [(float(i), 1000.0 + 50 * i, 3.0) for i in range(12)]          # 50 m per second, gap 3 s
+    check("clean when nothing within 2 s in the 300 m", clean_before(samp, 11.0, 1550.0), clean_before(samp, 11.0, 1550.0))
+    s2 = [(t, d, (1.5 if t == 7.0 else g)) for t, d, g in samp]               # 200 m before the onset
+    check("unclean when a car is within 2 s 200 m before", not clean_before(s2, 11.0, 1550.0), clean_before(s2, 11.0, 1550.0))
+    s3 = [(t, d, (1.5 if t == 4.0 else g)) for t, d, g in samp]               # 350 m before the onset
+    check("a close car 350 m before doesn't count", clean_before(s3, 11.0, 1550.0), clean_before(s3, 11.0, 1550.0))
+    # own reference needs 2 passes; field fallback; unscored corner
+    tbl = corner_table({1: [1000.0, 1004.0], 2: [998.0], 3: [1002.0], 4: [2500.0], 5: [2510.0]})
+    check("two corners found", len(tbl) == 2, [(round(x["field"]), x["count"], x["scored"]) for x in tbl])
+    check("own reference needs 2 passes", 1 in tbl[0]["own"] and 2 not in tbl[0]["own"], tbl[0]["own"])
+    k1 = classify_onset(1, 940.0, tbl, 4300.0)
+    check("car with 2 passes uses its own ref", k1 == ("own", True), k1)
+    k2 = classify_onset(2, 980.0, tbl, 4300.0)
+    check("car with 1 pass falls back to the field ref", k2 == ("field", False), k2)
+    k3 = classify_onset(4, 2440.0, tbl, 4300.0)
+    check("corner with < 4 clean passes is unscored", k3 == ("NA", None), k3)
 
     # rear-end vs side-swipe
     check("rear-end: follower 6 m behind", contact_kind(1000.0, 1006.0) == ("rear_end", 0), contact_kind(1000.0, 1006.0))
