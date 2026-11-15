@@ -52,4 +52,30 @@ for label, fmt, p1, p2, rows, want in cases:
     ok = got == want and all(ACCOUNT.decode() not in n for n in got)
     failed += not ok
     print(f"{'ok  ' if ok else 'FAIL'} {label}: {got}")
+
+def damage_entry(size: int, fl: int, fr: int, rear: int) -> bytes:
+    e = bytearray(size)
+    off = u.DAMAGE_PART_OFF[size]
+    e[off:off + 3] = bytes([fl, fr, rear])
+    return bytes(e)
+
+
+def damage_packet(fmt: int, size: int, car1) -> bytes:
+    n = u.LAYOUTS[fmt]["cars"]
+    return header(fmt, 10, 0) + b"".join(damage_entry(size, *(car1 if c == 1 else (0, 0, 0))) for c in range(n))
+
+
+for fmt in (2025, 2026):
+    for size in (46, 42):
+        pk = [damage_packet(fmt, size, (0, 0, 0)), damage_packet(fmt, size, (0, 0, 0)),
+              damage_packet(fmt, size, (12, 0, 0)), damage_packet(fmt, size, (12, 0, 30))]
+        s = u.parse(capture(pk), [])[42]
+        car1 = [rec[:3] for _, c, rec in s["damage"] if c == 1]
+        ok = car1 == [(0, 0, 0), (12, 0, 0), (12, 0, 30)] and not s["bad_sizes"]
+        failed += not ok
+        print(f"{'ok  ' if ok else 'FAIL'} car damage {fmt} entry {size}: car 1 changes {car1}")
+bad = u.parse(capture([header(2026, 10, 0) + bytes(24 * 44)]), [])[42]
+ok = "car_damage" in bad["bad_sizes"] and not bad["damage"]
+failed += not ok
+print(f"{'ok  ' if ok else 'FAIL'} car damage wrong entry size reported: {bad['bad_sizes']}")
 sys.exit(1 if failed else 0)
