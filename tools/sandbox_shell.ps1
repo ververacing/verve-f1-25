@@ -101,8 +101,11 @@ if ($Udp) {
 $script:urgent = $false
 function Sidestep {
     # a switch can't be passed as -DryRun:$value through powershell -File (it arrives as a string), so add it only when set
+    # -Addon only when there is one: an empty value through powershell -File is a missing argument, and the call fails
     $a = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'storage_sidestep.ps1'), '-ExpProfile', $ExpProfile,
-        '-Addon', (@($Addon) -join ','), '-Log', (Join-Path $Out 'storage_sidestep.txt'))
+        '-Log', (Join-Path $Out 'storage_sidestep.txt'))
+    $ad = @($Addon) -join ','
+    if ($ad) { $a += @('-Addon', $ad) }
     if ($SidestepDryRun) { $a += '-DryRun' }
     $o = & powershell @a
     $code = $LASTEXITCODE
@@ -115,6 +118,7 @@ function PostCheck {
     $o | ForEach-Object { Write-Host "post-run: $_" }
 }
 $result = 'not run'
+$t0 = Get-Date   # also read after the loop, so set it even when nothing launches
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
