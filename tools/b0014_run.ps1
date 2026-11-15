@@ -31,6 +31,7 @@ $wrapups = @($now.Date.AddHours(5).AddMinutes(45), $now.Date.AddHours(16).AddMin
 $inWindow = $now.Hour -lt 6 -or ($now.Hour -ge 9 -and $now.Hour -lt 17)
 if ($WindowOverride) {
     $end = $now.Date + [TimeSpan]::Parse($WindowOverride)
+    if ($end -le $now) { $end = $end.AddDays(1) }   # an override ending at 06:00 set in the evening means tomorrow 06:00
     if ($now -lt $end) { $inWindow = $true; $wrapups = @($end.AddMinutes(-15)) + $wrapups | Sort-Object }
 }
 if (-not $inWindow) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, outside the testing windows (00:00-06:00, 09:00-17:00$(if ($WindowOverride) { ", override to $WindowOverride" })); not launching"; exit 8 }

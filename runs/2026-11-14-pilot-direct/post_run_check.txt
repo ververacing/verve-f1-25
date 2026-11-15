@@ -1,0 +1,14 @@
+﻿post-run: NOT CLEAN (drift lines 1, doctor's open journals 0 [], journal files 0, version.dll absent)
+  drift              swofty/cache/exe-sha256.tsv is not part of the game
+no readable journal file: using verve-test's addons
+sidestep for: swofty.core, teamsimplified.mods, dromodf.skip-cutscenes, twilight.offline-quiet
+storage sidestep 20261114-182836: active profile tyler; addons swofty.core, teamsimplified.mods, dromodf.skip-cutscenes, twilight.offline-quiet
+moved empty teamsimplified.mods\tyler -> verve-f1-25-recovery\20261114-182836\teamsimplified.mods\tyler
+moved empty teamsimplified.mods\test-shell-20261115-021834 -> verve-f1-25-recovery\20261114-182836\teamsimplified.mods\test-shell-20261115-021834
+moved empty dromodf.skip-cutscenes\tyler -> verve-f1-25-recovery\20261114-182836\dromodf.skip-cutscenes\tyler
+moved empty dromodf.skip-cutscenes\test-shell-20261115-021834 -> verve-f1-25-recovery\20261114-182836\dromodf.skip-cutscenes\test-shell-20261115-021834
+moved empty twilight.offline-quiet\tyler -> verve-f1-25-recovery\20261114-182836\twilight.offline-quiet\tyler
+moved empty twilight.offline-quiet\test-shell-20261115-021834 -> verve-f1-25-recovery\20261114-182836\twilight.offline-quiet\test-shell-20261115-021834
+swofty restore exit 0: restored: the game folder matches the baseline for build 25251167
+after restore: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
+post-run: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)

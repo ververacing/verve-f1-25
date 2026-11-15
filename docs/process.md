@@ -62,6 +62,7 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 - Docs and results-text PRs may merge after the supervisor's review, or without it if docs-only and trivial.
 - Generator, addon, test-file and tools changes wait for the supervisor's review.
 - "DO NOT MERGE" from the supervisor holds until it's resolved.
+- Never chain commit + merge in one command. Merge only after the pre-commit hook and the tests have passed, as a separate step (2026-11-14: a refused commit went unnoticed and #81 merged without its fix).
 - Tyler's word overrides all of these.
 
 ## Profiles (2026-11-14)
