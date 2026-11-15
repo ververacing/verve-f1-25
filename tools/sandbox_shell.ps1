@@ -67,7 +67,10 @@ $activeProfile = (Get-Content (Join-Path $env:LOCALAPPDATA 'Swofty\config.json')
 if ($ExpProfile -eq $activeProfile) { throw "-ExpProfile $ExpProfile is the active profile; experiments run on an isolated one" }
 Copy-Item $profileFile (Join-Path $Out 'profile.json') -Force
 # 1.9.x stores addon data under the ACTIVE profile's name, so refuse if any of this run's addons has data there
-$chk = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'addon_storage_check.ps1') -ExpProfile $ExpProfile -Addon ($Addon -join ',')
+# -Addon only when there is one: an empty value through powershell -File is a missing argument, and the call fails
+$chkArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'addon_storage_check.ps1'), '-ExpProfile', $ExpProfile)
+if (@($Addon) -join ',') { $chkArgs += @('-Addon', (@($Addon) -join ',')) }
+$chk = & powershell @chkArgs
 $chk | Set-Content (Join-Path $Out 'addon_storage_check.txt') -Encoding utf8
 if ($LASTEXITCODE -ne 0) { $chk; throw 'addon storage check refused the run (see addon_storage_check.txt)' }
 $settingsHash = (Get-FileHash $profileFile -Algorithm SHA256).Hash
@@ -123,7 +126,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
     Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
-        '-Log', (Join-Path (Resolve-Path $Out).Path "process_trace_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
+        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true

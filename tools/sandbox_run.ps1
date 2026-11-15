@@ -169,7 +169,7 @@ if ($Session) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $planResult = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
     Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
-        '-Log', (Join-Path (Resolve-Path $Out).Path "process_trace_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
+        '-Summary', (Join-Path (Resolve-Path $Out).Path "process_trace_summary_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
     $t0 = Get-Date
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test session $Session --fixture $Fixture --wait 0"
     $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
