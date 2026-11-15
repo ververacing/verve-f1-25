@@ -149,13 +149,14 @@ def contact_outcome(before: dict, after: dict) -> dict:
 
 
 def train_behind(samples: dict[int, list[tuple]], passes: list[dict], lap_starts: dict[int, dict[int, float]],
-                 gap: float = TRAIN_GAP_S) -> dict[int, float]:
+                 gap: float = TRAIN_GAP_S, clear_on: str = "held") -> dict[int, float]:
     """Seconds other cars spend stuck behind each car (B-0015's secondary): for every follower sample on laps 2+, not in
     the pit lane, within `gap` of the car ahead and with no held pass on that car before the start of the follower's
-    lap L+2, the time is added to the car AHEAD. The same samples as train_time, attributed the other way round."""
+    lap L+2, the time is added to the car AHEAD. The same samples as train_time, attributed the other way round.
+    clear_on = "held" (the #71 rule, as train_time) or "net" (held and not a restoration; the sensitivity line)."""
     held = defaultdict(list)
     for p in passes:
-        if p["held"]:
+        if p[clear_on]:
             held[(p["car"], p["other"])].append(p["t"])
     out: dict[int, float] = defaultdict(float)
     for car, rows in samples.items():
@@ -458,6 +459,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
                 trains.append(longest_train([None] + [gap_ahead(cars[c]) for c in order[1:]]))
     tt = train_time(samples, passes, lap_starts)
     tb = train_behind(samples, passes, lap_starts)
+    tb_net = train_behind(samples, passes, lap_starts, clear_on="net")   # sensitivity, not scored
 
     # sudden braking (2026-11-14 ruling): corner references from clean CORNER passes, own (>= 2) or field (>= 4)
     gap_samples = {c: [(t, cars[c][u.L_LAPDIST], gap_ahead(cars[c])) for t, cars in frames] for c in range(n)}
@@ -579,6 +581,7 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
             "held_suffered_2plus": sum(1 for p in passes if p["other"] == c and p["held"] and p["lap"] >= 2),
             "held_suffered_net_2plus": sum(1 for p in passes if p["other"] == c and p["net"] and p["lap"] >= 2),
             "train_s_behind": round(tb.get(c, 0.0), 2),
+            "train_s_behind_net": round(tb_net.get(c, 0.0), 2),
             "early_brakes_total": (phantoms[c]["own"] + phantoms[c]["field"]) if c in phantom_scored else "NA",
             "early_brakes_in_traffic": early_traffic[c] if c in phantom_scored else "NA",
             "phantom_brakes": clear_road[c] if c in phantom_scored else "NA",
@@ -678,6 +681,8 @@ def selftest() -> int:
     b2 = train_behind({1: rows}, [{"t": 50.0, "car": 1, "other": 9, "held": True}], {1: {2: 0.0, 3: 70.0, 4: 140.0}})
     check("train time behind is attributed to the car ahead", abs(b1.get(9, 0) - 5.0) < 1e-9 and 1 not in b1, dict(b1))
     check("a held pass on the car ahead clears its train-behind time", b2.get(9, 0) == 0.0, dict(b2))
+    b3 = train_behind({1: rows}, [{"t": 50.0, "car": 1, "other": 9, "held": True, "net": False}], {1: {2: 0.0, 3: 70.0, 4: 140.0}}, clear_on="net")
+    check("net variant: a restoration doesn't clear it", abs(b3.get(9, 0) - 5.0) < 1e-9, dict(b3))
 
     # phantom brake: corner onset at 1000 m on clean laps; an onset 60 m early is phantom, 20 m early isn't
     cl = corners([998.0, 1000.0, 1003.0, 2500.0, 2510.0])
