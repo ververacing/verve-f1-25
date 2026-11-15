@@ -111,6 +111,7 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 |---|---|---|
 | 2026-11-14 20:42 | PAUSE ("Pause now"). B-0014 race 5 aborted before its session, marked invalid ("pause") on #71. | Tyler, in the agent's chat |
 | 2026-11-14 22:17 | RESUME ("you are good to resume"). Pre-flight OK after one `swofty restore` for the benign cache-file line; fresh LKG `20261114-221808-lkg-20261114-resume` (Steam remote unchanged since 17:21; Tyler's launcher save changed by his play). | Tyler, in the agent's chat (also relayed by the supervisor) |
+| 2026-11-15 08:28 | PAUSE AFTER THE CURRENT RACE ("Pause after the current race"). B-0016 race 2 runs to the end with its full checks; nothing launches after it. Race 2's game quit at 08:29:56; the Swofty Launcher (not ours) opened at 08:30:24, so its saves check and post-run check were deferred (exit 11) and the rest of the PAUSE routine waits for the standing rule to allow it. | Tyler, relayed by the supervisor |
 
 ## Housekeeping log
 
