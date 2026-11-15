@@ -19,6 +19,15 @@ From Tyler or the supervisor. Do these in order:
 
 Then start nothing until RESUME.
 
+**While paused, and whenever F1 25 or the Swofty Launcher is running and the agent didn't start it** (standing rule,
+supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55; nothing was changed):
+- Run NO swofty CLI commands at all, read-only ones like `doctor` included.
+- No reads or writes under `%LOCALAPPDATA%\Swofty` or the game folder, and no scripts that touch them.
+  `storage_sidestep.ps1`, `cleanup_test_profiles.ps1`, `guard_snapshot.ps1` and `post_run_check.ps1` refuse or skip
+  on their own when the game or the launcher is running.
+- Only repo, docs and analysis work on files already copied out.
+- The first Swofty-touching command after RESUME is `tools/preflight.ps1`.
+
 ## RESUME
 
 1. Pre-flight: `tools/preflight.ps1` (build pin, drift, cleanup, hardware-settings diff).
