@@ -82,7 +82,7 @@ if (@(Ours-Foreign).Count) { throw 'F1 25 or a Swofty process (launcher) is runn
 function KillOurs([string] $why) {
     # our game started through Steam and no test agent reports its PID here, so it stays foreign: Ours-Stop then
     # stops nothing, and the game is left for pre-flight (supervisor review of #107: no fallback adoption)
-    if (-not (Ours-Stop $why)) { Write-Host "not stopping ($why): a process that is not ours is running" }
+    if (-not (Ours-Stop $why '^test (session|run/shell)')) { Write-Host "not stopping ($why): a process that is not ours is running" }
 }
 $before = Snapshot
 # keep the before-snapshot outside the repo (it names save files) for a deferred check (tools/deferred_saves_check.ps1)

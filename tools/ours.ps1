@@ -113,11 +113,14 @@ function Ours-StopOne($proc, [string] $reason = '') {
     $true
 }
 
-function Ours-Stop([string] $reason = '') {
-    # stops our recorded processes (and their trees) only; refuses while anything foreign is running
+function Ours-Stop([string] $reason = '', [string] $Roles = '') {
+    # stops our recorded processes (and their trees) only; refuses while anything foreign is running.
+    # -Roles <regex>: only the records whose Role matches (e.g. one launch attempt's shell and game, not the UDP
+    # capture or the process trace: race 3 of 2026-11-15 lost its capture to an unscoped stop on relaunch)
     $snap = Get-ProcSnapshot
-    $rec = Ours-Records
+    $rec = @(Ours-Records)
     $foreign = Get-ForeignProcs $rec $snap
+    if ($Roles) { $rec = @($rec | Where-Object { $_.Role -match $Roles }) }
     if ($foreign.Count) {
         Write-Host ("ours: NOT stopping anything ($reason): not ours running: " + (($foreign | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', '))
         return $false

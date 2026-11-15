@@ -85,6 +85,8 @@ $run = Join-Path $dir 'run'
 Ours-Init $run
 $oursCmd = Start-Process cmd -ArgumentList '/c', "`"$(Join-Path $dir 'swofty.exe')`" -n 300 127.0.0.1" -WindowStyle Hidden -PassThru
 Ours-Add $oursCmd 'test dummy (ours)'
+$oursCap = Start-Process $ping -ArgumentList '-n', '300', '127.0.0.1' -WindowStyle Hidden -PassThru
+Ours-Add $oursCap 'udp capture'   # another role of ours: a scoped stop must leave it running
 # our recorded shell starts "Steam", which starts an "F1_25" (as if Tyler launched through a Steam our shell started)
 # (a .cmd file avoids cmd's nested-quote rules: shell cmd -> steam.exe (a cmd copy) -> F1_25.exe)
 $chain = Join-Path $dir 'chain.cmd'
@@ -128,12 +130,13 @@ try {
     foreach ($id in @($g2[0].Id, $st2[0].Id)) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }
     if (-not $oursShell2.HasExited) { $oursShell2.Kill() }
     Start-Sleep -Milliseconds 500
-    Check 'with nothing foreign, Ours-Stop stops our tree' ((Ours-Stop 'selftest') -and $oursCmd.WaitForExit(5000))
+    Check 'a role-scoped stop stops only that role' ((Ours-Stop 'selftest' '^test dummy \(ours\)') -and $oursCmd.WaitForExit(5000) -and -not $oursCap.HasExited)
+    Check 'with nothing foreign, Ours-Stop stops the rest of our tree' ((Ours-Stop 'selftest') -and $oursCap.WaitForExit(5000))
     Start-Sleep -Milliseconds 500
     Check "our dummy's child is gone too" (-not @(Get-ProcSnapshot | Where-Object { $_.Name -eq 'swofty' -and $_.ParentId -eq $oursCmd.Id }).Count)
 } finally {
     foreach ($id in @($g2 | ForEach-Object { $_.Id }) + @($st2 | ForEach-Object { $_.Id })) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }   # the test's own chain
-    foreach ($h in $fGame, $fLaunch, $oursCmd, $oursShell2) { if ($h -and -not $h.HasExited) { $h.Kill() } }   # by the test's own handles only
+    foreach ($h in $fGame, $fLaunch, $oursCmd, $oursShell2, $oursCap) { if ($h -and -not $h.HasExited) { $h.Kill() } }   # by the test's own handles only
     Get-ProcSnapshot | Where-Object { $_.Name -eq 'swofty' -and $_.ParentId -eq $oursCmd.Id } | ForEach-Object { Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue }
     Start-Sleep -Milliseconds 500
     Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
