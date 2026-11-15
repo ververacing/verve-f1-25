@@ -71,6 +71,7 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 - Docs and results-text PRs may merge after the supervisor's review, or without it if docs-only and trivial.
 - Generator, addon, test-file and tools changes wait for the supervisor's review.
 - "DO NOT MERGE" from the supervisor holds until it's resolved.
+- **Merge only through `tools/merge_pr.ps1 -Pr <n>`** (supervisor, 2026-11-15, after a second slip). It refuses a PR under 5 minutes old, one GitHub doesn't call mergeable, one with failing or pending checks, and one whose head commit fails the repo's selftests or the pre-commit hook's rules (re-checked on the PR diff). `-DryRun` runs every check without merging.
 - Never chain commit + merge in one command. Merge only after the pre-commit hook and the tests have passed, as a separate step (2026-11-14: a refused commit went unnoticed and #81 merged without its fix).
 - Tyler's word overrides all of these.
 

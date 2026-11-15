@@ -40,6 +40,24 @@ copy are all resolved on this build (`verified=yes`).
    byte, safety-car status byte at body+124, formation via `race.start` / LGOT timing) and fail the run if it differs.
 3. **Only in test profiles,** gated on the `swofty test` environment, never in Tyler's profile.
 
+## The direct start's safety car is deterministic (2026-11-15)
+
+Two direct-start races (`runs/2026-11-14-pilot-direct`, `runs/2026-11-15-store-seed`) gave the same full safety car
+almost to the second. That points to a session setting the direct start inherits, not an incident. So it belongs to
+the options work above, and there are no more direct-start races until the safety car can be set (supervisor,
+2026-11-15).
+
+| | Pilot | Second run |
+|---|---|---|
+| SCAR deployed (session s after lights out) | 3.13 | 3.18 |
+| returning | 143.31 | 142.95 |
+| returned | 180.69 | 180.36 |
+| resume race | 189.48 | 189.13 |
+| AI player car disqualified (PENA type 6, infringement 19) | lap 5 | lap 5 |
+| AI difficulty read | 19 | 19 |
+
+The menu route had 0 safety-car events in 21 races (check 4b plus B-0014's 20).
+
 ## What's still unknown (needs the game DB, read-only, with the game closed)
 
 - **The option names themselves** (the `options_system` tables): AI difficulty, safety car, formation lap, and their
