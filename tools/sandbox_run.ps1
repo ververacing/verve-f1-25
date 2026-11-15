@@ -96,8 +96,9 @@ function FreshLiveLog([datetime] $since) {
 $script:urgent = $false
 function Sidestep {
     # a switch can't be passed as -DryRun:$value through powershell -File (it arrives as a string), so add it only when set
+    # -Addon only when there is one: an empty value through powershell -File is a missing argument, and the call fails
     $a = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'storage_sidestep.ps1'), '-ExpProfile', $ExpProfile,
-        '-Addon', (@() -join ','), '-Log', (Join-Path $Out 'storage_sidestep.txt'))
+        '-Log', (Join-Path $Out 'storage_sidestep.txt'))
     if ($SidestepDryRun) { $a += '-DryRun' }
     $o = & powershell @a
     $code = $LASTEXITCODE
@@ -162,9 +163,13 @@ if ($Session) {
         Start-Sleep -Seconds 20   # file locks (addon-profiles, overlay cache) hold on for a while after the game exits
     }
     $planResult = 'not run'
+    $job = $null; $t0 = Get-Date
     # relaunch on a skipped intro (the title then ignores the virtual pad) or a transient lock, up to -IntroTries
     for ($try = 1; $try -le $IntroTries; $try++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $planResult = 'sidestep refused'; break }
+    # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
+    Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
+        '-Log', (Join-Path (Resolve-Path $Out).Path "process_trace_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
     $t0 = Get-Date
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test session $Session --fixture $Fixture --wait 0"
     $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
@@ -300,9 +305,11 @@ if ($Session) {
     }
     break
     }   # end of the relaunch loop
-    $job.WaitForExit(60000) | Out-Null
-    CloseStreams
-    Log "plan: $planResult; test exit: $($job.ExitCode); sandbox $verdict; took $([math]::Round(((Get-Date) - $t0).TotalSeconds)) s"
+    if ($job) {
+        $job.WaitForExit(60000) | Out-Null
+        CloseStreams
+        Log "plan: $planResult; test exit: $($job.ExitCode); sandbox $verdict; took $([math]::Round(((Get-Date) - $t0).TotalSeconds)) s"
+    } else { Log "plan: $planResult; nothing launched" }
     $gl = GameLog
     if ($gl -and (Test-Path $gl)) { New-Item -ItemType Directory -Force $raw | Out-Null; Copy-Item $gl (Join-Path $raw 'loader.log') -Force }
 

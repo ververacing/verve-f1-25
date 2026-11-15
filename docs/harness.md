@@ -39,6 +39,11 @@ emote`, a UI toggle only ("Use launcher saves", ticked by default). The
   `tools/storage_sidestep.ps1` moves the empty targets to `Documentserve-f1-25-recovery\<stamp>\` before every launch,
   and refuses if any holds a file. `tools/post_run_check.ps1` checks the game folder after every run and in PAUSE.
   **Never run `swofty apply` as a probe.**
+- **Defender exclusion: declined.** Tyler decided on 2026-11-14 not to add a Windows Defender exclusion for
+  `%LOCALAPPDATA%\Swofty`. Don't raise it again. The sidestep is the fix.
+- **Addon helper programs:** teamsimplified.mods declares `launcher.program` = `bin/simplified-helper.exe` with `build`
+  and `startup` set; it runs during the build. Each run logs `process_trace_*.txt` (read-only) to see whether it's alive
+  during the storage swap.
 - **The hash guard** (`tools/guard_snapshot.ps1`) now also covers the launcher saves and the addon data of every profile
   that isn't ours (not `verve-*`, not `test-*`), so `tyler`'s.
 - **Community addons installed** (Tyler, 2026-11-14): dromodf.skip-cutscenes 1.9.4, twilight.offline-quiet 1.0.1,

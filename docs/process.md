@@ -47,6 +47,7 @@ override window also gets a `window_override.txt` in its folder.
 | Date | Window | Wrap-up | From | Tyler's words |
 |---|---|---|---|---|
 | 2026-11-14 | about 17:27 to 20:30 PT | 20:15 | Tyler, relayed by the supervisor about 17:27 PT | "Also you are good to start running tests from now till 8:30pm, exception for tonight" |
+| 2026-11-14 | about 18:12 PT to 06:00 PT (15 Nov), continuous | 05:45 | Tyler, relayed by the supervisor about 18:12 PT | "You can start things now, no need to wait till midnight. Just plan to go through the night. I'll likely pause you around 8:30 but we can work around that and I'll give you a heads up" |
 
 The supervisor's scheduled tasks post into the local session: "Verve testing window opens" (09:03 PT), "Verve night testing window opens" (00:00 PT), "Verve testing window wrap-up" (05:45 and 16:45 PT) and "Verve hourly heartbeat (window-aware)" (:37 every hour).
 
