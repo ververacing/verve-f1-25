@@ -117,6 +117,9 @@ function PostCheck {
 $result = 'not run'
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
+    # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
+    Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'process_trace.ps1'),
+        '-Log', (Join-Path (Resolve-Path $Out).Path "process_trace_$(Get-Date -Format 'HHmmss').txt"), '-Seconds', '45') -WindowStyle Hidden | Out-Null
     $psi = New-Object Diagnostics.ProcessStartInfo $Swofty, "--profile $ExpProfile test shell --fixture $Fixture --wait 0 $addonArgs"
     $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true
     $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true

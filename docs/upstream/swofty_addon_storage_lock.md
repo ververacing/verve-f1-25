@@ -41,6 +41,14 @@
 > remove. `swofty restore` then succeeded first time: "the game folder matches the baseline", no drift, journal closed,
 > and Swofty re-created the empty folders itself.
 >
+> **Likely fix (one line).** Commit d181576 (#959, in 1.8.33, "finish the game folder restore when an empty addon
+> folder stays locked") added `clear_tree()`. It leaves an empty folder that stays locked "as a helper program or a
+> scanner holds it" in place and logs it instead of failing, and it pauses addon helper programs during restore. But
+> `finish()` in `addon_storage.rs` still calls `remove_tree(aside)`, not `clear_tree(aside)` (checked past 1.9.50). So the
+> save_as/finish path never got that tolerance. Suggested fix: `clear_tree` for the aside in `finish()`. Also consider
+> pausing helpers there, as restore does: teamsimplified.mods runs `bin/simplified-helper.exe` (`launcher.program`,
+> with build and startup set).
+>
 > **Suggestions.**
 > - Don't let a failed cleanup of the aside abort `rollback()`: putting the game files back matters more than tidying
 >   storage. Log the leftover `.saved-old` and remove it on the next start.
