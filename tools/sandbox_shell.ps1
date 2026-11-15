@@ -69,13 +69,13 @@ $chk = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScrip
 $chk | Set-Content (Join-Path $Out 'addon_storage_check.txt') -Encoding utf8
 if ($LASTEXITCODE -ne 0) { $chk; throw 'addon storage check refused the run (see addon_storage_check.txt)' }
 $settingsHash = (Get-FileHash $profileFile -Algorithm SHA256).Hash
-Set-Content (Join-Path $Out 'settings_hash.txt') -Value "$ExpProfile $settingsHash addons+=$($Addon -join ',')" -Encoding utf8
+Set-Content (Join-Path $Out 'settings_hash.txt') -Value "$ExpProfile $settingsHash addons+=$($Addon -join ',') active=$activeProfile" -Encoding utf8
 $hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'
 Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Pattern '<udp ' -ErrorAction SilentlyContinue | Select-Object -First 1).Line.Trim()) -Encoding utf8   # Tyler's choice (60 Hz since 2026-11-14); recorded, never changed
 $steps = Get-Content $Plan | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') } | ForEach-Object { $_.Trim() }
 if ($steps[0] -notmatch '^wait screen=splash') { throw 'the plan must start with `wait screen=splash <s>` (skipped-intro check)' }
 $before = Snapshot
-Log "saves before: $($before.Count) entries; profile $ExpProfile ($settingsHash) +addons $($Addon -join ',')"
+Log "saves before: $($before.Count) entries; profile $ExpProfile ($settingsHash) +addons $($Addon -join ','); active profile $activeProfile"
 
 if ($Channels) { $env:SWOFTY_GAME_LOG_CHANNELS = $Channels }
 $addonArgs = ($Addon | ForEach-Object { "--addon $_" }) -join ' '

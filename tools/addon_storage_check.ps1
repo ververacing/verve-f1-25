@@ -12,6 +12,8 @@ param(
     [string[]] $Addon = @()
 )
 $ErrorActionPreference = 'Stop'
+# under `powershell -File`, -Addon a,b arrives as ONE string "a,b": split it (supervisor review, PR #75)
+$Addon = @($Addon | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 $data = Join-Path $env:LOCALAPPDATA 'Swofty'
 $active = (Get-Content (Join-Path $data 'config.json') -Raw | ConvertFrom-Json).active_profile
 $prof = Get-Content (Join-Path $data "profiles\$ExpProfile.json") -Raw | ConvertFrom-Json
