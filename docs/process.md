@@ -9,7 +9,8 @@ From Tyler or the supervisor. Do these in order:
 1. Abort the current run. Losing it is fine.
 2. Quit F1 25 and every swofty, test and UDP process.
 3. If no such process remains, clear a stale `%LOCALAPPDATA%\swofty-game.lock.d`.
-4. Run `swofty restore`. `swofty doctor` must then show no drift.
+4. Run `tools/post_run_check.ps1` (no drift, 0 open journals, no version.dll; if not clean it does one storage sidestep
+   and one `swofty restore`). Exit 2 = URGENT: tell the supervisor and Tyler at once, Tyler must not launch the game.
 5. Check Tyler's `remote\` and Steam's records against the last-known-good snapshot. **Report** any difference and don't touch it.
 6. Report the Steam Cloud state. If it's off and the check passed, tell Tyler it's safe to turn on.
 7. Delete leftover `test-*` profiles where they're unlocked. Tyler's own profiles, addons, saves and settings stay untouched.
