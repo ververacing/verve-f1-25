@@ -6,6 +6,10 @@ hardware_settings_config.xml as values (supervisor, 2026-11-16: treated like a s
 The game rewrites the file with a different layout on launch and quit (118 differing lines, identical values), so
 only values count, never lines or timestamps.
 #>
+# Known benign flips (supervisor, 2026-11-16): ONE named equivalence. The game writes motion/udp@sendRate as "60hz" in
+# one layout and "60" in the other (seen around the #134 pilot), so "<N>hz" counts as "<N>" for that key only. Any
+# other value change still shows as a change (guard exit 5, reported to the supervisor).
+$HwBenignFlips = @{ 'hw hardware_settings_config/motion/udp@sendRate' = '^(\d+)hz$' }
 $HwFile = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hardware_settings_config.xml'
 $HwReference = Join-Path $env:LOCALAPPDATA 'verve-f1-25\settings-snapshots\hardware_settings_config.ref-20261116.xml'
 
@@ -21,7 +25,11 @@ function Get-HwValues([string] $file) {
         $p = $path -join '/'
         $seen[$p] = 1 + [int]$seen[$p]
         if ($seen[$p] -gt 1) { $p = "$p[$($seen[$p])]" }   # repeated siblings keep their order
-        foreach ($at in $el.Attributes) { $h["hw $p@$($at.LocalName)"] = $at.Value }
+        foreach ($at in $el.Attributes) {
+            $k = "hw $p@$($at.LocalName)"; $v = $at.Value
+            if ($HwBenignFlips.ContainsKey($k) -and $v -match $HwBenignFlips[$k]) { $v = $Matches[1] }
+            $h[$k] = $v
+        }
     }
     $h
 }
