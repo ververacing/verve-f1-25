@@ -1,0 +1,3 @@
+weather: WET
+  0 clear: 4 session packets
+  3 light rain: 806 session packets

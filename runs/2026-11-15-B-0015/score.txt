@@ -1,0 +1,38 @@
+race_1 (order a): VALID
+race_2 (order b): VALID
+race_3 (order a): VALID
+race_4 (order b): VALID
+race_5 (order a): VALID
+race_6 (order b): VALID
+race_7 (order a): VALID
+race_8 (order b): VALID
+race_9 (order a): VALID
+race_10 (order b): VALID
+race_11 (order a): VALID
+race_12 (order b): VALID
+race_13 (order a): VALID
+race_14 (order b): VALID
+race_15 (order a): VALID
+race_16 (order b): VALID
+race_17 (order a): VALID
+race_18 (order b): VALID
+race_19 (order a): VALID
+race_20 (order b): VALID
+
+20 valid of 20 races
+Arm check: 4 keys at 45 in order a and 5 in order b; 4 the reverse (expect 4 and 4)
+
+Primary train_s_behind_net per driver-race: coefficient (45 - 5) -18.7 s, bootstrap SE 17.0, 2-SE [-52.8, +15.3] (null band +-40 s); within-driver mean -21.2 s
+Cost check, costly contacts (45 - 5): +0.013 (SE 0.027)
+Secondary held_suffered_net_2plus: within-driver 45 - 5 -0.050, 2-SE [-0.252, +0.152]
+Secondary train_s_behind: within-driver 45 - 5 -15.502, 2-SE [-45.704, +14.699]
+Secondary costly_contacts: within-driver 45 - 5 +0.013, 2-SE [-0.042, +0.067]
+Secondary held_passes_net_2plus: within-driver 45 - 5 -0.125, 2-SE [-0.339, +0.089]
+Secondary net: within-driver 45 - 5 -0.025, 2-SE [-0.522, +0.472]
+Secondary lap1_pos_change: within-driver 45 - 5 +0.050, 2-SE [-0.171, +0.271]
+Secondary collisions: within-driver 45 - 5 -0.112, 2-SE [-0.422, +0.197]
+Secondary penalties: within-driver 45 - 5 +0.000, 2-SE [-0.033, +0.033]
+Secondary dnf: within-driver 45 - 5 +0.000, 2-SE [+0.000, +0.000]
+Sensitivity (5 s / 20 s hold windows, not scored): run race_feel with HOLD_S changed; not computed here
+
+RESULT: INCONCLUSIVE

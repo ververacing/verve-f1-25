@@ -1,0 +1,17 @@
+saves before: 34 entries; profile verve-test (02E75EB41BBED565A4F4A0AAD37B5709F2BC61BBFE7CB59FF9EE50BE327A9B6B) +addons verve.b0015b; active profile tyler
+udp capture pid 20048
+attempt 1 started 21:54:44
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261116-055444-1 ({"schema":1,"run":"shell-20261116-055444-1","state":"armed","pid":19240,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261116-055444-1\\saves\\remote","why":""})
+21:56:34 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81937}
+21:56:34 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":19240,"run":"shell-20261116-055444-1","ticks":4469,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+game pid 19240 (test agent)
+intro played (splash after 82 s)
+21:56:55 > pad ls 15000  =>  {"seq":3,"status":"ok","ms":20453}
+21:56:55 > pad ls  =>  {"seq":4,"status":"ok","ms":265}
+> pad ls 2000  =>  GAME EXITED
+stdin closed (EOF) at 21:57:01
+run folder: shell-20261116-055444-1
+result: game exited
+udp recording: 275 bytes
+udp parse skipped: paused
+saves unchanged (34 entries)

@@ -1,0 +1,4 @@
+﻿storage sidestep 20261115-224942: active profile tyler; addons swofty.core, teamsimplified.mods, dromodf.skip-cutscenes, twilight.offline-quiet, verve.b0015a
+moved empty teamsimplified.mods\tyler -> verve-f1-25-recovery\20261115-224942\teamsimplified.mods\tyler
+moved empty dromodf.skip-cutscenes\tyler -> verve-f1-25-recovery\20261115-224942\dromodf.skip-cutscenes\tyler
+moved empty twilight.offline-quiet\tyler -> verve-f1-25-recovery\20261115-224942\twilight.offline-quiet\tyler
