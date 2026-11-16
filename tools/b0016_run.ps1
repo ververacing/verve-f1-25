@@ -19,7 +19,10 @@ param(
     [int] $RaceMinutes = 17,
     [string] $WindowOverride = '',   # 'HH:mm' PT, end of a one-off window granted by Tyler (docs/process.md)
     [string] $ExpProfile = 'verve-test',
-    [switch] $SidestepDryRun
+    [switch] $SidestepDryRun,
+    [string] $Plan = 'harness\sessions\gp_menu_full_skip.plan',   # #118: the dry-locked plan for B-0016b / B-0018
+    [switch] $StockOnly,       # B-0018 (#120): every race is stock (arm A), no addon
+    [switch] $LockedWeather    # #118: weather.txt from weather_check --locked (the checkers then require LOCKED)
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -49,9 +52,10 @@ if (Get-Process swofty-launcher -ErrorAction SilentlyContinue) { "race ${Race}: 
 $cleanup = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1')
 if ($LASTEXITCODE -ne 0) { "race ${Race}: test profiles are left over; not launching"; $cleanup | ForEach-Object { "  $_" }; exit 10 }
 
-$armB = ($Race % 2) -eq 0
+$armB = (($Race % 2) -eq 0) -and -not $StockOnly
 $arm = if ($armB) { 'B (swofty.lap1-ai)' } else { 'A (stock)' }
-$plan = 'harness\sessions\gp_menu_full_skip.plan'
+if (-not (Test-Path $Plan)) { "race ${Race}: no plan $Plan; not launching"; exit 13 }
+$plan = $Plan
 $out = Join-Path $Batch "race_$Race"
 if (Test-Path $out) {
     $aside = Join-Path $Batch 'invalid'
@@ -106,6 +110,10 @@ elseif ($bin -and (Test-Path $bin)) {
     $ErrorActionPreference = 'Continue'
     & python -I (Join-Path $PSScriptRoot 'race_feel.py') (Join-Path $out 'raw\udp.bin') --out (Join-Path $out 'race_feel') *> (Join-Path $out 'race_feel_stdout.txt')
     "race_feel exit: $LASTEXITCODE"
+    # weather (#100 rule; --locked for the dry-locked plan, #118)
+    $wa = @('-I', (Join-Path $PSScriptRoot 'weather_check.py'), (Join-Path $out 'raw\udp.bin'), '--out', $out)
+    if ($LockedWeather) { $wa += '--locked' }
+    & python @wa | Select-Object -First 1
     $ErrorActionPreference = 'Stop'
 } else { 'race_feel: no UDP capture found for this race' }
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }

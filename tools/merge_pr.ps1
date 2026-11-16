@@ -72,10 +72,17 @@ try {
         }
     }
     if (Test-Path 'tools/test_pause.ps1') {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 *> $null
-        if ($LASTEXITCODE -ne 0) { $fails += 'test_pause' } else { '  ok test_pause' }
+        # like test_ours: the live cases (PING dummies, a real pause run) only inside a window and not while paused
+        if ($inWin -and -not $paused) {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 *> $null
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_pause' } else { '  ok test_pause (pure + live)' }
+        } else {
+            & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 -PureOnly *> $null
+            $why = if ($paused) { 'paused' } else { 'outside a testing window' }
+            if ($LASTEXITCODE -ne 0) { $fails += 'test_pause (pure)' } else { "  ok test_pause (pure only: $why; live part not run)" }
+        }
     }
-    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'), @('weather_check --selftest', 'tools/weather_check.py'))) {
+    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'), @('weather_check --selftest', 'tools/weather_check.py'), @('b0018_check --selftest', 'tools/b0018_check.py'))) {
         if (Test-Path $t[1]) {
             & $Python -I $t[1] --selftest *> $null
             if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }

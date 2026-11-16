@@ -4,6 +4,7 @@ Usage:
     python -I tools/b0016_check.py --validity runs/<batch>/race_<n>   # one race's validity, no scoring
     python -I tools/b0016_check.py runs/<batch>                       # score, after the last race only (#101)
     python -I tools/b0016_check.py --selftest
+    --require-locked (B-0016b, #119): a race is also INVALID ("weather") unless its weather.txt says LOCKED (#118)
 
 Reads each race's udp/sessions.csv and events.csv, raw/loader.log, addons.json and race_feel/race_feel_summary.json
 (written by tools/b0016_run.ps1 from tools/race_feel.py). The rules are #101's v3, fixed before any data:
@@ -47,6 +48,9 @@ def arm_of(run: Path) -> str:
     return "A" if int(run.name.split("_")[1]) % 2 == 1 else "B"
 
 
+REQUIRE_LOCKED = False
+
+
 def load_race(run: Path) -> tuple[dict, list[str]]:
     """The race's summary values, and why it's invalid (empty if valid)."""
     arm = arm_of(run)
@@ -86,6 +90,12 @@ def load_race(run: Path) -> tuple[dict, list[str]]:
         invalid.append(f"player is car {player}, not {PLAYER_CAR}")
     if not any(e["code"] == "CHQF" for e in events):
         invalid.append("no chequered flag")
+    if REQUIRE_LOCKED:
+        wx = run / "weather.txt"
+        if not wx.exists():
+            invalid.append("weather: no weather.txt")
+        elif not wx.read_text(encoding="utf-8").startswith("weather: LOCKED"):
+            invalid.append("weather: " + wx.read_text(encoding="utf-8").splitlines()[0].split(":", 1)[1].strip())
     if (run / "pause_cut.txt").exists():
         invalid.append("PAUSE cut")
     vals = {k: summary.get(k) for k in (PRIMARY, GUARD, *CO_PRIMARIES, *SECONDARY)}
@@ -151,8 +161,10 @@ def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
         return selftest()
+    global REQUIRE_LOCKED
+    REQUIRE_LOCKED = "--require-locked" in args
     validity = "--validity" in args
-    args = [a for a in args if a != "--validity"]
+    args = [a for a in args if a not in ("--validity", "--require-locked")]
     if len(args) != 1 or args[0].startswith("--"):
         print(__doc__)
         return 3
