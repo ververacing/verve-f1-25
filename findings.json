@@ -643,6 +643,20 @@
       "implications": "The current AI-only route on 1.0.145 while ai_drives_player is unavailable (F-45): B-0018 (#120) runs on it, with LapData as the finish source, a UDP-driven quit, per-car race-feel windows ending at each car's finish, and validity from tools/aionly_check.py.",
       "related_questions": [],
       "status": "verified (one pilot race; B-0018 adds replications)"
+    },
+    {
+      "id": "F-47",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "Every quit of F1 25 on 1.0.145 under the Swofty Launcher ends with a Swofty crash report: the game ends itself with exit code -1 (TerminateProcess 0xffffffff on the exiting thread) while closing, and the mod loader sees no unhandled exception. It happens after valid races too, so it's systemic at quit, not a race failure.",
+      "confidence": "seen on every 1.0.145 session so far (B-0018's 10 valid races, W-0134, Phase 0); the saves and hardware settings compare unchanged after each one (guard_snapshot, preflight).",
+      "evidence": [
+        "the launcher's session end.json: 'F1 25 ended itself with code -1, which its crash handler uses and which it also leaves when it fails while closing; the mod loader saw no unhandled exception'",
+        "the session's game-logs crash-*.txt: 'reason TerminateProcess(4294967295 = 0xffffffff) on thread <the exiting thread>'",
+        "runs/2026-11-16-B-0018 (all 10 races valid, saves unchanged)"
+      ],
+      "implications": "A crash report at quit is not by itself a failed race; validity stays with tools/aionly_check.py and the saves guard. Crash reports stay local: Swofty uploads only when someone clicks Send Logs to Developers on the crash screen or runs `swofty logs send` (Swofty docs, using/send-logs). We never use either.",
+      "related_questions": [],
+      "status": "verified (systemic on 26566308)"
     }
   ]
 }
