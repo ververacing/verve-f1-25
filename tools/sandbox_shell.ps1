@@ -19,6 +19,8 @@ Plan file, one step per line ('#' comments):
                                  This is the guard for wizard `a` presses: they stop the moment the screen leaves.
     @sleep <seconds>             wait without input
     @control <idle seconds>      take more steps live from <Out>/control.txt (appended lines), until `@end` or idle
+    @udpfinish <max> [<after>]   (needs -Udp) wait until every AI car has LapData resultStatus >= 3, at most the
+                                 leader's finish + <after> s (default 150) and <max> s in all (tools/udp_finish_watch.py)
 
 Safety:
 - Tyler's `remote\` files and Steam's per-file remotecache records are snapshotted before and after; any change
@@ -279,6 +281,15 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
                 if ($scr -notmatch $want) { Log "while: screen '$scr' left $want after $i press(es)"; break }
                 Send $cmd | Out-Null; Start-Sleep -Seconds 4
             }
+            return
+        }
+        if ($s -match '^@udpfinish (\d+)(?: (\d+))?$') {
+            # AI-only route (#134 ruling 4): wait until every AI car has LapData resultStatus >= 3, at most the leader's
+            # finish + <after> s (default 150), at most <max> s in all. The player car (parked) is ignored.
+            $max = $Matches[1]; $after = if ($Matches[2]) { $Matches[2] } else { '150' }
+            if (-not $Udp -or -not $udpBin) { Log 'udpfinish: no -Udp capture to watch; stopping the plan'; $script:stop = 'udpfinish without -Udp'; return }
+            $watch = & $Python -I (Join-Path $PSScriptRoot 'udp_finish_watch.py') --bin $udpBin --max-s $max --after-leader-s $after 2>&1
+            Log "udpfinish: $($watch -join ' ') "
             return
         }
         Send $s | Out-Null
