@@ -1,0 +1,9 @@
+﻿process trace 12:15:52 for 45 s (full trace in %TEMP%\verve-trace, not committed); 80 other process start(s) not named
+  DefenderSessionHelper (pid 1908): first seen before start, last seen 12:16:37.132
+  F1_25 (pid 23300): first seen 12:16:04.417, last seen 12:16:37.133
+  MsMpEng (pid 5220): first seen before start, last seen 12:16:37.133
+  simplified-helper (pid 27072): first seen 12:15:55.011, last seen 12:16:37.132
+  steam (pid 15036): first seen before start, last seen 12:16:37.132
+  steamservice (pid 15188): first seen before start, last seen 12:16:37.132
+  steamwebhelper (pid 15112): first seen before start, last seen 12:16:37.133
+  swofty (pid 26076): first seen before start, last seen 12:16:37.133

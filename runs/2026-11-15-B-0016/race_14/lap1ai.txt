@@ -1,0 +1,85 @@
+﻿addons.json: { "swofty.lap1-ai": "1.0.0" }
+installed swofty.lap1-ai version: 1.0.0
+loader.log lap1-ai lines: 82
+[offline] module: lap1_ai.dll @ 0x7ffcce6d0000
+2026-11-15 14:01:04.372 [31640] addon lap1_ai.dll: calling SwoftyAddonRegister (API v9) at the early stage
+2026-11-15 14:01:04.372 [31640] addon lap1_ai.dll: SwoftyAddonRegister returned 1 (0 ms)
+2026-11-15 14:01:04.372 [31640] addon lap1_ai.dll: loads at the window stage
+2026-11-15 14:01:05.590 [11152] [perf] VirtualQuery accounting on in game exe (1), version.dll (1), swofty_gamelog.dll (1), simplified.dll (1), lap1_ai.dll (1); import slot(s) in brackets
+2026-11-15 14:01:14.512 [31640] addon lap1_ai.dll: loading C:\Program Files (x86)\Steam\steamapps\common\F1 25\swofty\addons\swofty.lap1-ai\native\lap1_ai.dll
+2026-11-15 14:01:14.513 [31640] addon lap1_ai.dll: loaded at 00007ffcce6d0000, calling SwoftyAddonInit (API v9)
+2026-11-15 14:01:14.513 [31640] [core] addon lap1_ai.dll: registered 1 mixin(s)
+2026-11-15 14:01:14.513 [31640] addon lap1_ai.dll: SwoftyAddonInit returned 1 (ok)
+2026-11-15 14:01:14.518 [31640] [events] attach after on race.start by swofty.lap1-ai -> ok token 2147483656
+2026-11-15 14:01:14.518 [31640] [events] attach after on session.lap by swofty.lap1-ai -> ok token 2147483657
+2026-11-15 14:01:14.518 [31640] [events] attach after on session.end by swofty.lap1-ai -> ok token 2147483658
+2026-11-15 14:01:14.518 [31640] [events] attach after on session.unload by swofty.lap1-ai -> ok token 2147483659
+2026-11-15 14:01:14.518 [31640] [events] on_frame by swofty.lap1-ai -> ok token 9
+2026-11-15 14:01:14.518 [31640] [lap1-ai] race.start ok, session.lap ok, session.end ok, session.unload ok, frame ok
+2026-11-15 14:07:53.659 [31004] [lap1-ai] lights out (race, 0 laps): lap 1 rules on
+2026-11-15 14:07:54.053 [29444] [lap1-ai] 20 AI car(s) on lap 1 rules (30 of 30 levers) until they finish lap 1
+2026-11-15 14:07:54.053 [29444] [perf] slow call: swofty.lap1-ai on_frame took 144.9 ms on thread 29444 during "flow #8fa66360 Exiting; flow #a5f900d7 Entering; flow #a5f900d7 Exiting; flow #f00bd57e Entering"
+2026-11-15 14:07:54.058 [31640] [perf] hitch: 150 ms frame during "flow #8fa66360 Exiting; flow #a5f900d7 Entering; flow #a5f900d7 Exiting; flow #f00bd57e Entering"; swofty 144.94 ms in it (core flow tick (events, career poll) 144.92 ms, swofty.lap1-ai on_frame 144.87 ms, swofty.core on_frame car_live 0.01 ms)
+2026-11-15 14:07:55.414 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.grip_scale 1.100000, ai.blocking.max_blocking_distance 45.000000, ai.blocking.max_blocking_distance_at_race_start 45.000000, ai.blocking.fraction_of_follow_speed 0.700000, ai.blocking.fraction_of_follow_speed_at_race_start 0.600000
+2026-11-15 14:07:55.414 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.overtake.attacker_close_enough_car_lengths 6.000000, ai.overtake.braking_zone_abort_overtake_time 0.100000, ai.overtake.close_range_car_lengths_to_start_overtake 4.000000, ai.overtake.close_range_car_lengths_to_continue_overtake 4.500000, ai.overtake.oppertunist_overtake_time 1.500000
+2026-11-15 14:07:55.414 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.overtake.regular_overtake_initiate_time_adjustment 2.750000, ai.overtake.regular_overtake_continue_time_adjustment 3.250000, ai.overtake.danger_overtake_initiate_time_adjustment 2.500000, ai.overtake.danger_overtake_continue_time_adjustment 2.750000, ai.overtake.regular_overtake_pull_out_time 2.000000
+2026-11-15 14:07:55.414 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.overtake.danger_overtake_pull_out_time 1.500000, ai.overtake.overlap_percentage 0.050000, ai.space_seeking.concede_overtake_blocked_by_crowed_time 60.000000, ai.offset_variation.offset_limit_at_corner_start 1.000000, ai.space_seeking.total_queue_needed 1.000000
+2026-11-15 14:07:55.415 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.space_seeking.car_in_front_needed 1.000000, ai.space_seeking.time_to_switch_sides 0.300000, ai.space_seeking.track_distance_needed 60.000000, ai.space_seeking.speed_below_follow 8.000000, ai.space_seeking.first_speed_below_follow 5.000000
+2026-11-15 14:07:55.415 [29444] [lap1-ai] car 0 on lap 1: the AI reads ai.space_seeking.distance_braking_point 150.000000, ai.space_seeking.can_start_track_radius 800.000000, ai.space_seeking.track_abort_distance 100.000000, ai.alongside.yield_overtake_rate 0.500000, ai.alongside.speed_difference_for_limited_zone_yielding 1.500000
+2026-11-15 14:07:55.681 [23492] [lap1-ai] 1 AI car(s) on lap 1 rules (30 of 30 levers) until they finish lap 1
+2026-11-15 14:07:55.681 [23492] [perf] slow call: swofty.lap1-ai on_frame took 15.4 ms on thread 23492 during "flow #8fa66360 Exiting; flow #a5f900d7 Entering; flow #a5f900d7 Exiting; flow #f00bd57e Entering"
+2026-11-15 14:08:02.435 [23492] [lap1-ai] car 11 crossed the line 8.775 s after lights out: the start line, lap 1 goes on
+2026-11-15 14:08:03.037 [29444] [lap1-ai] car 2 crossed the line 9.377 s after lights out: the start line, lap 1 goes on
+2026-11-15 14:08:03.639 [23492] [lap1-ai] car 18 crossed the line 9.979 s after lights out: the start line, lap 1 goes on
+2026-11-15 14:08:05.939 [11152] [perf] last 60 s: 3521 frame(s) (60 fps, p99 30.1 ms, 3 over 50 ms); swofty 5.443 ms/s on game threads (core flow tick (events, career poll) 4.034 ms/s 58.7 calls/s, swofty.lap1-ai on_frame 2.727 ms/s 58.7 calls/s, core overlay present 0.353 ms/s 58.6 calls/s); worst call 144.90 ms (core flow tick (events, career poll))
+2026-11-15 14:09:11.731 [31004] [lap1-ai] car 9 finished lap 1 in P1, 78.062 s after lights out
+2026-11-15 14:09:11.781 [31116] [lap1-ai] car 9 back to the game's AI (lap 1 done)
+2026-11-15 14:09:11.797 [31116] [perf] slow call: swofty.lap1-ai on_frame took 16.2 ms on thread 31116 during "flow #f00bd57e Exiting; flow #4852eb9a Entering; flow #4852eb9a Exiting; flow #cf16b86f Exiting; flow #b540350e Entering; flow #b540350e Exiting; flow #03d0c539 Entering; flow #03d0c539 Entering; flow #ba16bc16 Entering"
+2026-11-15 14:09:12.486 [31216] [lap1-ai] car 0 finished lap 1 in P2, 78.816 s after lights out
+2026-11-15 14:09:12.552 [23492] [lap1-ai] car 0 back to the game's AI (lap 1 done)
+2026-11-15 14:09:12.568 [23492] [perf] slow call: swofty.lap1-ai on_frame took 15.4 ms on thread 23492 during "flow #f00bd57e Exiting; flow #4852eb9a Entering; flow #4852eb9a Exiting; flow #cf16b86f Exiting; flow #b540350e Entering; flow #b540350e Exiting; flow #03d0c539 Entering; flow #03d0c539 Entering; flow #ba16bc16 Entering"
+2026-11-15 14:09:12.806 [29444] [lap1-ai] car 6 finished lap 1 in P3, 79.137 s after lights out
+2026-11-15 14:09:13.056 [31004] [lap1-ai] car 6 back to the game's AI (lap 1 done)
+2026-11-15 14:09:13.071 [31004] [perf] slow call: swofty.lap1-ai on_frame took 14.4 ms on thread 31004 during "flow #f00bd57e Exiting; flow #4852eb9a Entering; flow #4852eb9a Exiting; flow #cf16b86f Exiting; flow #b540350e Entering; flow #b540350e Exiting; flow #03d0c539 Entering; flow #03d0c539 Entering; flow #ba16bc16 Entering" (further ones are logged every 100th)
+2026-11-15 14:09:13.126 [26180] [lap1-ai] car 7 finished lap 1 in P4, 79.456 s after lights out
+2026-11-15 14:09:13.309 [27940] [lap1-ai] car 7 back to the game's AI (lap 1 done)
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.grip_scale 1.000000, ai.blocking.max_blocking_distance 18.000000, ai.blocking.max_blocking_distance_at_race_start 18.000000, ai.blocking.fraction_of_follow_speed 0.975000, ai.blocking.fraction_of_follow_speed_at_race_start 0.875000
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.overtake.attacker_close_enough_car_lengths 3.000000, ai.overtake.braking_zone_abort_overtake_time 0.666700, ai.overtake.close_range_car_lengths_to_start_overtake 1.500000, ai.overtake.close_range_car_lengths_to_continue_overtake 2.000000, ai.overtake.oppertunist_overtake_time 0.250000
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.overtake.regular_overtake_initiate_time_adjustment 0.750000, ai.overtake.regular_overtake_continue_time_adjustment 1.250000, ai.overtake.danger_overtake_initiate_time_adjustment 0.500000, ai.overtake.danger_overtake_continue_time_adjustment 0.750000, ai.overtake.regular_overtake_pull_out_time 1.552941
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.overtake.danger_overtake_pull_out_time 2.007843, ai.overtake.overlap_percentage 0.568627, ai.space_seeking.concede_overtake_blocked_by_crowed_time 5.000000, ai.offset_variation.offset_limit_at_corner_start 0.200000, ai.space_seeking.total_queue_needed 3.000000
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.space_seeking.car_in_front_needed 2.000000, ai.space_seeking.time_to_switch_sides 2.000000, ai.space_seeking.track_distance_needed 170.000000, ai.space_seeking.speed_below_follow 4.000000, ai.space_seeking.first_speed_below_follow 2.000000
+2026-11-15 14:09:13.322 [27940] [lap1-ai] car 9 after lap 1: the AI reads ai.space_seeking.distance_braking_point 75.000000, ai.space_seeking.can_start_track_radius 400.000000, ai.space_seeking.track_abort_distance 50.000000, ai.alongside.yield_overtake_rate 1.000000, ai.alongside.speed_difference_for_limited_zone_yielding 3.000000
+2026-11-15 14:09:14.562 [27940] [lap1-ai] car 10 finished lap 1 in P5, 80.892 s after lights out
+2026-11-15 14:09:14.595 [31004] [lap1-ai] car 10 back to the game's AI (lap 1 done)
+2026-11-15 14:09:15.364 [29444] [lap1-ai] car 5 finished lap 1 in P6, 81.694 s after lights out
+2026-11-15 14:09:15.515 [27940] [lap1-ai] car 4 finished lap 1 in P7, 81.845 s after lights out
+2026-11-15 14:09:15.598 [31116] [lap1-ai] car 4 back to the game's AI (lap 1 done)
+2026-11-15 14:09:15.611 [31116] [lap1-ai] car 5 back to the game's AI (lap 1 done)
+2026-11-15 14:09:15.760 [31216] [lap1-ai] car 1 finished lap 1 in P8, 82.090 s after lights out
+2026-11-15 14:09:15.861 [23492] [lap1-ai] car 1 back to the game's AI (lap 1 done)
+2026-11-15 14:09:15.995 [27940] [lap1-ai] car 17 finished lap 1 in P9, 82.325 s after lights out
+2026-11-15 14:09:16.111 [31116] [lap1-ai] car 17 back to the game's AI (lap 1 done)
+2026-11-15 14:09:16.797 [29444] [lap1-ai] car 15 finished lap 1 in P10, 83.127 s after lights out
+2026-11-15 14:09:16.863 [27940] [lap1-ai] car 15 back to the game's AI (lap 1 done)
+2026-11-15 14:09:17.098 [23492] [lap1-ai] car 12 finished lap 1 in P11, 83.428 s after lights out
+2026-11-15 14:09:17.114 [31116] [lap1-ai] car 12 back to the game's AI (lap 1 done)
+2026-11-15 14:09:17.466 [31004] [lap1-ai] car 3 finished lap 1 in P12, 83.795 s after lights out
+2026-11-15 14:09:17.615 [31116] [lap1-ai] car 3 back to the game's AI (lap 1 done)
+2026-11-15 14:09:17.666 [31116] [lap1-ai] car 19 finished lap 1 in P13, 83.996 s after lights out
+2026-11-15 14:09:17.866 [31004] [lap1-ai] car 19 back to the game's AI (lap 1 done)
+2026-11-15 14:09:17.917 [31116] [lap1-ai] car 8 finished lap 1 in P14, 84.246 s after lights out
+2026-11-15 14:09:18.117 [31216] [lap1-ai] car 8 back to the game's AI (lap 1 done)
+2026-11-15 14:09:18.151 [29444] [lap1-ai] car 16 finished lap 1 in P15, 84.481 s after lights out
+2026-11-15 14:09:18.368 [27940] [lap1-ai] car 16 back to the game's AI (lap 1 done)
+2026-11-15 14:09:18.536 [23492] [lap1-ai] car 14 finished lap 1 in P16, 84.865 s after lights out
+2026-11-15 14:09:18.619 [27940] [lap1-ai] car 14 back to the game's AI (lap 1 done)
+2026-11-15 14:09:18.854 [22576] [lap1-ai] car 11 finished lap 1 in P17, 85.184 s after lights out
+2026-11-15 14:09:18.870 [27940] [lap1-ai] car 11 back to the game's AI (lap 1 done)
+2026-11-15 14:09:19.339 [31004] [lap1-ai] car 13 finished lap 1 in P18, 85.668 s after lights out
+2026-11-15 14:09:19.371 [26180] [lap1-ai] car 13 back to the game's AI (lap 1 done)
+2026-11-15 14:09:19.739 [27940] [lap1-ai] car 2 finished lap 1 in P19, 86.069 s after lights out
+2026-11-15 14:09:19.872 [23492] [lap1-ai] car 2 back to the game's AI (lap 1 done)
+2026-11-15 14:09:20.023 [26180] [lap1-ai] car 18 finished lap 1 in P20, 86.353 s after lights out
+2026-11-15 14:09:20.123 [31116] [lap1-ai] car 18 back to the game's AI (lap 1 done)
+2026-11-15 14:10:06.052 [11152] [perf] last 60 s: 3593 frame(s) (60 fps, p99 17.1 ms, 0 over 50 ms); swofty 5.621 ms/s on game threads (core flow tick (events, career poll) 4.278 ms/s 59.8 calls/s, swofty.lap1-ai on_frame 3.230 ms/s 59.8 calls/s, core overlay present 0.353 ms/s 59.9 calls/s); worst call 22.37 ms (core flow tick (events, career poll))
+2026-11-15 14:15:14.298 [23492] [lap1-ai] 1 car(s) back to the game's AI (no lap 1 running)

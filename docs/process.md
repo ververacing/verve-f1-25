@@ -140,6 +140,9 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 | 2026-11-15 after 08:34 | HANDS OFF ("Make sure neither of you are touching anything. Swofty just closed the game on its own without me."). No commands until cleared; scheduled tasks into the session disabled by the supervisor. | Tyler, relayed by the supervisor |
 | 2026-11-15 09:07 | RESUME ("resume"). Launcher closed (F1 25 was closed). Read-only diagnosis first; safety fixes (PID ownership) as one PR before any race; the 16:45 wrap-up is ignored today (the extended window runs to 05:45). | Tyler, relayed by the supervisor |
 | 2026-11-15 12:19 | PAUSE ("pause"). B-0016 race 12 quit through the test agent at about 12:20 (invalid, "pause"); the test shell stayed up after the game exited, so its recorded PID was stopped at 12:24 (scoped to that attempt). Checks done, SAFE TO PLAY sent at 12:24:47. Tyler's game started at 12:25:58. This pause led to `tools/pause.ps1`. | Tyler, relayed by the supervisor |
+| 2026-11-15 13:25 | RESUME ("resume"). F1 25 already closed; the launcher (open since 12:25:35) closed under Tyler's standing OK. Pause flag cleared, pre-flight OK. #110's live tests passed and it was merged; B-0016 slot 12 rerun. | Tyler, relayed by the supervisor |
+| 2026-11-15 14:29 | PAUSE ("Pause"), the first through `tools/pause.ps1`: race 15 quit through the test agent, the shell stopped (attempt only) after the 60 s wait, SAFE TO PLAY at 14:30:55 (72 s). Race 15 invalid ("pause"). | Tyler, relayed by the supervisor |
+| 2026-11-15 19:46 | RESUME ("resume"). The agent's session had lost its connection about 14:32; a RESUME and a PAUSE queued in between were superseded by the supervisor's FINAL STATE (RESUME). Pause flag cleared, pre-flight OK; the extended window still stands (confirmed by the supervisor). B-0016 slot 15 rerun. | Tyler, relayed by the supervisor |
 
 ## Housekeeping log
 

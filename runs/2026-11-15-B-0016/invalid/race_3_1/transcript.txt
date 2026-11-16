@@ -1,0 +1,23 @@
+saves before: 32 entries; profile verve-test (652BB5A0C51E2E620438EB15C4ECFD9E3124C7345391A40B156D7966CE987793) +addons ; active profile tyler
+udp capture pid 9140
+attempt 1 started 09:24:50
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-172450-1 ({"schema":1,"run":"shell-20261115-172450-1","state":"armed","pid":12116,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-172450-1\\saves\\remote","why":""})
+09:25:36 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":17578}
+09:25:36 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":12116,"run":"shell-20261115-172450-1","ticks":630,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+game pid 12116 (test agent)
+intro skipped (splash after 18 s); relaunching
+attempt 2 started 09:25:47
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-172547-1 ({"schema":1,"run":"shell-20261115-172547-1","state":"armed","pid":27820,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-172547-1\\saves\\remote","why":""})
+09:26:32 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":16578}
+09:26:32 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":27820,"run":"shell-20261115-172547-1","ticks":622,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+game pid 27820 (test agent)
+intro skipped (splash after 17 s); relaunching
+attempt 3 started 09:26:43
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-172643-1 ({"schema":1,"run":"shell-20261115-172643-1","state":"armed","pid":27732,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-172643-1\\saves\\remote","why":""})
+09:27:28 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":16359}
+09:27:28 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":27732,"run":"shell-20261115-172643-1","ticks":640,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+game pid 27732 (test agent)
+intro skipped (splash after 16 s); relaunching
+result: intro skipped
+udp recording: 0 bytes
+saves unchanged (32 entries)

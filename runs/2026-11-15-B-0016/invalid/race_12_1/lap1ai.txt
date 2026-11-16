@@ -1,0 +1,18 @@
+﻿addons.json: { "swofty.lap1-ai": "1.0.0" }
+installed swofty.lap1-ai version: 1.0.0
+loader.log lap1-ai lines: 15
+[offline] module: lap1_ai.dll @ 0x7ffcc9540000
+2026-11-15 12:16:05.923 [ 8548] addon lap1_ai.dll: calling SwoftyAddonRegister (API v9) at the early stage
+2026-11-15 12:16:05.923 [ 8548] addon lap1_ai.dll: SwoftyAddonRegister returned 1 (0 ms)
+2026-11-15 12:16:05.924 [ 8548] addon lap1_ai.dll: loads at the window stage
+2026-11-15 12:16:07.163 [25056] [perf] VirtualQuery accounting on in game exe (1), version.dll (1), swofty_gamelog.dll (1), simplified.dll (1), lap1_ai.dll (1); import slot(s) in brackets
+2026-11-15 12:16:16.029 [ 8548] addon lap1_ai.dll: loading C:\Program Files (x86)\Steam\steamapps\common\F1 25\swofty\addons\swofty.lap1-ai\native\lap1_ai.dll
+2026-11-15 12:16:16.029 [ 8548] addon lap1_ai.dll: loaded at 00007ffcc9540000, calling SwoftyAddonInit (API v9)
+2026-11-15 12:16:16.029 [ 8548] [core] addon lap1_ai.dll: registered 1 mixin(s)
+2026-11-15 12:16:16.029 [ 8548] addon lap1_ai.dll: SwoftyAddonInit returned 1 (ok)
+2026-11-15 12:16:16.037 [ 8548] [events] attach after on race.start by swofty.lap1-ai -> ok token 2147483656
+2026-11-15 12:16:16.037 [ 8548] [events] attach after on session.lap by swofty.lap1-ai -> ok token 2147483657
+2026-11-15 12:16:16.037 [ 8548] [events] attach after on session.end by swofty.lap1-ai -> ok token 2147483658
+2026-11-15 12:16:16.037 [ 8548] [events] attach after on session.unload by swofty.lap1-ai -> ok token 2147483659
+2026-11-15 12:16:16.037 [ 8548] [events] on_frame by swofty.lap1-ai -> ok token 9
+2026-11-15 12:16:16.037 [ 8548] [lap1-ai] race.start ok, session.lap ok, session.end ok, session.unload ok, frame ok

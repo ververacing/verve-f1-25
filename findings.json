@@ -584,6 +584,18 @@
       "implications": "The aggression characteristic is not Verve's lever for passing. No extension of B-0014 (more races on a pre-registered null would be optional stopping). Next: per-driver tick-read racecraft keys (B-0015: blocking.max_blocking_distance, overtake.overlap_percentage) and the community screens (B-0016: stock vs swofty.lap1-ai), measured with race_feel primaries.",
       "related_questions": [],
       "status": "inconclusive (pre-registered); practical null: effect at most about 15% of baseline"
+    },
+    {
+      "id": "F-43",
+      "claim": "swofty.lap1-ai (Lap 1 Realistic AI 1.0.0) showed no detectable change in lap-1 held changes. The registered result was confounded by random weather (3 wet races, all in arm A). On dry races the estimate is about 0 (SE about 2). B-0016 (#101), 20 races (10 stock, 10 lap1-ai), Austria, 5 laps, difficulty 100. Registered P3 (lap-1 held changes, net, per race) B - A +1.30, bootstrap SE 1.73, 2-SE [-2.16, +4.76]: INCONCLUSIVE (includes 0; reaches past the +-4 band). Guard: lap-1 costly contacts +0.30 (SE 0.25), no cost. Co-primaries: lap-1 loss median -0.82 s (2-SE [-1.80, +0.15]), lap-1 spread -0.36 s (2-SE [-1.80, +1.09]). Grand Prix weather was random: races 7 and 9 (A) storm, race 11 (A) light rain, all B races dry. Dry-only sensitivity, NOT SCORED (A 7, B 10): P3 +0.06 (SE 1.97), P1 -0.39 s (SE 0.47).",
+      "confidence": "pre-registered on #101 (v3 rules fixed before any data; N = 20 set on time only, before any metric was seen). Verdict INCONCLUSIVE by the registered criterion. 20/20 races valid; lap1-ai lines present in every B race and absent in every A race. The weather finding came after scoring and is reported only as a sensitivity.",
+      "evidence": [
+        "runs/2026-11-15-B-0016/score.txt, README.md and race_1..race_20 (#101, #113)",
+        "tools/b0016_check.py, tools/weather_check.py"
+      ],
+      "implications": "No evidence that lap1-ai changes lap-1 overtaking at Austria. Weather must be fixed to dry (or a rainy race invalid) in every field-level screen: B-0015 invalidates rain races (#100); B-0016b (dry fixed, 10+10, same v3 rules) is queued once a fixed-dry setting is proven.",
+      "related_questions": [],
+      "status": "inconclusive (pre-registered); confounded by weather; dry-only estimate about 0"
     }
   ]
 }
