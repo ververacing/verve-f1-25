@@ -113,6 +113,7 @@ MEASURES = {
     "gain_lap1": ("places", True, "grid - position at the end of lap 1"),
     "passes_made": ("/race", False, "race_feel held_passes_net_2plus"),
     "passes_suffered": ("/race", False, "race_feel held_suffered_net_2plus"),
+    "held_behind_s": ("s/race", False, "race_feel train_s_behind: seconds other cars spend within 1.0 s behind this car, laps 2+"),
     "offtracks_spins": ("/race", False, "off-tracks (surfaceType) + spins (slip angle)"),
     "offtracks": ("/race", False, ">= 2 wheels unpaved, episodes"),
     "spins": ("/race", False, "slip angle >= 60 deg at >= 5 m/s, episodes"),
@@ -138,13 +139,16 @@ PRIMARY = {
 NULL_BAND = {
     "reaction_s": (0.02, "from the prereg"),
     "launch_m": (0.5, "PROVISIONAL (not in the prereg)"),
-    "passes_made": (0.25, "from the prereg"),
+    # prereg v3 (supervisor, #155 review): 25% of the stock per-driver-per-race mean at Austria. B-0016 arm A, dry:
+    # 55 net held passes on laps 2+ in 7 races = 7.9 per race = 0.41 per driver per race -> +/-0.10. Re-fixed only if
+    # the discovery's stock rate is under 4 or over 16 per race.
+    "passes_made": (0.10, "prereg v3: 25% of the stock 0.41/driver-race"),
     "offtracks_spins": (0.1, "from the prereg"),
     "entry_kph": (2.0, "from the prereg"),
     "exit_kph": (2.0, "from the prereg"),
     "entry_all_kph": (2.0, "from the prereg"),
     "exit_all_kph": (2.0, "from the prereg"),
-    "passes_suffered": (0.25, "from the prereg"),
+    "passes_suffered": (0.10, "prereg v3: 25% of the stock 0.41/driver-race"),
 }
 COMMON_SECONDARY = ["gain_t1", "gain_lap1", "laptime_sd_s", "contacts"]
 EXTRA_SECONDARY = {
@@ -154,7 +158,7 @@ EXTRA_SECONDARY = {
     "control": ["offtracks", "spins"],
     "speed_in": ["entry_kph"],          # clean-pass: secondary (it leaves few cars in a train-heavy race, Phase 0: 4 of 19)
     "speed_out": ["exit_kph"],
-    "DEFEND": ["passes_made"],          # cross-effect
+    "DEFEND": ["held_behind_s", "passes_made"],   # seconds an attacker is held (supervisor); cross-effect
     "ATTACK": ["passes_suffered"],      # cross-effect
 }
 PARTIAL = "NOT SCORED (partial)"
@@ -478,7 +482,7 @@ def race_measures(s: dict, d: dict, rows_rf: list[dict], ai: list[int]) -> tuple
         r = by_car.get(c, {})
         sp = spin.get(c) if d["n_motion"] else None
         out[c] = {"passes_made": r.get("held_passes_net_2plus"), "passes_suffered": r.get("held_suffered_net_2plus"),
-                  "contacts": r.get("collisions"), "offtracks": off.get(c), "spins": sp,
+                  "held_behind_s": r.get("train_s_behind"), "contacts": r.get("collisions"), "offtracks": off.get(c), "spins": sp,
                   "offtracks_spins": off.get(c) + sp if sp is not None and off.get(c) is not None else None,
                   **{k: v.get(c) for k, v in pace.items()},
                   "laptime_sd_s": statistics.stdev(lt[c]) if len(lt[c]) >= 2 else None,
@@ -719,6 +723,11 @@ def report(res: dict, head: list[str], partial: bool) -> list[str]:
         flag = " [measure constant: floor]" if r["constant"] else ""
         lines.append(f"{f:<15}{r['measure']:<17}{r['predicted']:>5}{fnum(r['estimate']):>10}{fnum(r['se']):>9}"
                      f"{fnum(r['p'], 4):>8}{fnum(r.get('fe_slope')):>10}{fnum(r.get('se_fe')):>9}  {band:<42}{dec}{flag}")
+    fx = res["factors"]
+    if "aggression" in fx and "ATTACK" in fx:   # they share passes_made (supervisor, #155): read them together
+        lines.append("aggression vs ATTACK, both on " + fx["ATTACK"]["measure"] + ": " + "; ".join(
+            f"{f} {fnum(fx[f]['estimate'], 3)} (FE {fnum(fx[f].get('fe_slope'), 3)}, p {fnum(fx[f]['p'], 4)}) "
+            f"{PARTIAL if partial else fx[f]['decision']}" for f in ("aggression", "ATTACK")))
     fl = res.get("floor") or {}
     if fl:
         lines.append(f"control floor rule: {fnum(fl['control_events_total'], 0)} off-track + spin events in the batch "
@@ -846,6 +855,7 @@ def synth_launch_data(seed: int, plant: dict[str, tuple[str, float]], rng_seed: 
     scale = {"reaction_s": (0.47, 0.03, 0.015, 0.04), "launch_m": (19.0, 1.0, 0.4, 1.2),
              "speed_1s_kph": (35.0, 3.0, 1.0, 3.0), "gain_t1": (0.0, 0.5, 0.3, 0.8), "gain_lap1": (0.0, 0.7, 0.4, 1.2),
              "passes_made": (1.0, 0.3, 0.2, 0.7), "passes_suffered": (1.0, 0.3, 0.2, 0.7),
+             "held_behind_s": (20.0, 5.0, 3.0, 8.0),
              "offtracks": (0.0, 0.02, 0.01, 0.03), "spins": (0.0, 0.01, 0.01, 0.02),
              "entry_kph": (0.0, 1.5, 0.3, 0.6), "exit_kph": (0.0, 1.5, 0.3, 0.6),
              "entry_all_kph": (0.0, 1.5, 0.4, 0.8), "exit_all_kph": (0.0, 1.5, 0.4, 0.8),
@@ -1041,8 +1051,14 @@ def selftest() -> int:
     one = {n: {**L, "races": L["races"][:1]} for n, L in data.items()}
     four = {n: {**L, "races": [L["races"][0]] * 4} for n, L in data.items()}
     r1, r4 = analyse(one, assigns, seed, 1000)["factors"], analyse(four, assigns, seed, 1000)["factors"]
+    # the control floor rule counts events over the whole batch, so 4 copies can cross it (by design); compare the
+    # factors whose primary is the same in both, and allow only control to differ
+    same = [f for f in FACTORS if r1[f]["measure"] == r4[f]["measure"]]
     chk("4 copies of a race carry no more weight than 1 (same SE and p: races are not independent)",
-        all(abs(r1[f]["se"] - r4[f]["se"]) < 1e-9 and r1[f]["p"] == r4[f]["p"] for f in FACTORS))
+        set(FACTORS) - set(same) <= {"control"} and
+        all(abs(r1[f]["se"] - r4[f]["se"]) < 1e-9 and r1[f]["p"] == r4[f]["p"] for f in same),
+        f"compared {len(same)} of {len(FACTORS)} factors" + ("" if len(same) == len(FACTORS) else
+                                                                " (control's floor rule switched with 4x the events)"))
     calls = []
 
     def counting(s, n):
