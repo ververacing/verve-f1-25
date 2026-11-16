@@ -28,7 +28,8 @@ Safety:
 - The shell must print its sandbox confirmation on stderr within -ConfirmS, else everything is killed.
 - The game skips its intro video on every other launch, and then the title ignores the virtual pad. The plan's
   first step must be `wait screen=splash 180`. If that returns in under -SkippedIntroS seconds, the intro was
-  skipped: kill, `swofty restore`, clean up, relaunch (up to -IntroTries).
+  skipped: kill, `swofty restore`, clean up, wait -RelaunchWaitS (300 s), relaunch (up to -IntroTries). Every attempt
+  logs the time since the last game exit (state\last_game_exit.txt) beside its intro outcome.
 Writes <Out>/transcript.txt (every command and result) and <Out>/saves_diff.txt, plus storage_sidestep.txt and
 post_run_check.txt (exit 7 = URGENT: the game folder isn't stock after the run).
 #>
@@ -40,6 +41,8 @@ param(
     [int] $ConfirmS = 120,
     [int] $IntroTries = 3,
     [int] $SkippedIntroS = 40,
+    [int] $RelaunchWaitS = 300,   # #120 (2026-11-16): after a skipped intro, wait this long before relaunching
+                                  # (quick relaunches about 60 s apart kept skipping; 300 s later the intro played)
     [string[]] $Addon = @(),      # installed addons to switch on in the shell's minimal profile
     [string] $Channels = '',      # SWOFTY_GAME_LOG_CHANNELS for the game, when given
     [switch] $SidestepDryRun,     # the storage sidestep only logs what it would move (pilot: is the Defender exclusion enough?)
@@ -145,6 +148,13 @@ function CloseStdin {
 }
 $result = 'not run'
 $t0 = Get-Date   # also read after the loop, so set it even when nothing launches
+# time since the last exit of a game this tooling ran, logged with every attempt's intro outcome (#120: do intro skips
+# cluster on quick relaunches?)
+$lastExitFile = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\last_game_exit.txt'
+function MarkGameExit { try { Set-Content $lastExitFile (Get-Date -Format o) -Encoding utf8 } catch {} }
+function SinceLastExit {
+    try { $t = [datetime]::Parse((Get-Content $lastExitFile -TotalCount 1)); return [int]((Get-Date) - $t).TotalSeconds } catch { return $null }
+}
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     if ((Sidestep) -ne 0) { Log 'ABORT: storage sidestep refused (storage_sidestep.txt); nothing launched'; $result = 'sidestep refused'; break }
     # read-only: which processes start and exit around the launch (is an addon helper alive during the storage swap?)
@@ -160,7 +170,8 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     $errTask = $p.StandardError.ReadToEndAsync()   # stderr is read from the run folder's files below, not here
     $outTask = $p.StandardOutput.ReadToEndAsync()
     $t0 = Get-Date; $run = $null; $seq = 0
-    Log "attempt $attempt started $($t0.ToString('HH:mm:ss'))"
+    $since = SinceLastExit
+    Log "attempt $attempt started $($t0.ToString('HH:mm:ss')) ($(if ($null -ne $since) { "$since s since the last game exit" } else { 'no earlier game exit on record' }))"
 
     # sandbox confirmation: the shell creates test-runs\shell-<stamp>-1 with sandbox.json before the game starts
     while (-not $run -and ((Get-Date) - $t0).TotalSeconds -lt $ConfirmS -and -not $p.HasExited) {
@@ -258,9 +269,18 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             if (-not (Ours-Stop 'intro skipped, relaunch' $attemptRoles)) { $script:foreign = $true; $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
         } else { Log 'quit: the shell exited on its own' }
         Start-Sleep -Seconds 3
+        MarkGameExit
         PostCheck
         & powershell -NoProfile -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1') -Log (Join-Path $Out 'cleanup.txt') | Out-Null
-        $result = 'intro skipped'; continue
+        $result = 'intro skipped'
+        if ($attempt -lt $IntroTries -and $RelaunchWaitS -gt 0) {
+            # cool-down before the relaunch; a process that isn't ours appearing meanwhile ends the run (no relaunch)
+            Log "waiting $RelaunchWaitS s before relaunching (#120: intro skips cluster on quick relaunches)"
+            $wEnd = (Get-Date).AddSeconds($RelaunchWaitS)
+            while ((Get-Date) -lt $wEnd) { if (@(Ours-Foreign).Count) { $script:foreign = $true; break }; Start-Sleep -Seconds 5 }
+            if ($script:foreign) { $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
+        }
+        continue
     }
     Log "intro played (splash after $([math]::Round($ms / 1000)) s)"
 
@@ -342,7 +362,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         if (-not (Ours-Stop 'shell did not exit 120 s after quit' $attemptRoles)) { $script:foreign = $true }
     }
     if (-not $p.HasExited) { Log "shell (pid $($p.Id)) still running; left alone$(if ($script:foreign) { ': a process that is not ours is running' })" }
-    else { Ours-RecordExit $p }
+    else { Ours-RecordExit $p; MarkGameExit }
     if ($outTask.Wait(5000)) { $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8 }
     if ($errTask.Wait(5000)) { $errTask.Result | Set-Content (Join-Path $Out 'shell_stderr.txt') -Encoding utf8 }
     Log "run folder: $($run.Name)"
