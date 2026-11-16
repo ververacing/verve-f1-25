@@ -136,6 +136,24 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
 - No images outside `harness/fixtures/frames` and `docs/`.
 - No account ids or user paths in commits. The pre-commit hook (`tools/pre_commit_check.ps1`) and `tools/scrub_logs.ps1` catch these. **A fresh clone doesn't have the hook**: run `powershell -File tools/pre_commit_check.ps1 -Install` once.
 - Steam Cloud stays off for save-writing sandbox runs until 3 clean write runs on a new Swofty version, since the sandbox implementation may have changed. Tyler can switch it on after that.
+- **`hardware_settings_config.xml` is treated like a save** (supervisor, 2026-11-16). Tyler's own play shares it
+  (graphics, display, UDP). The local reference is `%LOCALAPPDATA%\verve-f1-25\settings-snapshots\
+  hardware_settings_config.ref-20261116.xml`, never committed, since it can hold device names. At pre-flight and after
+  every race, the agent compares the file's values (not timestamps) with the reference; a rewrite with identical
+  values is fine. Any changed key goes to the supervisor with its old and new values. The agent never restores or
+  edits the file; Tyler decides.
+
+## Rule amendments
+
+- **#118, the dry-weather lock** (`tools/weather_check.py --locked`):
+  - **Original (15 Nov):** weather byte 0 in every race Session packet, and every race forecast sample at weather 0
+    and rain% 0.
+  - **First amendment (16 Nov, after the pilot DSQ race):** rain% may be one constant value ≤ 3. It applied to the
+    pilot and #131 only.
+  - **Second amendment (16 Nov, after #131; from #134 on):** LOCKED = weather 0 in every race Session packet AND in
+    every forecast sample, AND rain% ≤ 5 in every sample, in any mix of values. Rain% is a forecast probability, and
+    Quick Weather = Clear (Dry) floors at 3-4 on build 26566308 (a flat 3 in the pilot; 3 and 4 in #131). Earlier
+    verdicts stay as recorded.
 
 ## Toolchain
 

@@ -70,4 +70,11 @@ if (Test-Path $live) {
         }
     }
 }
+# hardware_settings_config.xml, treated like a save (supervisor, 2026-11-16): Tyler's play shares it (graphics,
+# display, UDP). Values only, one entry per attribute (`hw <element path>@<attribute>`), so a rewrite with identical
+# values is no difference, and a changed value names its key with the old and new values in the guard's diff.
+. (Join-Path $PSScriptRoot 'hw_settings.ps1')
+if (Test-Path $HwFile) {
+    foreach ($e in (Get-HwValues $HwFile).GetEnumerator()) { $h[$e.Key] = $e.Value }
+}
 $h

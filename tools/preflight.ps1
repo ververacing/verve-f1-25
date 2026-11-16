@@ -40,15 +40,14 @@ $d = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings'
 $cur = Join-Path $d 'hardware_settings_config.xml'
 if (Test-Path $cur) {
     if (-not (Select-String $cur -Pattern '<udp enabled="true"' -Quiet)) { 'settings: WARNING: UDP telemetry is not enabled; UDP captures will be empty' }
-    # Tyler's own graphics choices aren't ours to flag, so compare with the last pre-flight, not the pre-UDP backup
-    $snapDir = Join-Path $env:LOCALAPPDATA 'verve-f1-25\settings-snapshots'
-    New-Item -ItemType Directory -Force $snapDir | Out-Null
-    $last = Join-Path $snapDir 'hardware_settings_config.last.xml'
-    if (Test-Path $last) {
-        $diff = @(Compare-Object (Get-Content $last) (Get-Content $cur))
-        if ($diff.Count) { "settings: $($diff.Count) line(s) changed since the last pre-flight:"; $diff | Format-Table -AutoSize -Wrap }
-        else { 'settings: unchanged since the last pre-flight' }
-    } else { 'settings: no earlier snapshot; this one is the new reference' }
-    Copy-Item $cur $last -Force
+    # Treated like a save (supervisor, 2026-11-16): VALUES against the fixed reference, never lines or timestamps (the
+    # game re-serialises the file on launch and quit). A changed key is reported for the supervisor and Tyler, never
+    # restored or edited here. The reference is local only (it can hold device names).
+    . (Join-Path $PSScriptRoot 'hw_settings.ps1')
+    if (Test-Path $HwReference) {
+        $chg = @(Compare-HwValues $HwReference $cur)
+        if ($chg.Count) { "settings: $($chg.Count) value(s) differ from the reference (report to the supervisor; don't restore):"; $chg | ForEach-Object { "  $_" } }
+        else { 'settings: values identical to the reference' }
+    } else { "settings: no reference at $HwReference; ask the supervisor before making one" }
 }
 'PREFLIGHT OK'
