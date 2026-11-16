@@ -42,7 +42,8 @@ def write_addon(arm: str, high: list[str], low: list[str]) -> None:
         "description": f"Test-only addon for race batch B-0014, order {arm}: {KEY} = {HIGH} on {', '.join(high)}; "
                        f"{LOW} on {', '.join(low)}. Not for play.",
         "license": "MIT", "category": "ai", "kind": ["database"],
-        "compat": {"game": "f1_25", "game_builds": ["25251167"], "launcher": ">=1.5.13"},
+        # absolute values, not stock deltas, so not tied to one dump; 26566308 = F1 25 1.0.145 (docs/harness.md)
+        "compat": {"game": "f1_25", "game_builds": [">=26566308"], "launcher": ">=1.5.13"},
         "requires": [{"id": "swofty.core", "version": ">=0.2.13"}], "saves": {"affects": False},
         "operations": {"database": [f"db/b0014{arm}.json"]},
     }
