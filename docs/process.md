@@ -196,6 +196,9 @@ standing version**:
      1.0.145, and the catalog has nothing newer.
    - **jonno.smarter-ai-strategies**: a manifest whose `game_builds` covers 26566308. 1.3.2 still declares
      `["=25251167"]`, despite its "Works on EA's latest F1 25 update" changelog.
+   - **Swofty's game-log channels**: a `log_channels.tsv` for 26566308. Without it the loader opens no game log
+     channel on 1.0.145 ("log_channels.tsv is for another build"), so the RaceStarts log is gone and start measures
+     come from UDP only.
 6. **Non-game work.** It's fine while Tyler plays or a PAUSE is active: network and repo only, no Swofty commands, no
    game-folder or Steam userdata reads. If a batch is running, it's done between races.
 7. **No action from a review without the supervisor's OK:** nothing installed, updated or enabled. The `tyler` profile
