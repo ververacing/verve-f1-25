@@ -6,6 +6,31 @@ Working rules (PAUSE, RESUME, messages, merging, testing windows) are in [proces
 `docs/design/std-2/test-suite.md` and `docs/reference/std/telemetry.md` in the Swofty repo, plus the smoke runs in
 `runs/2026-10-30-smoke/` (issue #3).
 
+## Current AI-only route on 1.0.145: the spectator garage start (F-46, #134; from 2026-11-16)
+
+`ai_drives_player` is unavailable on 26566308: Swofty's car fields are KB-build only. A player DSQ makes the game
+simulate the rest of the race (F-45). The route that gives a **live AI-only race** is this:
+- **verve-test add-ons:** twilight.offline-quiet 1.0.1 and teamsimplified.mods 0.13.9 (as before), **kizi.spectator-hud
+  0.1.11** and **msyeett.starting-grid 0.1.4**. dromodf.skip-cutscenes is off (it crashes 1.0.145). gamedb 56.
+- **spectator-hud settings:** start_garage **On**, park_teammate **Off** (it would open UDP 20777 next to our capture),
+  keep_race On, bg_run On, auto_on On; tv_director Off, panel Off, garage_after 6 s, hide_2026_logo On.
+- **Plan:** `harness/sessions/gp_menu_full_press_dry_hungary_grid.plan` (fixed end), or `…_grid_ai.plan` with
+  `@udpfinish 900 150` once #139 merges.
+  - Press route; Hungary at fifteen rights; difficulty 100; 5 laps.
+  - Quick Weather Clear (Dry) (#118: weather 0 and rain% ≤ 5 is LOCKED).
+  - Starting Grid Custom with the player moved to P20. The 19 AI cars' order varies per session and is recorded.
+- **What happens:**
+  - On `race.start` the add-on sends the player car to the garage 2 s later ("GARAGE: car 19 sent to the garage …
+    call returned 0"; LapData driverStatus 0 from 0.02 s after lights out). The spectator director then runs.
+  - The AI race is live: ratio 1.000 and max gap 0.03 s in the pilot.
+  - The player car stays resultStatus 2 (active), so **there is no CHQF, no results screen and no
+    FinalClassification**. LapData resultStatus 3 is the finish.
+- **Checking:**
+  - `tools/aionly_check.py` (#138): validity from LapData (leader and ≥ 18 AI cars at status 3), the live window from
+    lights out to the leader's finish, a plausible-finish check, and no COLL or PENA for the player before the garage.
+  - `tools/udp_finish_watch.py` (#139) is the quit trigger: every AI car at status ≥ 3, or the leader's finish + 150 s.
+  - `race_feel` (#140) ends each car's window at its own finish.
+
 ## F1 25 1.0.145 (game update found 2026-11-16)
 
 Steam updated F1 25 overnight on 15-16 Nov: pre-flight at 06:49 PT on 16 Nov found **build 26566308** (Steam copy

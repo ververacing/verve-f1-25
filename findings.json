@@ -630,6 +630,19 @@
       "implications": "A player DSQ is not a route to AI-only race-feel baselines: the remainder is simulated, not raced. AI-only racing on 1.0.145 needs the player car out of the race without a DSQ (#134, spectator garage start) or a Swofty update with 1.0.145 car offsets.",
       "related_questions": [],
       "status": "verified (two races, two grid positions)"
+    },
+    {
+      "id": "F-46",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "Spectator/Broadcast Mode garage start gives a live AI-only race on 26566308; with the player car never finishing, there's no CHQF and no FinalClassification; LapData carries the finish. kizi.spectator-hud 0.1.11 (start_garage on) sends the player car to the garage 2 s after race.start (LapData driverStatus 0 from 0.02 s after lights out); the 19 AI cars race live (session/wall ratio 1.000, max telemetry gap 0.03 s, laps.csv complete) and reach LapData resultStatus 3 (the first at 402.7 s, 5 laps at Hungary). The player car stays resultStatus 2 (active) in the garage, so the session never ends.",
+      "confidence": "one pilot race (#134), verified from the raw UDP: LapData status, session time vs arrival time, events. No PENA, no COLL and no SCAR involving the parked car. Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-16-W-0134/race_1 (#134), tools/aionly_check.py (#138)",
+        "loader.log: 'START IN GARAGE: race.start: your car is parked (again) in 2 s', 'GARAGE: car 19 sent to the garage ... call returned 0'"
+      ],
+      "implications": "The current AI-only route on 1.0.145 while ai_drives_player is unavailable (F-45): B-0018 (#120) runs on it, with LapData as the finish source, a UDP-driven quit, per-car race-feel windows ending at each car's finish, and validity from tools/aionly_check.py.",
+      "related_questions": [],
+      "status": "verified (one pilot race; B-0018 adds replications)"
     }
   ]
 }
