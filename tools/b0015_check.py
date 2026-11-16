@@ -79,6 +79,12 @@ def load_race(run: Path) -> tuple[list[dict], list[str]]:
         invalid.append("no chequered flag")
     if (run / "pause_cut.txt").exists():
         invalid.append("PAUSE cut")
+    # weather (#100, ruling of 2026-11-15): rain in the race session = invalid; tools/weather_check.py writes weather.txt
+    wx = run / "weather.txt"
+    if not wx.exists():
+        invalid.append("no weather.txt (run tools/weather_check.py on raw/udp.bin)")
+    elif not wx.read_text(encoding="utf-8").startswith("weather: DRY"):
+        invalid.append("weather: " + wx.read_text(encoding="utf-8").splitlines()[0].split(":", 1)[1].strip())
     high = k.G1 if order == "a" else k.G2
     rows = []
     for c in cars:
