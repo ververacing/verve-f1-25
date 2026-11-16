@@ -1,0 +1,11 @@
+#131 check: INVALID
+  INVALID: weather: weather: NOT LOCKED (rain% not constant 3,4)
+  FAIL live: session/wall time ratio 3.58 (lights out to classification), outside 0.9-1.1
+  FAIL live: 1 telemetry gap(s) > 5 s, first at session time 31.0 s (88.0 s)
+  FAIL live: laps.csv incomplete for 19 AI car(s) (laps 1-4)
+  scar: 0
+  player_first_penalty_s: 20.01
+  player_removed_s: 30.007
+  simulated_from_s: 31.0
+  lap1_disturbed: not measurable (no lap-1 rows in laps.csv)
+  grid: 1:BORTOLETO, 2:RUSSELL, 3:TSUNODA, 4:HAMILTON, 5:LAWSON, 6:VERSTAPPEN, 7:LECLERC, 8:HADJAR, 9:NORRIS, 10:ANTONELLI, 11:GASLY, 12:PIASTRI, 13:COLAPINTO, 14:ALBON, 15:OCON, 16:ALONSO, 17:BEARMAN, 18:HULKENBERG, 19:SAINZ, 20:player

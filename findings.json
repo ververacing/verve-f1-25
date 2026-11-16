@@ -617,6 +617,19 @@
       "implications": "Don't tune max_blocking_distance for defending or train behaviour. Next levers: overtake.overlap_percentage (B-0017, draft) and dirty air (S4, downforce_loss), measured against a stock train baseline at a train-prone track.",
       "related_questions": [],
       "status": "inconclusive (pre-registered); practical null: an increase above about 8% of baseline ruled out"
+    },
+    {
+      "id": "F-45",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "After a player DSQ in a Grand Prix, the game simulates the rest of the race with no telemetry (31.0 s -> 450.5 s in 90 wall-s). With ai_drives_player unavailable on 1.0.145, the parked player car is penalised (type 6) at 20 s and retired (RTMT reason 6, black flag) at 30 s; the UDP stream stops at session time 31.0 s and resumes at the results about 90 wall-s later, so laps.csv is empty and no race-feel metric exists past 31 s. Reproduced with the player starting P13 (Realistic grid) and P20 (Starting Grid Custom, player last): 31.0 -> 450.5 s in 90 s and 31.0 s with an 88 s gap.",
+      "confidence": "observed twice on 26566308 (pilot DSQ race and #131), from the raw UDP headers (session time vs arrival time); the FinalClassification still lists all 19 AI cars as finished. Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-16-pilot-dsq/README.md (raw/udp.bin on the test PC)",
+        "runs/2026-11-16-W-0131/race_1 (#131), tools/b0131_check.py live-race check (#135)"
+      ],
+      "implications": "A player DSQ is not a route to AI-only race-feel baselines: the remainder is simulated, not raced. AI-only racing on 1.0.145 needs the player car out of the race without a DSQ (#134, spectator garage start) or a Swofty update with 1.0.145 car offsets.",
+      "related_questions": [],
+      "status": "verified (two races, two grid positions)"
     }
   ]
 }

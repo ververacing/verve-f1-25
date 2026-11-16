@@ -1,0 +1,3 @@
+weather: NOT LOCKED (rain% not constant 3,4)
+  0 clear: 79 session packets
+  forecast (race samples): weather {0: 237}, rain% {3: 158, 4: 79}
