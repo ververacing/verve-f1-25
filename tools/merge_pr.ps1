@@ -53,6 +53,10 @@ try {
         & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_post_run_check.ps1 *> $null
         if ($LASTEXITCODE -ne 0) { $fails += 'test_post_run_check' } else { '  ok test_post_run_check' }
     }
+    if (Test-Path 'tools/test_hw_settings.ps1') {   # pure: temp files only
+        & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_hw_settings.ps1 *> $null
+        if ($LASTEXITCODE -ne 0) { $fails += 'test_hw_settings' } else { '  ok test_hw_settings' }
+    }
     # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
     # the live part (dummy F1_25/swofty processes) only inside a testing window and not while paused (#107 review)
     if (Test-Path 'tools/test_ours.ps1') {
