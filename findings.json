@@ -497,6 +497,7 @@
     },
     {
       "id": "F-36",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "In benchmark, the driver row's driver_characteristics.reaction_speed drives the AI race-start reaction and the racecraft rating does not: across four levels per source (per driver, 6 starts), the ROW slope is -0.109 s per unit (bootstrap SE 0.024, z -4.6) and the STATS slope is +0.068 (SE 0.029), positive, which is explained by the STATS drivers' untouched row values running against their levels (predicted +0.039 under row-wins).",
       "confidence": "replicated (B-0008, #43): new assignment, two drivers per level, untouched racecraft uncorrelated with level (r -0.14): ROW slope -0.118 s per unit (SE 0.017, z -6.8), every leave-one-level-out slope negative (-0.100 to -0.141), k ~0.56. Original B-0006: pre-registered pass, z -4.6; leave-one-driver-out ROW slopes -0.163 / -0.102 / -0.118 / -0.039 (dropping norris / russell / ocon / tsunoda): direction holds, strength rests mostly on tsunoda. No rating effect detected in B-0001 or B-0006 (confounded in B-0006), not proven absent.",
       "evidence": [
@@ -511,6 +512,7 @@
     },
     {
       "id": "F-37",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "B-0004: in benchmark, higher row driver_characteristics.mistakes -> higher race_start_performance (z 2.2-2.3, marginal), i.e. a lower bad-start draw b (F-38); mistakes = skill if bad_start is a penalty (F-38; behavioural check pending #4). The awareness rating shows no effect: ROW_high (Alpine 0.95) - ROW_low (Aston Martin 0.05) = +7.79 (bootstrap SE 3.39, z +2.30) vs STATS_high - STATS_low (awareness flat 0.95 vs 0.05) = +5.23 (SE 6.96, z +0.75), 5 fresh starts. Reaction time doesn't move for either source (z -0.50 / +1.21), as F-06 predicts. No CANNED_EVENTS lines were logged in benchmark starts.",
       "confidence": "replicated (B-0009, #45): row-only dose-response, 8 drivers at 0.02 / 0.35 / 0.65 / 0.98, 30 starts: slope of b on level -0.059 per unit (bootstrap SE 0.014, z -4.3), every leave-one-level-out slope negative (z -1.9 to -4.8), driver-level t -3.3. Original B-0004: pre-registered pass, marginal. Leave-one-start-out ROW gaps are all positive (+5.8 to +9.7), but z is 1.70 to 3.11, under 2 SE in two of five drops; per-start ROW gaps +6.2 / +21.2 / +16.4 / -1.4 / +0.2 (supervisor check on #44: two of five starts show no effect). Supervisor's independent bootstrap: SE 3.47, z 2.24.",
       "evidence": [
@@ -523,6 +525,7 @@
     },
     {
       "id": "F-38",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "race_start_performance = 100*(1 - b), where b is the per-start bad-start draw. Pinning all four bad_start bounds pins b exactly. So the logged metric is an INPUT draw (from ai_driver_config.race_start's min/max_bad_start_lower/upper), not an outcome; whether b costs time at the start is behavioural and stays open until #4 (UDP: position or speed after the launch). With all four bounds equal to b the value is exactly 100 * (1 - b) on every start: 0.01 -> 99, 0.15 -> 85, 0.35 -> 65, 0.60 -> 40 (8 drivers, 4 starts, no variation). Stock cars score 60-95, i.e. bad-start values of about 0.05-0.40, within the stock bounds (0.04 / 0.06 min, 0.28 / 0.42 max).",
       "confidence": "verified (runtime, benchmark; exact)",
       "evidence": [
@@ -534,6 +537,7 @@
     },
     {
       "id": "F-39",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "Start model (stock field, 368 samples, 33 starts, B-0001/3/4/5/6/7/8, modified cars and Ferrari left out): both race-start draws move each min/max bound pair from its upper toward its lower bound by k * row skill. Reaction r ~ U[0.28 - 0.24*k*rs, 0.42 - 0.18*k*rs] (rs = row reaction_speed); bad start b ~ U[0.06 - 0.02*k*m, 0.42 - 0.14*k*m] (m = row mistakes, b = 1 - race_start_performance/100). One pooled k ~0.52 fits both: reaction 0.529 +- 0.015, bad start 0.520 +- 0.067 (intercepts fixed by the bounds). Bad-start edges and bin means match the model within ~0.005, and no sample lies outside either envelope.",
       "confidence": "decoded (fit), benchmark only. The stock-field free OLS slope of b on m is -0.062 (SE 0.039, z -1.6): the same direction as B-0004 but not at 2 SE, and it was -0.112 (z -2.7) before B-0008's stock cars were added, so it depends on the driver pool (stock m spans only 0.51-0.90). Tagged-driver slopes agree with the pooled k: B-0006 0.52 and B-0008 0.56 (reaction); B-0004's gap is 1.1 SE above the model. B-0009 (#45, m = 0.02-0.98, 30 starts): tagged-driver bad-start k 0.70 +- 0.12 vs 0.60 +- 0.10 for the stock field of the same starts (difference z 0.7), so the bad-start form holds well outside the stock m range. B-0010 (#51, crossed rs x mistakes at 0.10 / 0.90, 20 starts) confirms both forms with no cross terms: rs moves reaction by -0.086 s (z -10.9; model -0.087 at k 0.52), mistakes doesn't move reaction (F-40 rejected), rs doesn't move b (z -1.3), no interaction. Its bad-start step is -0.060 +- 0.011 (model -0.033 at k 0.52), an implied k of 0.93 +- 0.17. Open point (supervisor, #54): b's k from written rows (0.70 in B-0009, 0.93 in B-0010) exceeds the stock-field fit (0.52), while reaction's agrees (tagged 0.52-0.56, field 0.53); form of the b dependence open (k_b nearer 1, or a different form; the stock m range 0.51-0.90 can't tell them apart). B-0011 (real Verve rows, 30 starts): reaction medians track predictions (r 0.66); the lower edge 0.28-0.24k*rs is over-predicted by ~0.01 s at fitted k 0.42-0.48 (9/540 below; pre-registered envelope FAIL). The form of k (per session vs per car) is open. Bad-start: pooled level-fit k 0.48 +- 0.08 on written rows vs contrast-derived 0.70 (B-0009) / 0.93 (B-0010); the form of the b dependence is open.",
       "evidence": [
@@ -549,6 +553,7 @@
     },
     {
       "id": "F-40",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "In benchmark, row driver_characteristics.mistakes also shortens the AI race-start reaction time, which F-39's reaction form (reaction_speed only) leaves out. B-0009 (8 drivers at mistakes 0.02-0.98, 30 starts): raw reaction slope -0.019 s per unit (bootstrap SE 0.006, z -3.0); after removing each car's predicted reaction from its reaction_speed row (0.35 - 0.21*k*rs, k per start), -0.029 s per unit (SE 0.006, z -4.7; driver level t -3.7). That is about a quarter of the reaction_speed effect (-0.118 s per unit, B-0008). It is not carried by the bad-start draw (stock field: corr(b, reaction residual) 0.05, 300 samples). The stock field points the same way: reaction residual on stock row mistakes -0.047 (naive SE 0.023).",
       "confidence": "candidate, not pre-registered, fragile (one batch, benchmark only; B-0009 logged reaction as a control). Raw leave-one-level-out slopes -0.014 / -0.023 / -0.024 / -0.004 (dropping 0.02 / 0.35 / 0.65 / 0.98; supervisor check on #50): the raw effect leans on the 0.98 pair, because the 0.65 pair has the slowest stock reaction_speed rows. The rs-adjusted slopes hold (-0.024 to -0.031, z -1.9 to -4.5), but that adjustment is a post-hoc model over 8 drivers. B-0004 (z -0.5) and B-0007 (pinned b, not mistakes) could not have seen an effect this size. REJECTED by B-0010 (#51, pre-registered, crossed rs x mistakes at 0.10 / 0.90, 20 starts): mistakes main effect on reaction +0.007 s (bootstrap SE 0.007), 2-SE interval [-0.007, +0.021] excludes the -0.015 s test value; the positive control (rs main -0.086 s, z -10.9) passed. The B-0009 slope was the confound its leave-one-level-out check pointed at: the stock reaction_speed rows of the tagged drivers, not their mistakes.",
       "evidence": [
@@ -561,6 +566,7 @@
     },
     {
       "id": "F-41",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "Benchmark is a procession: usable for race-start draws only. There is no overtaking, so lap times are train-limited. In stock benchmark races at Austria (3 laps x2, 10 laps requested), the cars cross every sector line in grid (team) order, 0-8, 19, 9-18, on every lap, with 10-15 of the 19 car-to-car gaps under 1 s. Faster cars stay behind slower ones (Ocon: 4th-best lap, runs 12th). Laps run 78-81 s, slower than the slowest point of the stock difficulty table (74.7 s). The game ends a benchmark 11 minutes after the start (8 laps at Austria). Extreme rows change neither order nor pace (B-0013c): Colapinto and Russell at aggression / speed_in / speed_out / control 1.0 stayed stuck 0.3-0.8 s behind, and Alonso at speed_in / speed_out 0.02 averaged 80.13 s vs 79.83 s stock.",
       "confidence": "pre-registered criterion on #60 (no position change within 5 laps), met in both parts. Ordering evidence:\n- The LAPTIMES 'Added sector' crossing order. Its wall-clock arrival order equals its session-time order at 24/24 lines, its sector times are consistent with session times (0/478 mismatches), and each vehicle id keeps one driver name all race.\n- The broadcast timing tower in a third stock run (laps 1-3: Antonelli P8, Hamilton P9, Leclerc P10, Alonso P11, Ocon P12), identical to the log.\nRESULTS/V is explicitly excluded: it is pre-loaded (Lap stays 0, 'ePreLoaded'), not live. An empty OVERTAKES channel is not used as evidence.",
       "evidence": [
@@ -574,6 +580,7 @@
     },
     {
       "id": "F-42",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "Per-driver aggression at the extremes (row driver_characteristics.aggression 0.05 vs 1.0, 4+4 drivers, within-driver crossover, AI difficulty 100, Austria, 5 laps, 20 races) produced no detectable change in held passes on laps 2-5. Coefficient +0.018 per driver-race, 2-SE interval about -0.29..+0.33, against a baseline of about 2 held passes per driver-race, so any real effect is at most about 15%. Secondaries are mixed and none is significant: collisions -0.26 (SE 0.145), lap-1 passes made -0.70 (an unregistered direction). Consistent with Swofty's AI map: aggression only feeds follow_speed_factor (5%) and alongside_space_factor (15%).",
       "confidence": "pre-registered on #71 (model, bootstrap and validity fixed before any data; Amendments 1-4). Verdict INCONCLUSIVE by the registered criterion (not PASS: coefficient far below 2 SE; not FAIL-NULL: the 2-SE interval just exceeds +-0.3). 20/20 races valid, arm check 4+4 keys flipping, saves unchanged in every race. The held-pass sign doesn't hold at both 5 s and 20 s (sensitivity).",
       "evidence": [
@@ -587,6 +594,7 @@
     },
     {
       "id": "F-43",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "swofty.lap1-ai (Lap 1 Realistic AI 1.0.0) showed no detectable change in lap-1 held changes. The registered result was confounded by random weather (3 wet races, all in arm A). On dry races the estimate is about 0 (SE about 2). B-0016 (#101), 20 races (10 stock, 10 lap1-ai), Austria, 5 laps, difficulty 100. Registered P3 (lap-1 held changes, net, per race) B - A +1.30, bootstrap SE 1.73, 2-SE [-2.16, +4.76]: INCONCLUSIVE (includes 0; reaches past the +-4 band). Guard: lap-1 costly contacts +0.30 (SE 0.25), no cost. Co-primaries: lap-1 loss median -0.82 s (2-SE [-1.80, +0.15]), lap-1 spread -0.36 s (2-SE [-1.80, +1.09]). Grand Prix weather was random: races 7 and 9 (A) storm, race 11 (A) light rain, all B races dry. Dry-only sensitivity, NOT SCORED (A 7, B 10): P3 +0.06 (SE 1.97), P1 -0.39 s (SE 0.47).",
       "confidence": "pre-registered on #101 (v3 rules fixed before any data; N = 20 set on time only, before any metric was seen). Verdict INCONCLUSIVE by the registered criterion. 20/20 races valid; lap1-ai lines present in every B race and absent in every A race. The weather finding came after scoring and is reported only as a sensitivity.",
       "evidence": [
@@ -599,6 +607,7 @@
     },
     {
       "id": "F-44",
+      "game_build": "25251167 (before the 1.0.145 update of 2026-11-16; not re-checked on 26566308)",
       "claim": "Per-driver ai.blocking.max_blocking_distance 45 vs 5 (stock 18), 4+4 crossover, Austria, difficulty 100, 20 dry races: no detectable change in time other cars spend held up behind the driver. Coefficient -18.7 s per driver-race (2-SE -52.8 to +15.3; stock mean about 186 s), so an increase of more than about 8% is ruled out, and the estimate leans the opposite way to the prediction. Passes suffered (net) ±0.25. No contact cost. Blocking distance is not a lever for defending or for trains at this track.",
       "confidence": "pre-registered on #100 (v4 rules and the weather validity rule fixed before race 1). Verdict INCONCLUSIVE by the registered criterion (not PASS: the coefficient is negative and under 2 SE; not FAIL-NULL: the 2-SE interval reaches past -40 s). 20/20 races valid, every race dry, arm check 4+4, gamedb 60, saves unchanged. Wording by the supervisor.",
       "evidence": [

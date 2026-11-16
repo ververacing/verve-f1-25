@@ -6,6 +6,25 @@ Working rules (PAUSE, RESUME, messages, merging, testing windows) are in [proces
 `docs/design/std-2/test-suite.md` and `docs/reference/std/telemetry.md` in the Swofty repo, plus the smoke runs in
 `runs/2026-10-30-smoke/` (issue #3).
 
+## F1 25 1.0.145 (game update found 2026-11-16)
+
+Steam updated F1 25 overnight on 15-16 Nov: pre-flight at 06:49 PT on 16 Nov found **build 26566308** (Steam copy
+1.0.145.2472), with **25251167** (1.0.141.7865) still pinned, and stopped. Doctor also shows `drift
+swofty/cache/exe-sha256.tsv is not part of the game` again.
+
+The supervisor's rulings (16 Nov):
+- **No launch on launcher 1.9.51.** It has no 1.0.145 bindings, and no gate turning add-ons off on unsupported
+  builds. Swofty 1.9.57 added 1.0.145 support and that gate.
+- **Update the launcher only after Tyler's OK**, to 1.9.58 or newer, through its own update. Then record launcher,
+  core and build here and re-pin `tools/preflight.ps1` to 26566308.
+- **Turn dromodf.skip-cutscenes off in verve-test**, since 1.9.4 crashes 1.0.145 within about a minute (Swofty
+  1.9.58 notes). Keep offline-quiet only if the new launcher accepts it. Menu plans go back to the manual
+  press route (`gp_menu_full_press.plan`) until a fixed skip-cutscenes appears.
+- **New baseline.** Every batch from now on runs on 26566308. F-36..F-44 carry `game_build` 25251167 in
+  `findings.json`. B-0018 (#120) is the first batch on the new build. B-0016b (#119) also needs lap1-ai's loader
+  lines on the new build.
+- **One stock smoke race after the update, before B-0018.** The dry-lock discovery of #118 can be it.
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
