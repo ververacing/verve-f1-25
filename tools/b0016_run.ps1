@@ -22,7 +22,8 @@ param(
     [switch] $SidestepDryRun,
     [string] $Plan = 'harness\sessions\gp_menu_full_skip.plan',   # #118: the dry-locked plan for B-0016b / B-0018
     [switch] $StockOnly,       # B-0018 (#120): every race is stock (arm A), no addon
-    [switch] $LockedWeather    # #118: weather.txt from weather_check --locked (the checkers then require LOCKED)
+    [switch] $LockedWeather,   # #118: weather.txt from weather_check --locked (the checkers then require LOCKED)
+    [int] $SkippedIntroS = 40  # passed to sandbox_shell; 0 = never treat a fast splash as a skipped intro (diagnostics only)
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -77,6 +78,7 @@ $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $
     '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
 if ($armB) { $shellArgs += @('-Addon', 'swofty.lap1-ai') }   # only when set: an empty -Addon through -File fails
 if ($SidestepDryRun) { $shellArgs += '-SidestepDryRun' }
+if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
 powershell @shellArgs |
     ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording' }
 $code = $LASTEXITCODE
