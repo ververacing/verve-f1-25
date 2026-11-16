@@ -1,0 +1,7 @@
+python.exe : the race session has no LapData
+At %USERPROFILE%\Documents\verve-f1-25\tools\b0016_run.ps1:111 char:5
++     & python -I (Join-Path $PSScriptRoot 'race_feel.py') (Join-Path $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (the race session has no LapData:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

@@ -1,0 +1,33 @@
+﻿pad up 250
+@sleep 2
+pad right 250
+@sleep 2
+pad a 250
+@sleep 4
+pad right 250
+@sleep 3
+pad b 250
+@sleep 4
+status
+pad left 250
+@sleep 2
+pad left 250
+@sleep 3
+pad b 250
+@sleep 4
+status
+pad b 250
+@sleep 4
+pad b 250
+@sleep 4
+pad right 200
+@sleep 1
+pad right 200
+@sleep 1
+pad right 200
+@sleep 3
+pad right 200
+@sleep 3
+pad right 200
+@sleep 3
+@end
