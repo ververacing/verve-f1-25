@@ -77,3 +77,10 @@ differ slightly from `default` (Verstappen experience 0.88 vs 0.87, awareness an
   drops below 1 only at points 8–10 (0.978, 0.955, 0.935); `time` 74.71 → 64.35 s.
 - **f1_2025 parameter maps** match the handoff's table exactly (four dead maps: alongside_awareness, brake_off_time,
   slide_confidence, wet_weather_ability).
+
+## Re-dump on build 26566308 (2026-11-16)
+
+`tools/dump_stock_grid.ps1 -OutDir docs/stock/26566308` re-dumped the converter's two anchors (Swofty 1.9.59, F1 25
+Steam 1.0.145.2472, build 26566308): 24 driver rows and 48 pace curves. **Both are identical, line for line,** to the
+25251167 files above (`driver_characteristics_grid.csv` and `pace_curves_grid.csv`). The 1.0.145 update didn't change
+the stock values the converter anchors on. The other dumps in this folder were not redone.
