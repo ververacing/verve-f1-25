@@ -1,7 +1,8 @@
-# DRAFT, NOT POSTED: Swofty issue on the test agent's player-car control on Steam 1.0.145
+# INTERNAL NOTES. Tyler: never post. The test agent's player-car control on Steam 1.0.145
 
-Status: draft for Tyler's decision (supervisor, 2026-11-16). Nothing here has been sent anywhere. It contains no
-account names, paths or personal details; keep it that way if it is posted.
+**Internal notes only.** Tyler, 2026-11-16: "No on sending swofty anything". Nothing in `docs/upstream/` is ever
+sent to Swofty: no issues, Discord, PRs or contact of any kind (docs/process.md). It was written as a draft issue
+before that ruling, and kept as the team's own record of the blocker.
 
 ---
 

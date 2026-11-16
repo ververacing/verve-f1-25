@@ -114,6 +114,16 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
   (`tools/cleanup_test_profiles.ps1`), and pre-flight fails if any is left over.
 - **`swofty addons install` writes the new id into every profile,** Tyler's included (as a disabled entry). Install only
   when a batch needs it, and say so in the batch's PR.
+- **Standing OK for Swofty add-ons** (Tyler, relayed by the supervisor, 2026-11-16: "yes you are always allowed to
+  download, add, remove, whatever you need to do, for swofty add ons"):
+  - The agent may download, install, update, enable, disable and remove add-ons as testing needs.
+  - Downloads come only from the Swofty catalog API, with the sha256 checked against the catalog entry before
+    install.
+  - Never enable, disable or remove anything in the `tyler` profile's list.
+  - Never uninstall an add-on that `tyler` has enabled; that would break his setup.
+  - The disabled entries an install adds to every profile are fine; report them (the profile diff) each time.
+- **Nothing is ever sent to Swofty** (Tyler, same message: "No on sending swofty anything"): no issues, Discord,
+  PRs or contact of any kind. `docs/upstream/*` are internal notes only.
 - **Never press Play on `verve-test` in the launcher** until it has its own save: with launcher saves on and an empty
   store, the launcher copies the Steam save in at the first Play.
 
