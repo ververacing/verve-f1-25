@@ -1,5 +1,13 @@
 # Verve F1 25: community-first plan (2026-11-14)
 
+> **Scope narrowed (2026-11-16).** Tyler: "let's drop anything that isn't specifically tied to Verve Drivers". Verve is
+> now ONE product: **Verve Drivers**, real-driver personalities by season, working alone or alongside the community
+> add-ons. The community screens as product tests, verve.racefeel and the Race Feel S-steps, B-0016b (#119), B-0017
+> (#121), B-0019 (#122) and the options-by-name difficulty research are **parked** (label "parked: scope narrowed
+> 2026-11-16"; nothing is deleted). #94/#95 (difficulty, alien) are parked for after v1. This plan stays as the record
+> of the survey; the current plan is [verve_drivers_plan.md](verve_drivers_plan.md), and the scope rules are in
+> [process.md](process.md#scope-verve-drivers-from-2026-11-16).
+
 Source: the Swofty public catalog (api.f1.swofty.net/v1/addons, 134 addons, pulled 2026-11-14), the Swofty release notes 1.8.5 to 1.9.50, and two downloaded addons (sha256 matched the catalog).
 
 ## What the survey found

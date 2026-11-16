@@ -2,6 +2,30 @@
 
 The rules for the local agent, the cloud supervisor and Tyler. Until 2026-11-03 these only lived in the supervisor's messages. The technical side (sandbox, hash guard, hygiene) is in [harness.md](harness.md).
 
+## Scope: Verve Drivers (from 2026-11-16)
+
+Tyler (2026-11-16, relayed by the supervisor): **"let's drop anything that isn't specifically tied to Verve Drivers"**.
+He wants speed. Verve is ONE product: real-driver personalities, by season, that work alone or alongside the community
+add-ons. Verve Drivers owns only per-driver character values.
+- **Kept:**
+  - B-0018 (#120), now the Verve Drivers stock baseline on the spectator route;
+  - the daily community review;
+  - the approved tyler add-on version updates;
+  - harness upkeep, the PAUSE and guard rules, and the relaunch cool-down (#144).
+- **Parked** (label "parked: scope narrowed 2026-11-16"; kept on record, not deleted):
+  - B-0016b (#119), B-0017 (#121) and B-0019 (#122);
+  - the community screens as product tests (#101);
+  - verve.racefeel and the Race Feel S-steps;
+  - the options-by-name difficulty research;
+  - the intro-skip diagnostic launch (the 300 s retry is enough).
+  - #94/#95 (difficulty, alien) are parked for after v1, not dropped.
+- **The new work, in order:**
+  1. `docs/verve_drivers_plan.md`: trait → lever → evidence → status;
+  2. a stock re-dump of every 2025/2026 driver row on 26566308;
+  3. a compatibility audit of community add-ons that write driver values;
+  4. the verve_to_swofty v0.2 per-season build design;
+  5. pre-registration V-1, "is each lever alive?", with extreme profiles on the spectator route.
+
 ## PAUSE
 
 From Tyler or the supervisor. **Run `tools/pause.ps1`**: it does steps 1-7 and 10 in one go (target under 3 min)
