@@ -104,20 +104,26 @@ def garage_session_time(wall: float | None, pts) -> float | None:
     return round(max(near[1] + (wall - near[0]), 0.0) if near[1] == 0 else near[1] + (wall - near[0]), 2)
 
 
-def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str], list[str], dict]:
+def check(run: Path, gamedb: int, track: str, loader_tag: str, uid: str | None = None,
+          udp_dir: Path | None = None) -> tuple[list[str], list[str], dict]:
+    """uid: check that race session only (V-1: several restart-races in one capture, one uid each); default the last
+    race session. udp_dir: where the udp_parse CSVs are (default <run>/udp)."""
     invalid: list[str] = []
     fails: list[str] = []
     m: dict = {}
-    s = race_session(read_csv(run / "udp" / "sessions.csv"))
+    udp = udp_dir or run / "udp"
+    sessions = read_csv(udp / "sessions.csv")
+    s = (next((x for x in sessions if x.get("session_uid") == str(uid) and x.get("session_type") == "race"), None)
+         if uid is not None else race_session(sessions))
     if not s:
-        return ["no race session in udp/sessions.csv"], [], m
+        return [f"no race session{f' {uid}' if uid is not None else ''} in udp/sessions.csv"], [], m
     uid, player = s["session_uid"], s.get("player_car", "")
     pidx = int(player) if player.isdigit() else None
     if s.get("track_id") != track:
         invalid.append(f"track_id {s.get('track_id')}, expected {track}")
     if s.get("ai_difficulty") != "100":
         invalid.append(f"difficulty {s.get('ai_difficulty')}, expected 100")
-    cars = [c for c in read_csv(run / "udp" / "cars.csv") if c["session_uid"] == uid]
+    cars = [c for c in read_csv(udp / "cars.csv") if c["session_uid"] == uid]
     names = {c["car"]: c.get("name", c["car"]) for c in cars}
     ai_idx = [int(c["car"]) for c in cars if c["car"] != player and c.get("ai") == "1"]
     wx = run / "weather.txt"
@@ -152,7 +158,7 @@ def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str
     m["final_order"] = [f"{v['pos']}:{names.get(str(c), c)}" for c, v in sorted(laps.items(), key=lambda x: x[1].get("pos") or 99)
                         if v.get("pos")]
 
-    events = [e for e in read_csv(run / "udp" / "events.csv") if e["session_uid"] == uid]
+    events = [e for e in read_csv(udp / "events.csv") if e["session_uid"] == uid]
     t_lgot = next((float(e["session_time"]) for e in events if e["code"] == "LGOT"), 0.0)
     pts = (rs or {}).get("points") or []
     if not pts:
@@ -189,14 +195,14 @@ def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str
                 pw, pss = post[-1][0] - post[0][0], post[-1][1] - post[0][1]
                 m["run_in_ratio_info"] = round(pss / pw, 2) if pw > 0 else None
     total = int(s["total_laps"]) if str(s.get("total_laps", "")).isdigit() else 5
-    lap_rows = {(r["car"], r["lap"]) for r in read_csv(run / "udp" / "laps.csv") if r["session_uid"] == uid}
+    lap_rows = {(r["car"], r["lap"]) for r in read_csv(udp / "laps.csv") if r["session_uid"] == uid}
     missing = [c for c in finished if any((str(c), str(n)) not in lap_rows for n in range(1, total))]
     if missing:
         fails.append(f"live: laps.csv incomplete for {len(missing)} AI finisher(s) (laps 1-{total - 1})")
     # a plausible finish: the leader's LapData finish comes after its own recorded laps 1..N-1. (After a player DSQ the
     # game flips every AI car to status 3 at once when it switches to simulating, F-45: a "finish" at 30 s.)
     if leader and t_finish is not None:
-        lt = {int(r["lap"]): int(r["lap_time_ms"]) / 1000 for r in read_csv(run / "udp" / "laps.csv")
+        lt = {int(r["lap"]): int(r["lap_time_ms"]) / 1000 for r in read_csv(udp / "laps.csv")
               if r["session_uid"] == uid and r["car"] == str(leader[0])}
         done = sum(lt.get(n, 0) for n in range(1, total))
         if done == 0 or t_finish < t_lgot + done:
@@ -228,7 +234,7 @@ def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str
     if pena:
         fails.append(f"PENA for the player car at {', '.join(f'{t:.1f}' for t in pena)} s")
     m["player_lapdata_status"] = laps.get(pidx, {}).get("status") if pidx is not None else None
-    lap1 = [r for r in read_csv(run / "udp" / "laps.csv") if r["session_uid"] == uid and r["lap"] == "1" and r["car"] != player]
+    lap1 = [r for r in read_csv(udp / "laps.csv") if r["session_uid"] == uid and r["lap"] == "1" and r["car"] != player]
     if lap1:
         t = {r["car"]: int(r["lap_time_ms"]) / 1000 for r in lap1}
         med = statistics.median(t.values())

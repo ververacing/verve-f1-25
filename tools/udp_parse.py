@@ -124,12 +124,15 @@ def new_session():
             "track_length": None}
 
 
-def parse(path: Path, launch_offsets: list[float]):
+def parse(path: Path, launch_offsets: list[float], uids: set[int] | None = None):
+    """uids: keep only these session uids (a capture can hold several races, e.g. V-1's restarts); None = all."""
     sessions: dict[int, dict] = {}
     for t, p in records(path):
         if len(p) < HEADER.size:
             continue
         fmt, year, major, minor, pver, pid, uid, stime, frame, oframe, player, player2 = HEADER.unpack_from(p, 0)
+        if uids is not None and uid not in uids:
+            continue
         s = sessions.setdefault(uid, new_session())
         s["format"] = fmt
         s["version"] = f"{year}.{major}.{minor}"
