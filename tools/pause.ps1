@@ -140,10 +140,11 @@ $end = (Get-Date).AddSeconds($RunnerWaitS)
 # never wait for our own ancestors: a runner calls this at the end of its race (-IfDue) and is still running then
 $snapA = Get-ProcSnapshot; $mine = @{}; $cur = $PID
 while ($cur -and -not $mine.ContainsKey($cur)) { $mine[$cur] = $true; $cur = ($snapA | Where-Object { $_.Id -eq $cur } | Select-Object -First 1).ParentId }
-$scriptRx ='(b00\d\d_run|sandbox_shell|sandbox_run|run_with_udp|post_run_check|cleanup_test_profiles|deferred_saves_check|storage_sidestep)\.ps1'
+$scriptRx ='(b00\d\d_run|v1_run|sandbox_shell|sandbox_run|run_with_udp|post_run_check|cleanup_test_profiles|deferred_saves_check|storage_sidestep)\.ps1'
 do {
     $busy = @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue |
-        Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match $scriptRx -and $_.CommandLine -notmatch 'pause\.ps1' })
+        Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match $scriptRx -and $_.CommandLine -notmatch 'pause\.ps1' -and
+                       $_.CommandLine -notmatch 'WScript\.Shell\)\.Popup' })   # our own WAIT popup names the scripts in its text (15:04 false WAIT)
     if (-not $busy.Count) { break }
     if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the pause; the checks wait for the next pre-flight" 1 }
     Start-Sleep -Seconds 1

@@ -122,7 +122,14 @@ db/2025/s25.json ... db/2025/s100.json, db/2026/s25.json ... db/2026/s100.json  
 - **The driver row is shared across seasons.** `driver_characteristics` sits on `entrants.drivers.driver_N`, and the
   2025 and 2026 grids use the same row labels (crosswalk `grid` = `2025|2026`). Only the statistics holders split, into
   the `default` and `2026` datasets (F-30, Q-11; `2026` is tagged `game_setup_modes f1_26`, `seasons season_2026`). This
-  is inferred from the dumps: no season-specific driver rows were found.
+  is inferred from the dumps: no season-specific driver rows were found. **Confirmed on 26566308** (#156): there is one
+  197-row driver table, and the `f1_2026-<label>` entrants name the same rows as 2025. So the season option stays, with
+  2026 as the default (the supervisor's ruling on #147).
+- **The vehicle packages are per season.** f1_2025 uses `vehicle_package_10` and f1_2026 uses `vehicle_package_15`,
+  each with its own `driver_parameter_maps`. They differ in one value on 26566308: throttle_on_time's
+  high_difficulty_low_characteristic corner is 0.2 on 2026 and 0.6 on 2025 (`docs/stock/driver_parameter_maps_26566308.txt`).
+  **If the product ships a map-based strength, it must write both packages** (supervisor, 2026-11-16), each from its
+  own stock corners.
 - A data build therefore can't hold 2025 and 2026 values at once. The **`season` option picks which season's rows
   apply** for the whole profile, and the player matches it to the season pack they race. A wrong pick still gives sane
   values, just from the other year's Verve snapshot.
