@@ -596,6 +596,18 @@
       "implications": "No evidence that lap1-ai changes lap-1 overtaking at Austria. Weather must be fixed to dry (or a rainy race invalid) in every field-level screen: B-0015 invalidates rain races (#100); B-0016b (dry fixed, 10+10, same v3 rules) is queued once a fixed-dry setting is proven.",
       "related_questions": [],
       "status": "inconclusive (pre-registered); confounded by weather; dry-only estimate about 0"
+    },
+    {
+      "id": "F-44",
+      "claim": "Per-driver ai.blocking.max_blocking_distance 45 vs 5 (stock 18), 4+4 crossover, Austria, difficulty 100, 20 dry races: no detectable change in time other cars spend held up behind the driver. Coefficient -18.7 s per driver-race (2-SE -52.8 to +15.3; stock mean about 186 s), so an increase of more than about 8% is ruled out, and the estimate leans the opposite way to the prediction. Passes suffered (net) ±0.25. No contact cost. Blocking distance is not a lever for defending or for trains at this track.",
+      "confidence": "pre-registered on #100 (v4 rules and the weather validity rule fixed before race 1). Verdict INCONCLUSIVE by the registered criterion (not PASS: the coefficient is negative and under 2 SE; not FAIL-NULL: the 2-SE interval reaches past -40 s). 20/20 races valid, every race dry, arm check 4+4, gamedb 60, saves unchanged. Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-15-B-0015/score.txt, README.md and race_1..race_20 (#100, #116)",
+        "tools/b0015_check.py, tools/race_feel.py, tools/weather_check.py"
+      ],
+      "implications": "Don't tune max_blocking_distance for defending or train behaviour. Next levers: overtake.overlap_percentage (B-0017, draft) and dirty air (S4, downforce_loss), measured against a stock train baseline at a train-prone track.",
+      "related_questions": [],
+      "status": "inconclusive (pre-registered); practical null: an increase above about 8% of baseline ruled out"
     }
   ]
 }
