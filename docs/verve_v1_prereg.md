@@ -3,7 +3,8 @@
 Status: **v3 for the supervisor's approval** (2026-11-16). It replaces the v2 draft (#147). It applies the supervisor's
 rulings on #147 (A-H), on #148 (bundles, maps, the throttle_exit_fallibility exception), on Phase 0 (size, UDP start
 measures, conditional starts session, launch-blocked permutation) and on #155 (mistakes direction, control floor fallback,
-corner pace, decision labels). Scope: Verve Drivers (docs/process.md). Evidence base:
+corner pace, decision labels, pass null bands). v1_check (#155) is approved; its null simulation gives a false-positive
+rate of 4.83% (95% CI 4.26-5.48) over 4,800 null tests. Scope: Verve Drivers (docs/process.md). Evidence base:
 [verve_drivers_plan.md](verve_drivers_plan.md).
 
 The values marked **[discovery]** are filled from the Austria discovery launch, and those marked **[readback]** from the
@@ -137,13 +138,21 @@ They are compared only between levels, never read as absolute times.
 |---|---|---|---|
 | reaction_speed | reaction (s) | shorter | ±0.02 s |
 | mistakes | launch (m) | **longer**: mistakes is a skill, higher = fewer mistakes (F-29, F-37) | ±0.5 m **[discovery]** |
-| aggression | held passes made, net, laps 2+, per race | more | ±0.25 per race |
+| aggression | held passes made, net, laps 2+, per race | more | ±0.10 per race |
 | control | off-tracks + spins per race (see below) | fewer | ±0.1 per race |
 | speed_in | corner-entry pace, all passes, field-relative (km/h) | faster | ±2 km/h |
 | speed_out | corner-exit pace, all passes, field-relative (km/h) | faster | ±2 km/h |
-| DEFEND | held passes suffered, net, laps 2+, per race | fewer | ±0.25 per race |
-| ATTACK | held passes made, net, laps 2+, per race | more | ±0.25 per race |
+| DEFEND | held passes suffered, net, laps 2+, per race | fewer | ±0.10 per race |
+| ATTACK | held passes made, net, laps 2+, per race | more | ±0.10 per race |
 
+- **Pass null bands, ±0.10 per driver-race** (supervisor, #155 review; fixed before any V-1 data, so not a look):
+  - The rule: 25% of the stock per-driver-per-race mean.
+  - At Austria, stock gives about 7.9 net held passes on laps 2+ per race (B-0016 arm A, 55 in 7 dry races), which is
+    0.41 per driver per race, so the band is ±0.10.
+  - The v2 band of ±0.25 was 60% of the mean: a 35% change in passing would have read ALIVE-SMALL.
+  - If the discovery's stock rate is under 4 or over 16 per race, the supervisor re-fixes the band before race 1.
+  - aggression and ATTACK share passes_made, which is fine in a factorial; the report shows the two lines side by side.
+  - DEFEND's primary isn't normalised by exposure, which randomisation balances in expectation.
 - **Launch null band, ±0.5 m:** it's about 2.5% of a 20 m launch. It will be fixed against the per-car launch SD
   across starts in the discovery launch **[discovery]**, with that reasoning written here before race 1.
 - **control: definitions.** UDP has no off-track event, and LapData's currentLapInvalid and cornerCuttingWarnings never
@@ -173,6 +182,8 @@ They are compared only between levels, never read as absolute times.
   - positions gained to T1 (at the first lap-1 lapDistance ≥ `T1_M` = **[discovery]** m, set from the Austria capture
     at the first braking zone) and at the end of lap 1;
   - ATTACK's effect on passes suffered, and DEFEND's on passes made (cross-effects);
+  - for DEFEND, the seconds attackers are held: race_feel `train_s_behind`, the seconds other cars spend within 1.0 s
+    behind the car on laps 2+;
   - contacts (race_feel collisions); lap-time SD (laps 2+, no pit laps);
   - clean-pass corner pace.
 
