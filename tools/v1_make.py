@@ -155,6 +155,13 @@ def fmt(x: float) -> str:
     return "0" if s in ("-0", "") else s
 
 
+# Supervisor's ruling on #148: ONE exception to the cap. "Rare vs frequent mistakes" is a headline trait for Tyler, and
+# the cap makes throttle_exit_fallibility a no-op (hh 0.75, hl = ll = 1), so its hl corner goes to hh + amp x (hl - hh)
+# UNCAPPED (1.5 at amp 3), past ll. The per-car exit_fallibility caps still bound the error. If the validity stop (F)
+# trips, the first step down is this map back to 1.0 (--no-uncapped), then amp 2 overall.
+UNCAPPED_MAPS = {"throttle_exit_fallibility"}
+
+
 def amplify(hh: float, hl: float, ll: float, amp: float) -> float:
     """hh + amp x (hl - hh), capped at ll in the direction of the low-difficulty value (never past it)."""
     v = hh + amp * (hl - hh)
@@ -176,7 +183,7 @@ def read_maps(path: Path = MAPS_FILE) -> dict[str, dict[str, str]]:
     return maps
 
 
-def map_plan(amp: float, maps: dict | None = None) -> list[dict]:
+def map_plan(amp: float, maps: dict | None = None, uncapped: bool = True) -> list[dict]:
     """One row per map: stock corners, status, amplified hl (None when untouched)."""
     rows = []
     for name, m in sorted((maps or read_maps()).items()):
@@ -186,6 +193,8 @@ def map_plan(amp: float, maps: dict | None = None) -> list[dict]:
             row["status"] = "dead (untouched)"
         elif hh == hl == lh == ll:
             row["status"] = "flat (untouched)"
+        elif uncapped and name in UNCAPPED_MAPS:
+            row["status"], row["new"] = "amplified, uncapped (ruling on #148)", float(fmt(hh + amp * (hl - hh)))
         else:
             new = float(fmt(amplify(hh, hl, ll, amp)))
             if new == hl:
@@ -213,7 +222,7 @@ def op(select: str, field: str, value: str) -> dict:
     return {"op": "set", "select": select, "field": field, "value": value}
 
 
-def build_ops(assign: dict[str, dict[str, int]], amp: float, maps: dict | None = None) -> list[dict]:
+def build_ops(assign: dict[str, dict[str, int]], amp: float, maps: dict | None = None, uncapped: bool = True) -> list[dict]:
     ops = []
     for d in ROSTER:
         sel = DRIVER_SELECT.format(d)
@@ -222,7 +231,7 @@ def build_ops(assign: dict[str, dict[str, int]], amp: float, maps: dict | None =
         for b in BUNDLES:
             for k in PROPOSAL[b]:
                 ops.append(op(sel, k["key"], k["level1"] if assign[d][b] else k["level0"]))
-    for r in map_plan(amp, maps):
+    for r in map_plan(amp, maps, uncapped):
         if r["new"] is not None:
             ops.append(op(PACKAGE_SELECT, MAP_FIELD.format(r["map"]), fmt(r["new"])))
     return ops
@@ -253,9 +262,9 @@ def stock_traits() -> dict[str, dict[str, float]]:
     return {r["label"]: {t: float(r[t]) for t in TRAITS} for r in csv.DictReader(rows)}
 
 
-def write_launch(seed: int, launch: int, out: Path, amp: float) -> list[dict]:
+def write_launch(seed: int, launch: int, out: Path, amp: float, uncapped: bool = True) -> list[dict]:
     assign = draw(seed, launch)
-    ops = build_ops(assign, amp)
+    ops = build_ops(assign, amp, uncapped=uncapped)
     check_ops(ops)
     folder = out / f"verve.v1-L{launch:02d}"
     (folder / "db").mkdir(parents=True, exist_ok=True)
@@ -391,12 +400,17 @@ def selftest() -> int:
     rows = {r["map"]: r for r in map_plan(3)}
     chk("dead and flat maps untouched", all(rows[m]["new"] is None for m in DEAD_MAPS) and
         all(r["new"] is None for r in rows.values() if r["hh"] == r["hl"] == r["ll"]))
-    chk("stock maps: 6 written, throttle_exit_fallibility capped at stock",
+    chk("stock maps: 7 written, throttle_exit_fallibility uncapped to 1.5 (ruling on #148)",
         sorted(m for m, r in rows.items() if r["new"] is not None) ==
         ["alongside_space_factor", "braking_distance_factor", "corner_curvature_factor", "follow_speed_factor",
-         "throttle_confidence", "throttle_on_time"] and rows["throttle_exit_fallibility"]["new"] is None)
-    chk("no amplified value past ll", all(
-        r["new"] is None or (min(r["hh"], r["ll"]) <= r["new"] <= max(r["hh"], r["ll"])) for r in rows.values()))
+         "throttle_confidence", "throttle_exit_fallibility", "throttle_on_time"]
+        and rows["throttle_exit_fallibility"]["new"] == 1.5)
+    chk("no amplified value past ll, except the named uncapped map", all(
+        r["new"] is None or r["map"] in UNCAPPED_MAPS or (min(r["hh"], r["ll"]) <= r["new"] <= max(r["hh"], r["ll"]))
+        for r in rows.values()))
+    rows_nu = {r["map"]: r for r in map_plan(3, uncapped=False)}
+    chk("the fallback (--no-uncapped) puts throttle_exit_fallibility back at stock (no op)",
+        rows_nu["throttle_exit_fallibility"]["new"] is None)
 
     # the proposal against the stock dump
     aic = stock_aic_keys()
@@ -472,6 +486,8 @@ def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
         return selftest()
+    uncapped = "--no-uncapped" not in args   # the validity-stop fallback: throttle_exit_fallibility back to stock
+    args = [a for a in args if a != "--no-uncapped"]
     opts = {"--seed": None, "--launch": None, "--out": None, "--amp": "3"}
     for k in list(opts):
         if k in args:
@@ -484,7 +500,7 @@ def main() -> int:
     seed, launch, amp, out = int(opts["--seed"]), int(opts["--launch"]), float(opts["--amp"]), Path(opts["--out"])
     if launch < 1 or amp <= 0:
         sys.exit("--launch must be >= 1 and --amp > 0")
-    ops = write_launch(seed, launch, out, amp)
+    ops = write_launch(seed, launch, out, amp, uncapped)
     assign = draw(seed, launch)
     print(f"V-1 seed {seed} launch {launch} -> {out / f'verve.v1-L{launch:02d}'} (id {addon_id(launch)})")
     print(f"  {'driver':<24}{'team':<12}" + "".join(f"{f[:7]:>8}" for f in FACTORS))
@@ -494,7 +510,7 @@ def main() -> int:
     print()
     print_proposal()
     print()
-    print_maps(map_plan(amp), amp)
+    print_maps(map_plan(amp, uncapped=uncapped), amp)
     stock = stock_traits()
     same = sum(1 for d in ROSTER for t in TRAITS if float(stock[d][t]) == float(assign[d][t]))
     n_map = sum(1 for o in ops if o["select"] == PACKAGE_SELECT)
