@@ -1,0 +1,79 @@
+{
+  "session_uid": 11127013919624767373,
+  "track_id": 9,
+  "track_length_m": 4378,
+  "laps": 5,
+  "ai_difficulty": 100,
+  "player_car": 19,
+  "ai_cars": 19,
+  "median_green_lap_s": 80.392,
+  "lap1_loss_median_s": 7.338,
+  "lap1_positions_changed": 22,
+  "lap1_held_changes": 14,
+  "lap1_spread_s": 7.316,
+  "lap1_collisions": 1,
+  "train_time_share": 0.7754,
+  "held_passes_net_2plus": 0,
+  "held_passes_2plus_as_71": 4,
+  "ovtk_raw": 35,
+  "longest_train_median": 17.0,
+  "longest_train_max": 19,
+  "early_brakes_total": 21,
+  "early_brakes_in_traffic": 21,
+  "phantom_brakes": 0,
+  "phantom_brakes_clear2s": 0,
+  "phantom_cars_scored": 18,
+  "phantom_onsets_scored_share": 0.985,
+  "phantom_ref_counts": {
+    "own": 71,
+    "field": 810
+  },
+  "phantom_by_ref": {
+    "own": 0,
+    "field": 21
+  },
+  "corners": {
+    "total": 12,
+    "scored": 11
+  },
+  "rear_end_contacts": 1,
+  "pit_cycle_passes": 0,
+  "contacts": [
+    {
+      "t": 15.424,
+      "cars": [
+        9,
+        7
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "9": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    }
+  ],
+  "costly_contact_cars": 0,
+  "lap1_costly_contacts": 0,
+  "front_wing_increments": 0,
+  "guards": {
+    "collisions": 1,
+    "wing_damage_added": 0,
+    "dnfs": 0,
+    "penalties": 0,
+    "median_green_lap_s": 80.392
+  },
+  "damage_packets_seen": true,
+  "bad_sizes": {}
+}

@@ -1,0 +1,278 @@
+{
+ "race_feel": "481d0b9 2026-11-16",
+ "races": [
+  {
+   "race": 1,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:VERSTAPPEN, 2:BORTOLETO, 3:HULKENBERG, 4:SAINZ, 5:ALONSO, 6:TSUNODA, 7:COLAPINTO, 8:GASLY, 9:ANTONELLI, 10:BEARMAN, 11:NORRIS, 12:LECLERC, 13:RUSSELL, 14:ALBON, 15:LAWSON, 16:PIASTRI, 17:OCON, 18:HADJAR, 19:HAMILTON, 20:player",
+   "net_passes_by_lap": {
+    "1": 5,
+    "2": 2
+   },
+   "ovtk_by_lap": {
+    "1": 24,
+    "2": 2
+   },
+   "summary": {
+    "held_passes_net_2plus": 2,
+    "train_time_share": 0.8834,
+    "longest_train_max": 18,
+    "lap1_loss_median_s": 7.526,
+    "lap1_spread_s": 7.726,
+    "lap1_held_changes": 12,
+    "phantom_brakes": 0,
+    "early_brakes_total": 22,
+    "ovtk_raw": 26
+   }
+  },
+  {
+   "race": 2,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:SAINZ, 2:OCON, 3:COLAPINTO, 4:RUSSELL, 5:TSUNODA, 6:VERSTAPPEN, 7:NORRIS, 8:LECLERC, 9:LAWSON, 10:PIASTRI, 11:ALBON, 12:ANTONELLI, 13:HADJAR, 14:BORTOLETO, 15:HAMILTON, 16:ALONSO, 17:GASLY, 18:BEARMAN, 19:HULKENBERG, 20:player",
+   "net_passes_by_lap": {
+    "1": 12,
+    "4": 2
+   },
+   "ovtk_by_lap": {
+    "1": 29,
+    "4": 2
+   },
+   "summary": {
+    "held_passes_net_2plus": 2,
+    "train_time_share": 0.8316,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.465,
+    "lap1_spread_s": 6.937,
+    "lap1_held_changes": 19,
+    "phantom_brakes": 0,
+    "early_brakes_total": 12,
+    "ovtk_raw": 31
+   }
+  },
+  {
+   "race": 3,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:ANTONELLI, 2:LAWSON, 3:LECLERC, 4:HAMILTON, 5:PIASTRI, 6:RUSSELL, 7:BEARMAN, 8:TSUNODA, 9:ALBON, 10:NORRIS, 11:SAINZ, 12:COLAPINTO, 13:HULKENBERG, 14:VERSTAPPEN, 15:HADJAR, 16:GASLY, 17:OCON, 18:BORTOLETO, 19:ALONSO, 20:player",
+   "net_passes_by_lap": {
+    "1": 10
+   },
+   "ovtk_by_lap": {
+    "1": 20,
+    "2": 6,
+    "3": 6,
+    "5": 3
+   },
+   "summary": {
+    "held_passes_net_2plus": 0,
+    "train_time_share": 0.7754,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.338,
+    "lap1_spread_s": 7.316,
+    "lap1_held_changes": 14,
+    "phantom_brakes": 0,
+    "early_brakes_total": 21,
+    "ovtk_raw": 35
+   }
+  },
+  {
+   "race": 4,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:LAWSON, 2:BEARMAN, 3:RUSSELL, 4:ALONSO, 5:VERSTAPPEN, 6:HADJAR, 7:COLAPINTO, 8:SAINZ, 9:ANTONELLI, 10:HAMILTON, 11:PIASTRI, 12:TSUNODA, 13:BORTOLETO, 14:ALBON, 15:HULKENBERG, 16:LECLERC, 17:NORRIS, 18:GASLY, 19:OCON, 20:player",
+   "net_passes_by_lap": {
+    "1": 10,
+    "2": 1,
+    "4": 2,
+    "5": 1
+   },
+   "ovtk_by_lap": {
+    "1": 14,
+    "2": 1,
+    "3": 14,
+    "4": 2,
+    "5": 1
+   },
+   "summary": {
+    "held_passes_net_2plus": 4,
+    "train_time_share": 0.7908,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.261,
+    "lap1_spread_s": 6.55,
+    "lap1_held_changes": 12,
+    "phantom_brakes": 0,
+    "early_brakes_total": 19,
+    "ovtk_raw": 32
+   }
+  },
+  {
+   "race": 5,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:HULKENBERG, 2:HAMILTON, 3:LAWSON, 4:SAINZ, 5:LECLERC, 6:TSUNODA, 7:COLAPINTO, 8:OCON, 9:ALONSO, 10:VERSTAPPEN, 11:HADJAR, 12:NORRIS, 13:BORTOLETO, 14:ALBON, 15:ANTONELLI, 16:RUSSELL, 17:PIASTRI, 18:GASLY, 19:BEARMAN, 20:player",
+   "net_passes_by_lap": {
+    "1": 8,
+    "4": 1
+   },
+   "ovtk_by_lap": {
+    "1": 25,
+    "2": 8,
+    "3": 5,
+    "4": 1,
+    "5": 3
+   },
+   "summary": {
+    "held_passes_net_2plus": 1,
+    "train_time_share": 0.789,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.153,
+    "lap1_spread_s": 6.921,
+    "lap1_held_changes": 13,
+    "phantom_brakes": 1,
+    "early_brakes_total": 11,
+    "ovtk_raw": 42
+   }
+  },
+  {
+   "race": 6,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:GASLY, 2:ALBON, 3:LAWSON, 4:ANTONELLI, 5:HADJAR, 6:BEARMAN, 7:HULKENBERG, 8:COLAPINTO, 9:VERSTAPPEN, 10:PIASTRI, 11:BORTOLETO, 12:ALONSO, 13:TSUNODA, 14:SAINZ, 15:NORRIS, 16:LECLERC, 17:RUSSELL, 18:HAMILTON, 19:OCON, 20:player",
+   "net_passes_by_lap": {
+    "1": 11
+   },
+   "ovtk_by_lap": {
+    "1": 21,
+    "3": 8
+   },
+   "summary": {
+    "held_passes_net_2plus": 0,
+    "train_time_share": 0.8709,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.403,
+    "lap1_spread_s": 6.764,
+    "lap1_held_changes": 15,
+    "phantom_brakes": 1,
+    "early_brakes_total": 19,
+    "ovtk_raw": 29
+   }
+  },
+  {
+   "race": 7,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:ANTONELLI, 2:OCON, 3:HAMILTON, 4:SAINZ, 5:ALONSO, 6:ALBON, 7:VERSTAPPEN, 8:BORTOLETO, 9:TSUNODA, 10:PIASTRI, 11:LECLERC, 12:LAWSON, 13:BEARMAN, 14:GASLY, 15:NORRIS, 16:RUSSELL, 17:COLAPINTO, 18:HADJAR, 19:HULKENBERG, 20:player",
+   "net_passes_by_lap": {
+    "1": 4,
+    "3": 1,
+    "4": 1
+   },
+   "ovtk_by_lap": {
+    "1": 13,
+    "2": 4,
+    "3": 3,
+    "4": 6
+   },
+   "summary": {
+    "held_passes_net_2plus": 2,
+    "train_time_share": 0.834,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 6.806,
+    "lap1_spread_s": 7.0,
+    "lap1_held_changes": 8,
+    "phantom_brakes": 0,
+    "early_brakes_total": 17,
+    "ovtk_raw": 26
+   }
+  },
+  {
+   "race": 8,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:ANTONELLI, 2:GASLY, 3:NORRIS, 4:OCON, 5:RUSSELL, 6:ALONSO, 7:VERSTAPPEN, 8:TSUNODA, 9:COLAPINTO, 10:ALBON, 11:LAWSON, 12:BEARMAN, 13:BORTOLETO, 14:HULKENBERG, 15:PIASTRI, 16:HADJAR, 17:HAMILTON, 18:LECLERC, 19:SAINZ, 20:player",
+   "net_passes_by_lap": {
+    "1": 8,
+    "3": 1,
+    "4": 1
+   },
+   "ovtk_by_lap": {
+    "1": 30,
+    "3": 9,
+    "4": 16
+   },
+   "summary": {
+    "held_passes_net_2plus": 2,
+    "train_time_share": 0.7887,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.257,
+    "lap1_spread_s": 6.948,
+    "lap1_held_changes": 15,
+    "phantom_brakes": 0,
+    "early_brakes_total": 12,
+    "ovtk_raw": 55
+   }
+  },
+  {
+   "race": 9,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:COLAPINTO, 2:VERSTAPPEN, 3:LECLERC, 4:GASLY, 5:OCON, 6:HULKENBERG, 7:HADJAR, 8:NORRIS, 9:BORTOLETO, 10:SAINZ, 11:BEARMAN, 12:LAWSON, 13:ALONSO, 14:ALBON, 15:RUSSELL, 16:ANTONELLI, 17:HAMILTON, 18:PIASTRI, 19:TSUNODA, 20:player",
+   "net_passes_by_lap": {
+    "1": 15,
+    "2": 3,
+    "4": 1,
+    "5": 1
+   },
+   "ovtk_by_lap": {
+    "1": 32,
+    "2": 3,
+    "3": 3,
+    "4": 1,
+    "5": 3
+   },
+   "summary": {
+    "held_passes_net_2plus": 5,
+    "train_time_share": 0.746,
+    "longest_train_max": 18,
+    "lap1_loss_median_s": 8.027,
+    "lap1_spread_s": 8.172,
+    "lap1_held_changes": 21,
+    "phantom_brakes": 1,
+    "early_brakes_total": 18,
+    "ovtk_raw": 42
+   }
+  },
+  {
+   "race": 10,
+   "aionly": "AI-only check: PASS",
+   "scar": "0",
+   "grid": "1:GASLY, 2:COLAPINTO, 3:HADJAR, 4:LAWSON, 5:OCON, 6:LECLERC, 7:RUSSELL, 8:ALBON, 9:TSUNODA, 10:VERSTAPPEN, 11:PIASTRI, 12:BORTOLETO, 13:HULKENBERG, 14:BEARMAN, 15:HAMILTON, 16:ANTONELLI, 17:NORRIS, 18:ALONSO, 19:SAINZ, 20:player",
+   "net_passes_by_lap": {
+    "1": 8,
+    "2": 1,
+    "3": 4,
+    "4": 1
+   },
+   "ovtk_by_lap": {
+    "1": 19,
+    "2": 3,
+    "3": 4,
+    "4": 10,
+    "5": 5
+   },
+   "summary": {
+    "held_passes_net_2plus": 6,
+    "train_time_share": 0.8176,
+    "longest_train_max": 19,
+    "lap1_loss_median_s": 7.27,
+    "lap1_spread_s": 6.368,
+    "lap1_held_changes": 12,
+    "phantom_brakes": 0,
+    "early_brakes_total": 36,
+    "ovtk_raw": 41
+   }
+  }
+ ]
+}

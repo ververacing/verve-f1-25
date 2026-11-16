@@ -153,6 +153,22 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
   - Never enable, disable or remove anything in the `tyler` profile's list.
   - Never uninstall an add-on that `tyler` has enabled; that would break his setup.
   - The disabled entries an install adds to every profile are fine; report them (the profile diff) each time.
+- **Version updates of Tyler's own add-ons** (Tyler via the supervisor, "update any of my add-ons that you genuinely
+  think would be beneficial"; confirmed in the agent's chat on 2026-11-16, "Yes to both"). This is a narrow exception
+  to the hands-off `tyler` profile, for **version updates only**:
+  - The scope is add-ons already enabled in `tyler`. Nothing is enabled, disabled, removed or changed in its settings.
+  - **Rule A, update now:** updates that fix the game version. **Rule B:** feature or behaviour updates go to the
+    supervisor as a list. **Rule C:** AI Driver Behaviour 0.2.0 and Contact Physics 0.8.0 are held for the daily review.
+  - Only with no game or launcher running and never during a race. Each time: Tyler's saves backed up and hashed
+    (`saves_guard`), `tyler.json` copied with its hash, the old install kept for rollback, the download from the catalog
+    with the sha256 checked, and the install through `tools/reinstall_addon.ps1` (profiles keep the id enabled).
+  - **Log:**
+    - **2026-11-16 13:29 PT, jonno.smarter-ai-strategies 1.3.1 → 1.3.2** (rule A; "Works on EA's latest F1 25 update").
+      sha256 `c64e1361…b5b8` matched the catalog. `tyler.json` was byte-identical afterwards (sha256 `80040DD1…EA33`),
+      with the add-on still enabled. Tyler's saves were unchanged (11 files). The old 1.3.1 install is kept locally.
+    - **Caveat:** 1.3.2's own manifest still declares `game_builds ["=25251167"]`, as 1.3.1's did, so Swofty may
+      still gate it off on 26566308. That isn't verified, since it needs a launch of Tyler's profile; his next
+      session's loader.log shows it.
 - **No contact with Swofty or add-on authors** (Tyler, same message: "No on sending swofty anything"; clarified the same
   day: "for nothing goes to swofty, i only meant that i don't want you to worry about messaging swofty about bugs or
   anything like that"). No bug reports, issues, Discord or other contact. `docs/upstream/*` are internal notes only.
