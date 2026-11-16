@@ -83,22 +83,29 @@ supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55;
 2. Take a fresh last-known-good snapshot of `remote\` and Steam's records.
 3. Go on with the queue.
 
-## Testing windows
+## Testing schedule (24 hours a day, from 2026-11-16)
 
-Game testing runs every day in two windows, Pacific time: **09:00-17:00** and **00:00-06:00**.
+Tyler (2026-11-16, relayed by the supervisor): **"Let's assume you have all day every day. Plan on one 1hr pause every
+day for my racing at some point during the day, but everything else is you doing testing."**
 
-- **Wrap-up at 16:45 and 05:45:** no new launches. Finish the current run only if it ends by :58, otherwise abort it as "window end". Finish the full PAUSE routine by the top of the hour, then message the supervisor `WINDOW CLOSED` plus 2 lines.
-- **Outside the windows:** non-game work only (analysis, verve.skip with Zig, docs, PRs). Never launch F1 25, and keep the CPU load light.
-- **If F1 25 or another game is running that the agent didn't start, Tyler is playing:** don't launch, even inside a window.
-- **Tyler's PAUSE inside a window** holds until RESUME or the next window opening.
-- **A batch approved while a window is open starts right away** unless the supervisor says otherwise. Don't hold it for the next window (standing rule, supervisor, 2026-11-15, after the 00:00-06:00 window sat idle with B-0016 approved).
-- **Planning:** the day window suits shorter batches and tooling checks. The night window suits long unattended batches (20-30 start replications, multi-race behavioural batches). Size every batch to finish 15 minutes before its wrap-up.
+- **Testing runs 24 hours a day, every day.** This replaces the 09:00-17:00 and 00:00-06:00 windows; there is no 16:45 or
+  05:45 wrap-up and no `WINDOW CLOSED` routine.
+- **Tyler's hour:** he takes about one hour a day to race, at a time he picks. He says "pause" (or "pause at HH:MM").
+  The PAUSE routine (`tools/pause.ps1`), the SAFE TO PLAY popup and every pause rule stay exactly as they are.
+  Testing resumes when he says "resume". Never assume the hour is over.
+- **All guards stay:**
+  - never launch while a game or launcher of his is running, since that means Tyler is playing;
+  - PID-owned stops only;
+  - the save guard on every run.
+- **Back to back:** an approved batch starts as soon as the previous one ends, unless the supervisor says otherwise.
+  The 19:40 daily review runs between races.
+- **Status:** the supervisor gets a short status at every batch end, and at least every 6 hours while racing.
+- **Per-race calls** stay, so control comes back between races (for pauses, the daily review and merges).
+- **Merges between races only:** merge_pr's live self-tests start dummy F1_25 processes, so they run only when no game
+  or launcher is up.
 
-**Scheduled messages only reach the agent between turns, so these rules can't depend on one arriving on time:**
-
-- Check the Pacific clock before every launch and between runs. Never start a run that can't finish 15 minutes before the next wrap-up (16:45 or 05:45).
-- No single blocking command may run past a wrap-up. Split long batches into per-race calls, so control comes back between races.
-- If a window turns out to have closed unnoticed, do the PAUSE routine at once.
+*Before 2026-11-16 the windows were 09:00-17:00 and 00:00-06:00 PT, with wrap-ups at 16:45 and 05:45 (the override log
+below records one-off changes to them).*
 
 **Window override log.** One-off changes to the windows, each with Tyler's words and the time. Every run in an
 override window also gets a `window_override.txt` in its folder.
@@ -146,8 +153,11 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
   - Never enable, disable or remove anything in the `tyler` profile's list.
   - Never uninstall an add-on that `tyler` has enabled; that would break his setup.
   - The disabled entries an install adds to every profile are fine; report them (the profile diff) each time.
-- **Nothing is ever sent to Swofty** (Tyler, same message: "No on sending swofty anything"): no issues, Discord,
-  PRs or contact of any kind. `docs/upstream/*` are internal notes only.
+- **No contact with Swofty or add-on authors** (Tyler, same message: "No on sending swofty anything"; clarified the same
+  day: "for nothing goes to swofty, i only meant that i don't want you to worry about messaging swofty about bugs or
+  anything like that"). No bug reports, issues, Discord or other contact. `docs/upstream/*` are internal notes only.
+  **Not blocked** by this rule: releasing Verve Drivers through Swofty's catalog later. A release is still an
+  outward-facing step that needs Tyler's explicit go at the time; nothing is published before that.
 - **Never press Play on `verve-test` in the launcher** until it has its own save: with launcher saves on and an empty
   store, the launcher copies the Steam save in at the first Play.
 

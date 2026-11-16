@@ -9,9 +9,10 @@ ODD races = arm A = stock (verve-test as is). EVEN races = arm B = verve-test + 
 Both on harness\sessions\gp_menu_full_skip.plan (Amendment-4 setup of #71). After the race, <race>\lap1ai.txt records
 lap1-ai's version (addons.json) and every [lap1-ai] loader.log line, as #101's per-race logging asks.
 
-Same refusals as tools/b0014_run.ps1: outside the testing windows (or a -WindowOverride), a game running that it didn't
-start, a race (an A race with its B partner) that can't finish 15 min before the next wrap-up, or test-* profiles left
-over. Exits 8, 9, 10 for those, 5 if saves changed. Rerunning a race moves the earlier attempt to <Batch>\invalid\.
+Refusals: a PAUSE (or a due pause-at) (exit 12), a game or launcher running that it didn't start (exit 9), test-*
+profiles left over (exit 10), a missing plan (exit 13); 5 if saves changed. Testing runs 24 hours a day since
+2026-11-16, so there's no window or wrap-up refusal (exit 8) any more. Rerunning a race moves the earlier attempt to
+<Batch>\invalid\.
 #>
 param(
     [Parameter(Mandatory)] [int] $Race,
@@ -28,21 +29,9 @@ param(
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
 $now = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
-$wrapups = @($now.Date.AddHours(5).AddMinutes(45), $now.Date.AddHours(16).AddMinutes(45), $now.Date.AddDays(1).AddHours(5).AddMinutes(45))
-$inWindow = $now.Hour -lt 6 -or ($now.Hour -ge 9 -and $now.Hour -lt 17)
-if ($WindowOverride) {
-    $end = $now.Date + [TimeSpan]::Parse($WindowOverride)
-    if ($end -le $now) { $end = $end.AddDays(1) }
-    if ($now -lt $end) {
-        $inWindow = $true
-        # the override replaces every wrap-up before its own end (the windows join)
-        $wrapups = @($end.AddMinutes(-15)) + @($wrapups | Where-Object { $_ -gt $end.AddMinutes(-15) }) | Sort-Object
-    }
-}
-if (-not $inWindow) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, outside the testing windows; not launching"; exit 8 }
-$next = $wrapups | Where-Object { $_ -gt $now } | Select-Object -First 1
-$need = if (($Race % 2) -eq 1) { 2 * $RaceMinutes } else { $RaceMinutes }   # complete pairs only
-if ($now.AddMinutes($need + 15) -gt $next) { "race ${Race}: it's $($now.ToString('HH:mm')) PT, and $need min of racing wouldn't finish 15 min before the $($next.ToString('HH:mm')) wrap-up; not launching"; exit 8 }
+# Testing is 24 hours a day (Tyler, 2026-11-16: "Let's assume you have all day every day. Plan on one 1hr pause every
+# day for my racing"). No windows and no wrap-ups: Tyler's hour is a PAUSE (tools/pause.ps1, "pause" / "pause at
+# HH:MM"), checked below. -WindowOverride is still accepted and logged, but no longer needed.
 # PAUSE (tools/pause.ps1): no launch while paused; a pause-at that this race wouldn't finish before pauses now
 $pauseFlag = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt'
 if (Test-Path $pauseFlag) { "race ${Race}: paused ($((Get-Content $pauseFlag -TotalCount 1))); not launching"; exit 12 }

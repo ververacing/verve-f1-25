@@ -58,31 +58,30 @@ try {
         if ($LASTEXITCODE -ne 0) { $fails += 'test_hw_settings' } else { '  ok test_hw_settings' }
     }
     # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
-    # the live part (dummy F1_25/swofty processes) only inside a testing window and not while paused (#107 review)
+    # the live part (dummy F1_25/swofty processes): testing runs 24 hours a day since 2026-11-16 (no windows), but the
+    # dummies never run while paused (#107 review), nor while any F1_25 or launcher process is up (a real race, or
+    # Tyler's game: the runner would read the dummies as a foreign game and refuse its next launch)
     if (Test-Path 'tools/test_ours.ps1') {
-        $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
-        $pt = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
-        $inWin = $pt.Hour -lt 6 -or ($pt.Hour -ge 9 -and $pt.Hour -lt 17)
-        $ovr = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\window_override.txt'   # one line: the override's end, ISO, PT
-        if (-not $inWin -and (Test-Path $ovr)) { try { $inWin = $pt -lt [datetime](Get-Content $ovr -TotalCount 1) } catch { } }
+        $gameUp = [bool](Get-Process F1_25, swofty-launcher -ErrorAction SilentlyContinue)
+        $inWin = -not $gameUp
         $paused = Test-Path (Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt')
         if ($inWin -and -not $paused) {
             & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 *> $null
             if ($LASTEXITCODE -ne 0) { $fails += 'test_ours' } else { '  ok test_ours (pure + live)' }
         } else {
             & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_ours.ps1 -PureOnly *> $null
-            $why = if ($paused) { 'paused' } else { "outside a testing window ($($pt.ToString('HH:mm')) PT)" }
+            $why = if ($paused) { 'paused' } else { 'a game or launcher is running' }
             if ($LASTEXITCODE -ne 0) { $fails += 'test_ours (pure)' } else { "  ok test_ours (pure only: $why; live part not run)" }
         }
     }
     if (Test-Path 'tools/test_pause.ps1') {
-        # like test_ours: the live cases (PING dummies, a real pause run) only inside a window and not while paused
+        # like test_ours: the live cases (PING dummies, a real pause run) not while paused or while a game is running
         if ($inWin -and -not $paused) {
             & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 *> $null
             if ($LASTEXITCODE -ne 0) { $fails += 'test_pause' } else { '  ok test_pause (pure + live)' }
         } else {
             & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_pause.ps1 -PureOnly *> $null
-            $why = if ($paused) { 'paused' } else { 'outside a testing window' }
+            $why = if ($paused) { 'paused' } else { 'a game or launcher is running' }
             if ($LASTEXITCODE -ne 0) { $fails += 'test_pause (pure)' } else { "  ok test_pause (pure only: $why; live part not run)" }
         }
     }
