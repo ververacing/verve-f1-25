@@ -85,6 +85,8 @@ elseif ($bin -and (Test-Path $bin)) {
     $ErrorActionPreference = 'Continue'
     & python -I (Join-Path $PSScriptRoot 'race_feel.py') (Join-Path $out 'raw\udp.bin') --out (Join-Path $out 'race_feel') *> (Join-Path $out 'race_feel_stdout.txt')
     "race_feel exit: $LASTEXITCODE"
+    # #100 validity (supervisor, 2026-11-15): a race with rain in its race session is invalid ("weather")
+    & python -I (Join-Path $PSScriptRoot 'weather_check.py') (Join-Path $out 'raw\udp.bin') --out $out | Select-Object -First 1
     $ErrorActionPreference = 'Stop'
 } else { 'race_feel: no UDP capture found for this race' }
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
