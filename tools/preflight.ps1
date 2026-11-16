@@ -17,7 +17,7 @@ Checks, in order, and exits 1 on the first hard failure:
 #>
 param(
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $Build = '25251167'
+    [string] $Build = '26566308'   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
 )
 $ErrorActionPreference = 'Stop'
 $doc = & $Swofty doctor

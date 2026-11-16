@@ -25,6 +25,23 @@ The supervisor's rulings (16 Nov):
   lines on the new build.
 - **One stock smoke race after the update, before B-0018.** The dry-lock discovery of #118 can be it.
 
+**Launcher update, 16 Nov 07:25 PT** (Tyler: "Yes you always have approval to update the swofty launcher").
+- **Launcher:** the installed copy was already **1.9.56** (files from 15 Nov 21:59 PT), not 1.9.51 as recorded.
+  `swofty update --check` offered 1.9.58, and `swofty update` installed it. Now **launcher 1.9.58, swofty.core
+  0.2.13** (as listed; the core files are from this install), **F1 25 build 26566308** (Steam 1.0.145.2472).
+- **Bindings:** the new core ships `bindings.steam-26566308.json` and `bindings.ea-1-0-145.json` next to the old
+  bindings.
+- **verve-test add-ons:** dromodf.skip-cutscenes 1.9.4 is now disabled. twilight.offline-quiet 1.0.1 and
+  teamsimplified.mods 0.13.9 stay enabled. Their manifests don't restrict `game_builds`, and
+  `registry check` says "every dependency is met". The first run's `registry status` shows whether the gate
+  accepts them.
+- **Gate and our add-ons:** swofty.lap1-ai 1.0.0 declares `game_builds >=25251167`, so it passes. Our generated
+  verve.* add-ons (`tools/b0014_make.py`) declare `game_builds ["25251167"]` and would be gated off on 26566308.
+  Re-pin the generator before the next generated add-on.
+- **Pre-flight** is pinned to 26566308. Doctor still shows `drift game build 26566308 differs from baseline
+  25251167`: Swofty's record of the original game files is from the old build. Pre-flight treats this as real drift
+  until Swofty re-baselines (`swofty setup reset`, verify, `setup done`, pending the supervisor's ruling).
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
