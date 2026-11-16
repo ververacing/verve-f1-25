@@ -82,7 +82,7 @@ try {
             if ($LASTEXITCODE -ne 0) { $fails += 'test_pause (pure)' } else { "  ok test_pause (pure only: $why; live part not run)" }
         }
     }
-    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'), @('weather_check --selftest', 'tools/weather_check.py'), @('b0018_check --selftest', 'tools/b0018_check.py'))) {
+    foreach ($t in @(@('b0015_check --selftest', 'tools/b0015_check.py'), @('b0016_check --selftest', 'tools/b0016_check.py'), @('weather_check --selftest', 'tools/weather_check.py'), @('b0018_check --selftest', 'tools/b0018_check.py'), @('udp_finish_watch --selftest', 'tools/udp_finish_watch.py'))) {
         if (Test-Path $t[1]) {
             & $Python -I $t[1] --selftest *> $null
             if ($LASTEXITCODE -ne 0) { $fails += $t[0] } else { "  ok $($t[0])" }
