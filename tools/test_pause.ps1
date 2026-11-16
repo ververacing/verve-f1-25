@@ -73,6 +73,26 @@ try {
     Check 'the UDP capture (another role) was left running' (-not $cap.HasExited)
     Check 'the race is marked pause_cut.txt' (Test-Path (Join-Path $run 'pause_cut.txt'))
     Check "it took under 60 s ($([int]$secs) s, with a 3 s quit wait)" ($secs -lt 60)
+
+    # a foreign hit just before the checks step (supervisor's condition): no check runs while it's there
+    $dummyDir = Join-Path $tmp 'foreign'; New-Item -ItemType Directory -Force $dummyDir | Out-Null
+    Copy-Item $ping (Join-Path $dummyDir 'F1_25.exe')
+    foreach ($case in @(@{ hold = 9; label = 'stays 9 s'; want = 1 }, @{ hold = 2; label = 'goes within the 5 s'; want = 0 })) {
+        & powershell @common -Clear | Out-Null
+        $marker = Join-Path $tmp "checks_$($case.hold).txt"
+        $job = Start-Process powershell -PassThru -WindowStyle Hidden -ArgumentList (@($common) + @('-HoldBeforeChecksS', '3', '-ChecksMarker', $marker))
+        Start-Sleep -Seconds 1
+        $f = Start-Process (Join-Path $dummyDir 'F1_25.exe') -ArgumentList '-n', '60', '127.0.0.1' -WindowStyle Hidden -PassThru
+        Start-Sleep -Seconds ($case.hold + 2)   # the hold ends at about 3 s, then the 5 s wait for the hit to go
+        $markerDuring = Test-Path $marker
+        if (-not $f.HasExited) { $f.Kill() }
+        $job.WaitForExit(30000) | Out-Null
+        if ($case.want -eq 1) {
+            Check "foreign hit that $($case.label): WAIT, and no check ran" ($job.ExitCode -eq 1 -and -not (Test-Path $marker)) "exit $($job.ExitCode), marker $(Test-Path $marker)"
+        } else {
+            Check "foreign hit that $($case.label): no check ran while it was there, then the checks went on" (-not $markerDuring -and $job.ExitCode -eq 0 -and (Test-Path $marker)) "exit $($job.ExitCode), marker during $markerDuring, after $(Test-Path $marker)"
+        }
+    }
 } finally {
     foreach ($h in $cap, $sh, $gm) { if ($h -and -not $h.HasExited) { $h.Kill() } }   # the test's own handles
     Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
