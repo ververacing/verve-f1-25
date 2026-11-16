@@ -10,7 +10,8 @@ Reads the growing capture (records of <wall f64><length u16><packet>) from where
 resultStatus 2 or more seen) has resultStatus >= 3 (finished, DNF, DSQ, retired, ...). The player car is ignored: on the
 spectator garage route it stays at 2 (active) in the garage.
 Exit 0 all AI done; 1 timeout at the leader's finish + --after-leader-s (the first AI status 3) with AI still running;
-2 --max-s passed with no finish (or no race session); 3 no capture file. Prints one summary line.
+2 --max-s passed with no finish (or no race session); 3 no capture file; 4 the LapData layout from tools/udp_parse.py
+isn't the expected one (57-byte entry, resultStatus at byte 45), so nothing is watched. Prints one summary line.
 """
 from __future__ import annotations
 
@@ -20,20 +21,19 @@ import sys
 import time
 from pathlib import Path
 
-HEADER = struct.Struct("<HBBBBBQfIIBB")
-LAP_SIZE = 57
-RSTATUS_OFF = 0
+sys.path.insert(0, str(Path(__file__).parent))
+import udp_parse as u  # noqa: E402   one source of truth for the LapData layout (#139 review)
+
+HEADER = u.HEADER
 REC = struct.Struct("<dH")
+LAP_SIZE = u.LAP.size
+# resultStatus's byte offset in a LapData entry: the size of the fields before L_RSTATUS in udp_parse's LAP format
+RSTATUS_OFF = struct.calcsize("<" + u.LAP.format.lstrip("<=>!@")[:u.L_RSTATUS])
+EXPECT_LAP_SIZE, EXPECT_RSTATUS_OFF = 57, 45   # F1 25 spec (formats 2025 and 2026)
 
 
-def _rstatus_offset() -> int:
-    # resultStatus is field 26 of the LapData entry (tools/udp_parse.py LAP, L_RSTATUS)
-    lap = struct.Struct("<IIHBHBHBHBfffBBBBBBBBBBBBBBBHHBfB")
-    fmt = "<IIHBHBHBHBfffBBBBBBBBBBBBBBBHHBfB"[1:]
-    return struct.calcsize("<" + fmt[:26]) if lap.size == LAP_SIZE else 0
-
-
-RSTATUS_OFF = _rstatus_offset()
+def layout_ok() -> bool:
+    return LAP_SIZE == EXPECT_LAP_SIZE and RSTATUS_OFF == EXPECT_RSTATUS_OFF
 
 
 class Watch:
@@ -149,6 +149,9 @@ def selftest() -> int:
         code, msg = run(p, 900, 150, fake_clock, fake_sleep)
         ok &= code == 0
         print("case DNFs done:", code, msg)
+    ok &= layout_ok()
+    print("case layout:", f"LapData entry {LAP_SIZE} bytes, resultStatus at byte {RSTATUS_OFF}",
+          "ok" if layout_ok() else f"WRONG (expected {EXPECT_LAP_SIZE} / {EXPECT_RSTATUS_OFF})")
     print("selftest", "ok" if ok else "FAILED", "| resultStatus offset", RSTATUS_OFF)
     return 0 if ok else 1
 
@@ -160,6 +163,10 @@ def main() -> int:
     if "--bin" not in a:
         print(__doc__)
         return 3
+    if not layout_ok():   # never guess an offset: a wrong one could read lastLapTime's low byte and quit mid-race
+        print(f"udp finish watch: LapData layout mismatch (entry {LAP_SIZE} bytes, resultStatus at {RSTATUS_OFF}; "
+              f"expected {EXPECT_LAP_SIZE} / {EXPECT_RSTATUS_OFF}); not watching (exit 4)")
+        return 4
     path = Path(a[a.index("--bin") + 1])
     max_s = float(a[a.index("--max-s") + 1]) if "--max-s" in a else 900.0
     after = float(a[a.index("--after-leader-s") + 1]) if "--after-leader-s" in a else 150.0
