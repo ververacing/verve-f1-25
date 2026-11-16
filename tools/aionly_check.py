@@ -82,6 +82,28 @@ def race_stream(run: Path, uid: str, player: int | None, n_cars: int = 20) -> di
     return {"points": pts, "player": ps, "laps": laps}
 
 
+GARAGE_LINE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d+) .*GARAGE: car (\d+) sent to the garage", re.M)
+
+
+def garage_wall(log: str, player: str) -> float | None:
+    """Wall time (epoch) of the spectator add-on's "GARAGE: car <player> sent to the garage" line (loader.log is local
+    time), or None."""
+    import datetime
+    hit = next((mt for mt in GARAGE_LINE.finditer(log) if mt[2] == str(player)), None)
+    return datetime.datetime.strptime(hit[1], "%Y-%m-%d %H:%M:%S.%f").timestamp() if hit else None
+
+
+def garage_session_time(wall: float | None, pts) -> float | None:
+    """The garage line's wall time mapped to session time through the nearest race packet. Before lights out session
+    time sits at 0, so a car parked on the grid before the start reads about 0."""
+    if wall is None or not pts:
+        return None
+    near = min(pts, key=lambda p: abs(p[0] - wall))
+    if abs(near[0] - wall) > 5:
+        return None
+    return round(max(near[1] + (wall - near[0]), 0.0) if near[1] == 0 else near[1] + (wall - near[0]), 2)
+
+
 def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str], list[str], dict]:
     invalid: list[str] = []
     fails: list[str] = []
@@ -184,21 +206,27 @@ def check(run: Path, gamedb: int, track: str, loader_tag: str) -> tuple[list[str
     if m["scar"]:
         fails.append(f"SCAR events: {m['scar']}")
     pv, po = f"vehicle={player}", f"other={player}"
-    garage = next((t for t, st in (rs or {}).get("player", []) if t > t_lgot and st == 0), None)
-    m["player_in_garage_s"] = round(garage, 2) if garage is not None else None
-
-    def before_garage(t: float) -> bool:
-        return t >= t_lgot and (garage is None or t <= garage)
-    coll = [float(e["session_time"]) for e in events if e["code"] == "COLL"
-            and (pv in e["fields"].split(";") or po in e["fields"].split(";")) and before_garage(float(e["session_time"]))]
+    # When the car reached the garage: the add-on's "GARAGE: car N sent" loader line (wall clock), mapped to session
+    # time through the race packets. LapData driverStatus 0 can read 0 before the car has left the grid (info only).
+    ds0 = next((t for t, st in (rs or {}).get("player", []) if t > t_lgot and st == 0), None)
+    m["player_driverstatus0_s_info"] = round(ds0, 2) if ds0 is not None else None
+    gw = garage_wall(log, player)
+    m["player_in_garage_s"] = garage_session_time(gw, pts)
+    lgot_wall = next((float(e["wall_time"]) for e in events if e["code"] == "LGOT" and e.get("wall_time")), None)
+    # negative: the car was parked before lights out (it never sat on the grid at the start)
+    m["player_garage_vs_lights_out_s"] = round(gw - lgot_wall, 2) if gw is not None and lgot_wall is not None else None
+    # #134 ruling 5, as reviewed: ANY COLL involving the player car or ANY PENA for it, lights out to the end = FAIL.
+    # A parked car should never get either, wherever it is.
+    coll = [float(e["session_time"]) for e in events if e["code"] == "COLL" and float(e["session_time"]) >= t_lgot
+            and (pv in e["fields"].split(";") or po in e["fields"].split(";"))]
     m["player_coll_s"] = coll
     if coll:
         fails.append(f"COLL with the player car at {', '.join(f'{t:.1f}' for t in coll)} s")
-    pena = [float(e["session_time"]) for e in events if e["code"] == "PENA" and pv in e["fields"].split(";")]
+    pena = [float(e["session_time"]) for e in events if e["code"] == "PENA" and float(e["session_time"]) >= t_lgot
+            and pv in e["fields"].split(";")]
     m["player_pena_s"] = pena
-    early = [t for t in pena if garage is None or t <= garage]
-    if early:
-        fails.append(f"PENA for the player car before it was in the garage, at {', '.join(f'{t:.1f}' for t in early)} s")
+    if pena:
+        fails.append(f"PENA for the player car at {', '.join(f'{t:.1f}' for t in pena)} s")
     m["player_lapdata_status"] = laps.get(pidx, {}).get("status") if pidx is not None else None
     lap1 = [r for r in read_csv(run / "udp" / "laps.csv") if r["session_uid"] == uid and r["lap"] == "1" and r["car"] != player]
     if lap1:
@@ -220,7 +248,8 @@ def selftest() -> int:
     global _RACE_OVERRIDE
     ok = True
     results = []
-    live = [(1000.0 + t / 60, t / 60, 2) for t in range(0, 550 * 60, 6)]   # 0-550 s live at 60 Hz, no FC packet
+    W0 = 1794849000.0   # a 2026 wall clock (Windows can't convert 1970-era local times)
+    live = [(W0 + t / 60, t / 60, 2) for t in range(0, 550 * 60, 6)]   # 0-550 s live at 60 Hz, no FC packet
 
     def lapstate(n_finished=19, leader_ok=True):
         st = {c: {"status": 3 if c < n_finished else 2, "pos": c + 1, "finish_s": 400.0 + c if c < n_finished else None}
@@ -254,10 +283,15 @@ def selftest() -> int:
               [["7", str(c), str(n), "90000", "1"] for c in range(19) for n in range(1, 5) if not (c == skip_car and n > 1)])
 
         def events(extra=()):
-            w("events.csv", ["session_uid", "session_time", "wall_time", "code", "fields"], [["7", "0.0", "1000.0", "LGOT", ""]] + list(extra))
+            w("events.csv", ["session_uid", "session_time", "wall_time", "code", "fields"], [["7", "0.0", str(W0), "LGOT", ""]] + list(extra))
         laps_csv(); events()
         (run / "weather.txt").write_text("weather: LOCKED\n", encoding="utf-8")
-        (run / "raw" / "loader.log").write_text("[assets] gamedb: 56 overwritten\n[spectator] START IN GARAGE\n", encoding="utf-8")
+        import datetime
+        gwall = datetime.datetime.fromtimestamp(W0 + 2.0).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]   # session time 2.0
+        (run / "raw" / "loader.log").write_text(
+            "[assets] gamedb: 56 overwritten\n[spectator] START IN GARAGE\n"
+            f"{gwall} [ 1] [spectator] off GARAGE: car 19 sent to the garage (start in the garage), call returned 0\n",
+            encoding="utf-8")
 
         def case(name, want, **kw):
             nonlocal ok
@@ -270,20 +304,26 @@ def selftest() -> int:
             results.append(f"{'ok' if good else 'FAIL'} {name}: {v}")
             return m
         m = case("no FinalClassification, LapData finishes (19), live", "PASS")
-        ok &= m["leader_finish_s"] == 400.0 and m["player_in_garage_s"] == 2.5 and m["ai_finished"] == 19
+        ok &= m["leader_finish_s"] == 400.0 and m["player_in_garage_s"] == 2.0 and m["ai_finished"] == 19
+        ok &= m["player_driverstatus0_s_info"] == 2.5
+        results.append(f"{'ok' if m['player_in_garage_s'] == 2.0 else 'FAIL'} garage time from the loader line: {m['player_in_garage_s']}")
         case("timeout with 17 AI finished", "INVALID", laps=lapstate(n_finished=17))
         case("18 AI finished (one DNF-at-quit), its laps missing", "PASS", laps=lapstate(n_finished=18))
         case("leader not status 3", "INVALID", laps=lapstate(leader_ok=False))
         case("run-in fast-forwarded after the leader's finish", "PASS",
-             points=[p for p in live if p[1] <= 401] + [(1402.0, 470.0, 2), (1402.5, 470.5, 2)])
+             points=[p for p in live if p[1] <= 401] + [(W0 + 402.0, 470.0, 2), (W0 + 402.5, 470.5, 2)])
         case("simulated past the finish (31 -> 450 s)", "FAIL",
-             points=[p for p in live if p[1] <= 31] + [(1121.0, 450.5, 2), (1121.5, 451.0, 2)])
+             points=[p for p in live if p[1] <= 31] + [(W0 + 121.0, 450.5, 2), (W0 + 121.5, 451.0, 2)])
         events([["7", "1.5", "1001.5", "COLL", "vehicle=18;other=19"]])
-        case("COLL with the player car before the garage", "FAIL")
+        case("COLL with the player car at 1.5 s while driverStatus already reads 0", "FAIL", player=[(0.1, 0), (2.5, 0)])
         events([["7", "30.0", "1030.0", "COLL", "vehicle=18;other=19"]])
-        case("COLL with the player car after the garage", "PASS")
+        case("COLL with the player car after the garage (any time is FAIL)", "FAIL")
         events([["7", "1.8", "1001.8", "PENA", "penalty_type=5;infringement=1;vehicle=19"]])
         case("PENA for the player before the garage", "FAIL")
+        events([["7", "60.0", "1060.0", "PENA", "penalty_type=5;infringement=1;vehicle=19"]])
+        case("PENA for the player after the garage", "FAIL")
+        events([["7", "30.0", "1030.0", "COLL", "vehicle=6;other=8"]])
+        case("a COLL between two AI cars only", "PASS")
         events([["7", "100.0", "1100.0", "SCAR", ""]])
         case("SCAR", "FAIL")
         events()
@@ -322,7 +362,7 @@ def main() -> int:
     v = verdict(invalid, fails)
     lines = [f"AI-only check: {v}"] + [f"  INVALID: {i}" for i in invalid] + [f"  FAIL: {f}" for f in fails]
     for k in ("ai_finished", "leader_finish_s", "live_ratio", "live_max_gap_s", "run_in_ratio_info", "scar",
-              "player_in_garage_s", "player_pena_s", "player_coll_s", "player_lapdata_status", "lap1_median_s_info",
+              "player_in_garage_s", "player_garage_vs_lights_out_s", "player_driverstatus0_s_info", "player_pena_s", "player_coll_s", "player_lapdata_status", "lap1_median_s_info",
               "lap1_over_3s_info", "loader_not_found"):
         if k in m:
             lines.append(f"  {k}: {m[k]}")
