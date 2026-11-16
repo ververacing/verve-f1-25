@@ -1,0 +1,58 @@
+AI-only check: PASS
+  ai_finished: 19
+  leader_finish_s: 401.5
+  live_ratio: 1.0
+  live_max_gap_s: 0.03
+  run_in_ratio_info: 1.0
+  scar: 0
+  player_in_garage_s: 0.0
+  player_garage_vs_lights_out_s: -4.21
+  player_driverstatus0_s_info: 0.02
+  player_pena_s: []
+  player_coll_s: []
+  player_lapdata_status: 2
+  lap1_median_s_info: 87.174
+  lap1_over_3s_info: ['BEARMAN']
+  loader_not_found: []
+  grid: 1:HULKENBERG, 2:HAMILTON, 3:LAWSON, 4:SAINZ, 5:LECLERC, 6:TSUNODA, 7:COLAPINTO, 8:OCON, 9:ALONSO, 10:VERSTAPPEN, 11:HADJAR, 12:NORRIS, 13:BORTOLETO, 14:ALBON, 15:ANTONELLI, 16:RUSSELL, 17:PIASTRI, 18:GASLY, 19:BEARMAN, 20:player
+  final: 1:HAMILTON, 2:LECLERC, 3:HULKENBERG, 4:SAINZ, 5:LAWSON, 6:COLAPINTO, 7:TSUNODA, 8:OCON, 9:ALONSO, 10:VERSTAPPEN, 11:NORRIS, 12:ANTONELLI, 13:HADJAR, 14:BORTOLETO, 15:PIASTRI, 16:GASLY, 17:ALBON, 18:RUSSELL, 19:BEARMAN, 20:player
+  loader: 2026-11-16 11:04:42.237 [26412] [core] bind Hud_SpectatorScreenVM_OnScreenDeactivated -> 0x141c25640 (base+0x1c25640), func experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.387 [26412] [core] bind Sess_SpectatorDirector_SetActive -> 0x142e1abe0 (base+0x2e1abe0), func experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.387 [26412] [core] bind Sess_SpectatorDirector_Update -> 0x142e1b360 (base+0x2e1b360), func experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.387 [26412] [core] bind Sess_SpectatorHud_Hide -> 0x141c253e0 (base+0x1c253e0), func experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.387 [26412] [core] bind Sess_SpectatorHud_Show -> 0x141c263a0 (base+0x1c263a0), func experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.473 [26412] [core] bind k_Live_SpectatorDirectorKey -> 0x146082ca8 (base+0x6082ca8), data experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.588 [26412] [core] bind vt_Sess_SpectatorReadyMonitor -> 0x14585fff0 (base+0x585fff0), vtable experimental via pattern at the KB address
+  loader: 2026-11-16 11:04:42.594 [26412] [bind] id=Hud_SpectatorScreenVM_OnScreenDeactivated build=steam pass=init result=resolved method=hint matches=1 rva=0x1c25640 match=0x1c25640 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.595 [26412] [bind] id=Sess_SpectatorDirector_SetActive build=steam pass=init result=resolved method=hint matches=1 rva=0x2e1abe0 match=0x2e1abe0 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.595 [26412] [bind] id=Sess_SpectatorDirector_Update build=steam pass=init result=resolved method=hint matches=1 rva=0x2e1b360 match=0x2e1b360 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.595 [26412] [bind] id=Sess_SpectatorHud_Hide build=steam pass=init result=resolved method=hint matches=1 rva=0x1c253e0 match=0x1c253e0 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.595 [26412] [bind] id=Sess_SpectatorHud_Show build=steam pass=init result=resolved method=hint matches=1 rva=0x1c263a0 match=0x1c263a0 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.595 [26412] [bind] id=k_Live_SpectatorDirectorKey build=steam pass=init result=resolved method=hint matches=1 rva=0x6082ca8 match=0x391d45 verified=yes reason="" site_bytes=""
+  loader: 2026-11-16 11:04:42.596 [26412] [bind] id=vt_Sess_SpectatorReadyMonitor build=steam pass=init result=resolved method=hint matches=1 rva=0x585fff0 match=0x8418ee verified=yes reason="" site_bytes=""
+  loader: [offline] module: kizi_spectator_hud.dll @ 0x7ffb8c4d0000
+  loader: 2026-11-16 11:04:43.591 [26412] addon kizi_spectator_hud.dll: calling SwoftyAddonRegister (API v9) at the early stage
+  loader: 2026-11-16 11:04:43.591 [26412] addon kizi_spectator_hud.dll: SwoftyAddonRegister returned 1 (0 ms)
+  loader: 2026-11-16 11:04:43.592 [26412] addon kizi_spectator_hud.dll: loads at the window stage
+  loader: 2026-11-16 11:04:43.634 [23624] [assets] resources: overlay ERP swofty/assets/resources/0.erp prebuilt by the launcher (4541 bytes, 1 resource(s): 1 replaced, 0 added) for 2 target ERP(s): 2025_asset_groups/ui_package/flow_race.erp, 2025_asset_groups/ui_package/screens/hud_spectator_2.erp
+  loader: 2026-11-16 11:04:44.905 [24504] [perf] VirtualQuery accounting on in game exe (1), version.dll (1), swofty_gamelog.dll (1), starting_grid.dll (1), simplified.dll (1), kizi_spectator_hud.dll (1); import slot(s) in brackets
+  loader: 2026-11-16 11:04:48.321 [26412] addon kizi_spectator_hud.dll: loading C:\Program Files (x86)\Steam\steamapps\common\F1 25\swofty\addons\kizi.spectator-hud\native\kizi_spectator_hud.dll
+  loader: 2026-11-16 11:04:48.321 [26412] addon kizi_spectator_hud.dll: loaded at 00007ffb8c4d0000, calling SwoftyAddonInit (API v9)
+  loader: 2026-11-16 11:04:48.321 [26412] [core] addon kizi_spectator_hud.dll: registered 3 mixin(s)
+  loader: 2026-11-16 11:04:48.321 [26412] addon kizi_spectator_hud.dll: SwoftyAddonInit returned 1 (ok)
+  loader: 2026-11-16 11:04:48.322 [26412] [core] wrap Ne_Post_BusMessage at 0x143989c50 (base+0x3989c50) installed: kizi_spectator_hud.dll(0)
+  loader: 2026-11-16 11:04:48.322 [26412] [core] wrap Game_Pitlane_SetVehicleStatus at 0x1434beac0 (base+0x34beac0) installed: kizi_spectator_hud.dll(0)
+  loader: 2026-11-16 11:04:48.322 [26412] [spectator] v0.1.11 loading: auto 1, hotkey F4, leave own car 1
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.start by kizi.spectator-hud -> ok token 2147483656
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on race.start by kizi.spectator-hud -> ok token 2147483657
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.state.enter by kizi.spectator-hud -> ok token 2147483658; the core doesn't fire session.state.enter in this version, so live() reports it unavailable
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.grid by kizi.spectator-hud -> ok token 2147483659; the core doesn't fire session.grid in this version, so live() reports it unavailable
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.formation_lap by kizi.spectator-hud -> ok token 2147483660; the core doesn't fire session.formation_lap in this version, so live() reports it unavailable
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.end by kizi.spectator-hud -> ok token 2147483661
+  loader: 2026-11-16 11:04:48.322 [26412] [events] attach after on session.unload by kizi.spectator-hud -> ok token 2147483662
+  loader: 2026-11-16 11:04:48.322 [26412] [spectator] keep race: terminal damage message found (matches 1)
+  loader: 2026-11-16 11:04:48.323 [26412] [spectator] HUD hide masks: found (matches 1)
+  loader: 2026-11-16 11:04:48.323 [ 8704] [spectator] UDP telemetry: not listening (only used for 'park my teammate too' and the TV director)
+  loader: 2026-11-16 11:04:48.323 [26412] [spectator] HUD visibility update: found (matches 1)
+  loader: 2026-11-16 11:04:48.633 [26412] [spectator] HUD block: 20 place(s) in the game code set hide reason 0 (rva: 0x2d59623 0x2d596e6 0x2d68925 0x2d69023 0x2d690e6 0x2d6cf83 0x2d6d046 0x2d81713 0x2d817d6 0x2d92846 0x2d92916 0x2da4a7a 0x2da4b46 0x2da8743 0x2da8806 0x36f9297 0x36f9366 0xe509c03 0xe509ccd 0xe6bbab3)
+  loader: 2026-11-16 11:04:48.641 [26412] [spectator] UI registry: ready (registry ok, Vm_Set_Bool ok, node path ok)

@@ -1,0 +1,1 @@
+race_feel.py at 481d0b9 2026-11-16 (main, #140 per-car finish window); re-run at the batch end; exit 0

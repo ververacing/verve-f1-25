@@ -1,0 +1,3 @@
+﻿launcher before launch: 1.9.59
+launcher in game (loader.log): not found
+LAUNCHER CHANGED: race 3 ran on 1.9.59, this race on not found

@@ -1,0 +1,103 @@
+{
+  "session_uid": 6085064618463657297,
+  "track_id": 9,
+  "track_length_m": 4378,
+  "laps": 5,
+  "ai_difficulty": 100,
+  "player_car": 19,
+  "ai_cars": 19,
+  "median_green_lap_s": 80.126,
+  "lap1_loss_median_s": 7.465,
+  "lap1_positions_changed": 24,
+  "lap1_held_changes": 19,
+  "lap1_spread_s": 6.937,
+  "lap1_collisions": 2,
+  "train_time_share": 0.8316,
+  "held_passes_net_2plus": 2,
+  "held_passes_2plus_as_71": 2,
+  "ovtk_raw": 31,
+  "longest_train_median": 18.0,
+  "longest_train_max": 19,
+  "early_brakes_total": 12,
+  "early_brakes_in_traffic": 12,
+  "phantom_brakes": 0,
+  "phantom_brakes_clear2s": 0,
+  "phantom_cars_scored": 18,
+  "phantom_onsets_scored_share": 0.992,
+  "phantom_ref_counts": {
+    "own": 11,
+    "field": 904
+  },
+  "phantom_by_ref": {
+    "own": 0,
+    "field": 12
+  },
+  "corners": {
+    "total": 12,
+    "scored": 11
+  },
+  "rear_end_contacts": 2,
+  "pit_cycle_passes": 0,
+  "contacts": [
+    {
+      "t": 14.295,
+      "cars": [
+        2,
+        1
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "2": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "1": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 16.722,
+      "cars": [
+        6,
+        5
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "6": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "5": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    }
+  ],
+  "costly_contact_cars": 0,
+  "lap1_costly_contacts": 0,
+  "front_wing_increments": 0,
+  "guards": {
+    "collisions": 2,
+    "wing_damage_added": 0,
+    "dnfs": 0,
+    "penalties": 0,
+    "median_green_lap_s": 80.126
+  },
+  "damage_packets_seen": true,
+  "bad_sizes": {}
+}

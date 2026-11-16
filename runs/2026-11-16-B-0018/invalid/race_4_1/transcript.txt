@@ -1,0 +1,35 @@
+saves before: 179 entries; profile verve-test (1280B3A6FCF36A7C6B0D11F78B2353FE70E979CACEF4D33CC0DF5113DF04ADC4) +addons ; active profile tyler
+udp capture pid 13284
+attempt 1 started 10:29:28
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261116-182928-1 ({"schema":1,"run":"shell-20261116-182928-1","state":"armed","pid":12876,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261116-182928-1\\saves\\remote","why":""})
+game pid 12876 (sandbox.json)
+10:30:08 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":17328}
+10:30:09 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":12876,"run":"shell-20261116-182928-1","ticks":612,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 12876 (test agent)
+intro skipped (splash after 17 s); relaunching
+10:30:09 > quit  =>  {"seq":3,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 10:30:09
+quit: the shell exited on its own
+attempt 2 started 10:30:28
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261116-183028-1 ({"schema":1,"run":"shell-20261116-183028-1","state":"armed","pid":22188,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261116-183028-1\\saves\\remote","why":""})
+game pid 22188 (sandbox.json)
+10:31:08 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":16500}
+10:31:08 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":22188,"run":"shell-20261116-183028-1","ticks":625,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 22188 (test agent)
+intro skipped (splash after 16 s); relaunching
+10:31:08 > quit  =>  {"seq":3,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 10:31:08
+quit: the shell exited on its own
+attempt 3 started 10:31:24
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261116-183124-1 ({"schema":1,"run":"shell-20261116-183124-1","state":"armed","pid":24012,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261116-183124-1\\saves\\remote","why":""})
+game pid 24012 (sandbox.json)
+10:32:04 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":16375}
+10:32:04 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":24012,"run":"shell-20261116-183124-1","ticks":609,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 24012 (test agent)
+intro skipped (splash after 16 s); relaunching
+10:32:04 > quit  =>  {"seq":3,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 10:32:04
+quit: the shell exited on its own
+result: intro skipped
+udp recording: 0 bytes
+saves unchanged (179 entries)

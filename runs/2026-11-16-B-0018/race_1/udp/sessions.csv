@@ -1,0 +1,3 @@
+session_uid,format,game_version,session_type,track_id,total_laps,n_active,player_car,lights_out_s,lapdata_grid_order,bad_sizes,packets,ai_difficulty
+0,2026,25.1.27,,,,,19,,spec,,event=171;session_history=20,
+14587418231939725052,2026,25.1.27,race,9,5,20,19,0.0,spec,,motion=32897;session=1103;lap_data=32897;event=134;participants=112;car_setups=1103;car_telemetry=32897;car_status=32897;car_damage=5507;session_history=10989;tyre_sets=11013;motion_ex=32897;lap_positions=552;car_telemetry_2=32897,100

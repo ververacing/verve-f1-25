@@ -1,0 +1,2 @@
+weather: NONE
+  forecast (race samples): weather {}, rain% {}
