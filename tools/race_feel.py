@@ -97,6 +97,29 @@ FINISHED = 3  # FinalClassification result status
 
 # ---------- pure metric functions (the selftest calls these directly) ----------
 
+def finish_times(frames: list, n: int) -> dict[int, float]:
+    """Each car's first LapData frame at resultStatus 3 (finished). #134 ruling 3: a car's race-feel window ends there."""
+    fin: dict[int, float] = {}
+    for t, cars in frames:
+        for c in range(min(n, len(cars))):
+            if c not in fin and cars[c][u.L_RSTATUS] == FINISHED:
+                fin[c] = t
+    return fin
+
+
+def racing(fin: dict[int, float], car: int, t: float) -> bool:
+    """True while the car is still racing at t (before or at its own finish)."""
+    return car not in fin or t <= fin[car]
+
+
+def race_ovtk(ovtk: list[tuple[float, int, int]], fin: dict[int, float], player: int | None = None,
+              parked=lambda t: False) -> list[tuple[float, int, int]]:
+    """OVTK events that count: both cars still racing (no cruising after the flag, #134 ruling 3), and not involving
+    the player car while it's parked in the garage (the spectator route)."""
+    return [(t, a, b) for t, a, b in ovtk
+            if racing(fin, a, t) and racing(fin, b, t) and not (player in (a, b) and parked(t))]
+
+
 def held_passes(ovtk: list[tuple[float, int, int]], hold: float = HOLD_S) -> list[dict]:
     """OVTK (time, overtaker, overtaken), with the time until the same pair swaps back, whether it's held (as #71 and
     tools/b0014_check.py: a reversal that isn't itself reversed counts as held), whether it restores a pass from the
@@ -384,6 +407,9 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     ai = [c for c in range(n) if c != player]
     track_len = s.get("track_length")
     ftimes = [t for t, _ in frames]
+    # #134 ruling 3: each car's window ends at its own finish (LapData resultStatus 3): no cruising after the flag in
+    # trains, held passes or braking onsets. On the spectator route the player car sits parked in the garage.
+    fin = finish_times(frames, n)
 
     def frame_at(t: float):
         i = bisect.bisect_right(ftimes, t) - 1
@@ -432,6 +458,10 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     def lap_of(car: int, t: float) -> int:
         return frame_at(t)[car][u.L_LAPNUM]
     ovtk = [(st, f["vehicle"], f["other"]) for st, _, code, f in s["events"] if code == "OVTK" and "vehicle" in f]
+
+    def parked(t: float) -> bool:
+        return player is not None and player < n and frame_at(t)[player][u.L_DSTATUS] == 0   # in the garage
+    ovtk = race_ovtk(ovtk, fin, player, parked)
     passes = held_passes(ovtk)
     for p in passes:
         p["lap"] = lap_of(p["car"], p["t"]) if p["car"] < n else 0
@@ -449,10 +479,12 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     for t, cars in frames:
         by_pos = {cars[c][u.L_POS]: c for c in range(n) if cars[c][u.L_POS]}
         for c in ai:
+            if not racing(fin, c, t):
+                continue
             g = gap_ahead(cars[c])
             samples[c].append((t, cars[c][u.L_LAPNUM], g, by_pos.get(cars[c][u.L_POS] - 1), bool(cars[c][u.L_PIT])))
         lead = by_pos.get(1)
-        if lead is not None and cars[lead][u.L_LAPNUM] > leader_lap:
+        if lead is not None and racing(fin, lead, t) and cars[lead][u.L_LAPNUM] > leader_lap:
             leader_lap = cars[lead][u.L_LAPNUM]
             if leader_lap >= 2:
                 order = [by_pos[p] for p in sorted(by_pos)]
@@ -484,11 +516,13 @@ def analyse(capture: Path) -> tuple[list[dict], dict]:
     ref_count = {"own": 0, "field": 0}
     for c in ai:
         for t, lap, d in onsets[c]:
-            if lap < 1 or d < 0:
+            if lap < 1 or d < 0 or not racing(fin, c, t):
                 continue
             cars = frame_at(t)
             pos = cars[c][u.L_POS]
             behind = next((x for x in range(n) if cars[x][u.L_POS] == pos + 1), None)
+            if behind is not None and not racing(fin, behind, t):
+                behind = None   # a follower cruising after its flag isn't a follower
             gb = gap_ahead(cars[behind]) if behind is not None else None
             if gb is None or gb > TRAIN_GAP_S:
                 continue
@@ -740,6 +774,25 @@ def selftest() -> int:
     # rear-end vs side-swipe
     check("rear-end: follower 6 m behind", contact_kind(1000.0, 1006.0) == ("rear_end", 0), contact_kind(1000.0, 1006.0))
     check("side-swipe: 1 m apart", contact_kind(1000.0, 1001.0) == ("side", None), contact_kind(1000.0, 1001.0))
+
+    # #134 ruling 3: per-car finish window, and the parked player car on the spectator route
+    def lap_entry(status: int):
+        e = [0] * 33
+        e[u.L_RSTATUS] = status
+        return tuple(e)
+    fr = [(100.0, [lap_entry(2), lap_entry(2)]), (400.0, [lap_entry(3), lap_entry(2)]), (410.0, [lap_entry(3), lap_entry(3)])]
+    fin = finish_times(fr, 2)
+    check("finish time = first frame at status 3", fin == {0: 400.0, 1: 410.0}, fin)
+    check("racing up to and including the finish, not after", racing(fin, 0, 400.0) and not racing(fin, 0, 400.1)
+          and racing(fin, 5, 999.0), (racing(fin, 0, 400.0), racing(fin, 0, 400.1)))
+    ov = race_ovtk([(300.0, 0, 1), (405.0, 1, 0), (405.0, 1, 2), (50.0, 2, 19), (60.0, 3, 4)], {0: 400.0, 1: 410.0},
+                   player=19, parked=lambda t: True)
+    check("an overtake after one car's flag, or on the parked player, doesn't count",
+          ov == [(300.0, 0, 1), (405.0, 1, 2), (60.0, 3, 4)], ov)
+    cruise = [(float(t), 5, 0.5, 9, False) for t in range(0, 21)]           # 20 s at 0.5 s behind car 9 ...
+    in_race = [r for r in cruise if racing({1: 10.0}, 1, r[0])]             # ... but car 1 finished at 10 s
+    tc = train_time({1: in_race}, [], {1: {5: 0.0, 6: 70.0}})
+    check("a post-finish cruise doesn't feed train time (5 s, not 10 s)", abs(tc[1][0] - 5.0) < 1e-9, tc)
 
     # front-wing increments
     check("front-wing increments", wing_increments([(0, 0, 0), (12, 0, 0), (12, 5, 30), (12, 5, 40)]) == (2, 17),
