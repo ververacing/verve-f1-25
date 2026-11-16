@@ -29,6 +29,19 @@ From the pilot's `[direct]` log lines:
 So the readers for the safety-car frequency and deployment type, the formation-lap logic and the options-to-session
 copy are all resolved on this build (`verified=yes`).
 
+## Preferred route once launcher 1.9.56 is released (2026-11-15 weekly review)
+
+Swofty's core in 1.9.56 (prepared on `main`, not released yet) sets the safety car, formation lap, penalties and
+corner-cutting options by name: `safety_car_frequency`, `formation_lap`, `rules_and_penalties_mode`,
+`corner_cutting_mode`, via `content.package` 1.5 per-box rules (SwoftyLauncher `docs/std/content.md:434`,
+`native/src/core/box_options.cpp:16-23`). A content-package box with `rules.safety_car: "off"` and
+`rules.formation_lap: false` may give fixed test rules without the `verve.harness` DLL below. Open points:
+- it applies when a box is pressed, so it must be checked on our Grand Prix path (direct start and menu route);
+- AI difficulty isn't covered, so difficulty still needs the menu or a harness hook.
+
+Supervisor (2026-11-15): this is the preferred route once 1.9.56 is out. It's re-tested after B-0015 is scored, not
+before. The launcher stays on 1.9.51 until then. Details: `docs/community/weekly/2026-11-15.md` (b) 1.
+
 ## Design (not built): a small native `verve.harness` addon
 
 1. **Set options by name, as Starting Grid does** (`menu_option.hpp:16-96` in constructor-mods/starting-grid):
