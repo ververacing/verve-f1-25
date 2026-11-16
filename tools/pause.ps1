@@ -42,6 +42,9 @@ $flag = Join-Path $StateDir 'paused.txt'
 $atFile = Join-Path $StateDir 'pause_at.txt'
 $resultFile = Join-Path $StateDir 'pause_result.txt'
 $t0 = Get-Date
+# a foreign process must still be there 5 s later before we WAIT: our shell's helpers are briefly unaccounted for
+# between the shell's exit and the runner recording that exit (pause of 2026-11-15 21:57)
+function Foreign-Steady { for ($i = 0; $i -lt 10; $i++) { if (-not @(Ours-Foreign).Count) { return $false }; Start-Sleep -Milliseconds 500 }; $true }
 function Say([string] $s) { "$((PT).ToString('HH:mm:ss')) $s" }
 
 if ($Clear) {
@@ -88,7 +91,7 @@ foreach ($f in $sets) {
     $recs = @(Import-Csv $f.FullName)
     if (@(Get-OursTree $recs (Get-ProcSnapshot)).Count) { $live = $f; break }
 }
-if (@(Ours-Foreign).Count -and -not $live) {
+if (-not $live -and (Foreign-Steady)) {
     Finish "WAIT, Tyler's game or the launcher is open (not ours); the post-run checks run at the next pre-flight" 1
 }
 
@@ -118,7 +121,7 @@ if ($live) {
         if (@(Ours-Foreign).Count) { break }
         Start-Sleep -Milliseconds 500
     }
-    if (@(Ours-Foreign).Count) { Finish "WAIT, Tyler's game or the launcher opened during the pause; our race is left as it is and the checks wait for the next pre-flight" 1 }
+    if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the pause; our race is left as it is and the checks wait for the next pre-flight" 1 }
     if ((& $alive $game) -or (& $alive $shell)) {
         Say "still up after $QuitWaitS s: stopping attempt $attempt only (recorded PIDs)"
         Ours-Stop "PAUSE ($Why)" $roles | Out-Null
@@ -135,7 +138,7 @@ do {
     $busy = @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue |
         Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match $scriptRx -and $_.CommandLine -notmatch 'pause\.ps1' })
     if (-not $busy.Count) { break }
-    if (@(Ours-Foreign).Count) { Finish "WAIT, Tyler's game or the launcher opened during the pause; the checks wait for the next pre-flight" 1 }
+    if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the pause; the checks wait for the next pre-flight" 1 }
     Start-Sleep -Seconds 1
 } while ((Get-Date) -lt $end)
 if ($busy.Count) { Finish "WAIT, cleanup running ($(($busy | ForEach-Object { [regex]::Match($_.CommandLine, $scriptRx).Value }) -join ', ') still up after $RunnerWaitS s)" 1 }
