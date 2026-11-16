@@ -42,6 +42,49 @@ The supervisor's rulings (16 Nov):
   25251167`: Swofty's record of the original game files is from the old build. Pre-flight treats this as real drift
   until Swofty re-baselines (`swofty setup reset`, verify, `setup done`, pending the supervisor's ruling).
 
+**Baseline reset, 16 Nov 07:28-07:37 PT** (supervisor's ruling: part of the update Tyler approved, run while his
+game and launcher were closed; this also redoes the setup for Tyler's own profile). Pre-checks before every step:
+0 journals, no F1_25 / swofty / launcher / ui process, not paused.
+1. `swofty --profile verve-test setup reset` (without `--other-mods`) failed twice, at 07:28 and 07:30, with os
+   error 32 on `Swofty\baseline-retired`. That folder was a leftover from the first setup on 30 Oct, holding 0 files
+   (empty dirs only). The first attempt had already put the game folder back, which removed the benign
+   `exe-sha256.tsv` drift line.
+2. At 07:34 the empty folder was renamed (same volume, no delete) to `Documents\verve-f1-25-recovery\
+   baseline-retired-20261030`. Reset then ran on: it renamed `baseline` to `baseline-retired`, then failed with os
+   error 32 on `Swofty\cache\overlay`. The Windows Restart Manager listed no process holding any of the 58 overlay
+   files, so the lock was on a folder or transient.
+3. At 07:36, on the supervisor's ruling, two more same-volume renames, no deletes:
+   - `cache\overlay` (58 files, 321 MB; Swofty rebuilds it) to `recovery\overlay-20261116-073648`;
+   - `baseline-retired` (the former 25251167 baseline, 21 files, 388 MB) to
+     `recovery\baseline-25251167-20261116-073648`.
+
+   Then `setup reset` succeeded: "the record of original game files starts over". Its output also said "the launch
+   checks every game file against Steam's own list, so there's nothing to verify". Setup status: "the game folder
+   was put back …; verify the game files, then run `swofty setup done`".
+4. Steam "Verify integrity of game files" (steam://validate/3059520) started at 07:37:06 on BuildID 26566308.
+   It finished at 07:41:52 with "result No Error": nothing re-downloaded, the state back to Fully Installed.
+5. At 07:42, `swofty setup done` gave "setup done: modded play can start" (status: done at unix 1794843731).
+   - Doctor: build 26566308, `baseline no drift`.
+   - `swofty verify`: all 5 checked files ok (gamedatabases.2025.bin, flow_frontend, persistent, databases,
+     fe_home), exit 0.
+   - Pre-flight OK.
+   - A fresh last-known-good snapshot `20261116-074307-lkg-20261116-resume`, in the same layout as the 14 Nov one:
+     11 Steam records.
+
+The recovery folders stay until the first successful test session on the new build (the supervisor rules on deleting
+them then).
+
+**The launcher updates itself.** It was never pinned: each race's `raw/loader.log` carries a `[main-menu] state: Swofty
+Launcher X` line.
+- B-0016: races 1-2 on 1.9.51, 3-11 on 1.9.54, 12-20 on 1.9.55.
+- B-0015: race 1 on 1.9.55, races 2-20 on 1.9.56.
+- Core 0.2.13 and build 25251167 throughout.
+
+NOT-SCORED sensitivities on #100 and #101 (B-0015 without race 1; B-0016 without the off-version pairs 1 and 6)
+leave both verdicts INCONCLUSIVE. From now on `tools/b0016_run.ps1` writes `<race>\launcher.txt`: the launcher file
+version before launch and the in-game version from loader.log. It prints `LAUNCHER CHANGED` when a race differs from
+the one before, and that change gets flagged in the batch's issue.
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
