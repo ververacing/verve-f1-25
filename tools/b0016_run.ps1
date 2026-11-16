@@ -68,6 +68,9 @@ if (Test-Path $out) {
 New-Item -ItemType Directory -Force $out | Out-Null
 if ($WindowOverride) { Set-Content (Join-Path $out 'window_override.txt') -Value "one-off window to $WindowOverride PT (docs/process.md override log)" -Encoding utf8 }
 Set-Content (Join-Path $out 'arm.txt') -Value $arm -Encoding utf8
+# the launcher updates itself (2026-11-16: B-0015 and B-0016 each straddled updates): record its version every race
+$launcherExe = Join-Path $env:LOCALAPPDATA 'Programs\SwoftyLauncher\bin\swofty-launcher.exe'
+$launcherBefore = if (Test-Path $launcherExe) { (Get-Item $launcherExe).VersionInfo.ProductVersion } else { 'MISSING' }
 "race $Race at $($now.ToString('HH:mm:ss')) PT: arm $arm, $plan"
 $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'sandbox_shell.ps1'), '-Fixture', 'tyler-profile-20261031',
     '-ExpProfile', $ExpProfile, '-Plan', $plan, '-Udp',
@@ -95,6 +98,20 @@ if (Test-Path $ll) {
 } else { $lines += 'loader.log: MISSING' }
 $lines | Set-Content (Join-Path $out 'lap1ai.txt') -Encoding utf8
 "lap1ai.txt: $($lines[2])"
+
+# launcher.txt: the launcher's file version before launch, and the version the game's main menu reported
+# ("[main-menu] state: Swofty Launcher X" in loader.log). A change from the previous race's launcher.txt prints
+# LAUNCHER CHANGED, to be flagged in the batch's issue (supervisor, 2026-11-16).
+$inGame = if (Test-Path $ll) { $m = Select-String $ll -Pattern 'state: Swofty Launcher (\S+),' | Select-Object -First 1; if ($m) { $m.Matches[0].Groups[1].Value } else { 'not found' } } else { 'no loader.log' }
+$lv = @("launcher before launch: $launcherBefore", "launcher in game (loader.log): $inGame")
+if ($inGame -match '^\d' -and $inGame -ne $launcherBefore) { $lv += "NOTE: the two differ (an update during the race?)" }
+$prev = Join-Path $Batch "race_$($Race - 1)\launcher.txt"
+if (Test-Path $prev) {
+    $pv = ((Get-Content $prev | Where-Object { $_ -match '^launcher in game' }) -split ': ', 2)[1]
+    if ($pv -and $pv -ne $inGame) { $lv += "LAUNCHER CHANGED: race $($Race - 1) ran on $pv, this race on $inGame" }
+}
+$lv | Set-Content (Join-Path $out 'launcher.txt') -Encoding utf8
+$lv | ForEach-Object { "launcher.txt: $_" }
 
 # race_feel per race (the primaries come from it): the capture stays in %TEMP%\verve-udp\shell-*; keep a copy in raw\
 # (gitignored) and write race_feel.csv / race_feel_summary.json into <race>\race_feel\
