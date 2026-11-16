@@ -15,8 +15,10 @@ driver's measure over the launch's valid races, centre each driver's launch-mean
 effects; start measures are first residualised on grid side), statistic = mean over launches of (mean centred value
 at 1 - mean at 0). Permutation test: 10,000 redraws, each replacing EVERY launch's assignment with draw(seed_k, launch)
 for a fresh seed_k (the real constrained randomisation: teammates split, Alonso alternates), two-sided p; SE = the SD
-of the permutation null. Decision: ALIVE (p < 0.05, predicted direction), ALIVE-REVERSED (p < 0.05, opposite), DEAD
-(estimate +/- 2 SE inside the prereg's null band), else INCONCLUSIVE. No interim looks: exit 3 unless the batch has
+of the permutation null. Decision (prereg v3): ALIVE (p < 0.05, predicted direction, FE slope outside the null band),
+ALIVE-SMALL (p < 0.05, FE slope inside the band: real but not usable), ALIVE-REVERSED (p < 0.05, opposite, outside the
+band), DEAD (FE slope +/- 2 SE of its own permutation null inside the band), else INCONCLUSIVE. Control floor fallback:
+fewer than 10 off-track + spin events in the whole batch -> control's primary is corner-exit pace (exit_all_kph). No interim looks: exit 3 unless the batch has
 12 complete launches; --allow-partial runs anyway and prints NOT SCORED (partial) on every line.
 
 Validity per race: tools/aionly_check.py's check() on that race's uid (INVALID or FAIL = dropped, listed).
@@ -127,8 +129,8 @@ PRIMARY = {
     "mistakes": ("launch_m", +1),             # mistakes is a skill (F-29, F-37): 1 -> fewer mistakes -> longer launch
     "aggression": ("passes_made", +1),
     "control": ("offtracks_spins", -1),
-    "speed_in": ("entry_kph", +1),
-    "speed_out": ("exit_kph", +1),
+    "speed_in": ("entry_all_kph", +1),      # prereg v3: all passes primary (clean-pass left 4 of 19 cars in Phase 0)
+    "speed_out": ("exit_all_kph", +1),
     "DEFEND": ("passes_suffered", -1),
     "ATTACK": ("passes_made", +1),
 }
@@ -140,6 +142,8 @@ NULL_BAND = {
     "offtracks_spins": (0.1, "from the prereg"),
     "entry_kph": (2.0, "from the prereg"),
     "exit_kph": (2.0, "from the prereg"),
+    "entry_all_kph": (2.0, "from the prereg"),
+    "exit_all_kph": (2.0, "from the prereg"),
     "passes_suffered": (0.25, "from the prereg"),
 }
 COMMON_SECONDARY = ["gain_t1", "gain_lap1", "laptime_sd_s", "contacts"]
@@ -148,18 +152,42 @@ EXTRA_SECONDARY = {
     "mistakes": ["speed_1s_kph", "reaction_s"],
     "aggression": ["passes_suffered"],
     "control": ["offtracks", "spins"],
-    "speed_in": ["entry_all_kph"],      # the clean-pass rule leaves few cars in a train-heavy race (Phase 0: 4 of 19)
-    "speed_out": ["exit_all_kph"],
+    "speed_in": ["entry_kph"],          # clean-pass: secondary (it leaves few cars in a train-heavy race, Phase 0: 4 of 19)
+    "speed_out": ["exit_kph"],
     "DEFEND": ["passes_made"],          # cross-effect
     "ATTACK": ["passes_suffered"],      # cross-effect
 }
 PARTIAL = "NOT SCORED (partial)"
+# prereg v3 control FLOOR FALLBACK (supervisor, ruling on #155), decided blind to assignment: if the whole batch has fewer
+# than FLOOR_EVENTS off-track + spin events in total (all cars, all valid races), control's primary becomes corner-exit
+# pace (exit_all_kph, predicted faster at 1); off-tracks + spins stays a secondary.
+FLOOR_EVENTS = 10
+CONTROL_FALLBACK = ("exit_all_kph", +1)
 
 _VALIDITY_OVERRIDE = None   # selftest: callable(launch_dir, uid) -> (verdict, reasons)
 
 
-def secondaries(f: str) -> list[str]:
-    return [m for m in EXTRA_SECONDARY.get(f, []) + COMMON_SECONDARY if m != PRIMARY[f][0]]
+def secondaries(f: str, primary: dict | None = None) -> list[str]:
+    prim = (primary or PRIMARY)[f][0]
+    extra = EXTRA_SECONDARY.get(f, []) + COMMON_SECONDARY
+    if prim != PRIMARY[f][0]:
+        extra = [PRIMARY[f][0]] + extra      # the fallback's original primary stays as a secondary
+    return list(dict.fromkeys(m for m in extra if m != prim))
+
+
+def control_events(launch_data: dict[int, dict]) -> float:
+    """Total off-track + spin events over all cars and all valid races (the floor rule looks at nothing else)."""
+    return sum(v.get("offtracks_spins") or 0 for L in launch_data.values() for r in L["races"] if r["valid"]
+               for v in r["drivers"].values())
+
+
+def primaries(launch_data: dict[int, dict]) -> tuple[dict, dict]:
+    ev = control_events(launch_data)
+    prim = dict(PRIMARY)
+    if ev < FLOOR_EVENTS:
+        prim["control"] = CONTROL_FALLBACK
+    return prim, {"control_events_total": ev, "floor_events": FLOOR_EVENTS, "control_fallback": ev < FLOOR_EVENTS,
+                  "control_primary": prim["control"][0]}
 
 
 # ==================================================================================================== batch discovery
@@ -613,18 +641,26 @@ def analyse(launch_data: dict[int, dict], assigns: dict[int, dict], seed: int, p
     launches = sorted(launch_data)
     tables = launch_tables(launch_data)
     stats = {m: Stat(tables[m], launches) for m in MEASURES}
-    pairs = [(f, PRIMARY[f][0]) for f in FACTORS] + [(f, m) for f in FACTORS for m in secondaries(f)]
+    prim, floor = primaries(launch_data)
+    pairs = [(f, prim[f][0]) for f in FACTORS] + [(f, m) for f in FACTORS for m in secondaries(f, prim)]
+    prim_pairs = [(f, prim[f][0]) for f in FACTORS]
     real = {n: ones(assigns[n]) for n in launches}
     obs = {(f, m): stats[m]({n: real[n][f] for n in launches}) for f, m in pairs}
     live = [p for p in pairs if obs[p] is not None]
     null = {p: [] for p in live}
+    null_fe = {p: [] for p in prim_pairs}     # the FE slope's own permutation null (its SE for the band comparison)
     t0 = time.perf_counter()
     for sk in perm_seeds(seed, perms):
-        idx = {n: ones(draw(sk, n)) for n in launches}
+        drawn = {n: draw(sk, n) for n in launches}
+        idx = {n: ones(drawn[n]) for n in launches}
         for f, m in live:
             v = stats[m]({n: idx[n][f] for n in launches})
             if v is not None:
                 null[(f, m)].append(v)
+        for f, m in prim_pairs:
+            v = fe_slope(tables[m], drawn, f)
+            if v is not None:
+                null_fe[(f, m)].append(v)
     perm_s = time.perf_counter() - t0
 
     def test(f, m):
@@ -643,22 +679,28 @@ def analyse(launch_data: dict[int, dict], assigns: dict[int, dict], seed: int, p
 
     out = {}
     for f in FACTORS:
-        m, sign = PRIMARY[f]
+        m, sign = prim[f]
         r = test(f, m)
         band, src = NULL_BAND[m]
-        r.update(predicted="+" if sign > 0 else "-", null_band=band, null_band_source=src)
-        if r["p"] is None:
+        fe = r["fe_slope_info"]
+        nf = null_fe.get((f, m), [])
+        se_fe = statistics.pstdev(nf) if len(nf) > 1 else None
+        r.update(predicted="+" if sign > 0 else "-", null_band=band, null_band_source=src, fe_slope=fe, se_fe=se_fe)
+        # prereg v3 labels (ruling on #155): p from the centred statistic; the band comparison uses the FE slope.
+        if r["p"] is None or fe is None or se_fe is None:
             r["decision"] = "NO DATA"
+        elif r["p"] < ALPHA and abs(fe) <= band:
+            r["decision"] = "ALIVE-SMALL"
         elif r["p"] < ALPHA:
             r["decision"] = "ALIVE" if (r["estimate"] > 0) == (sign > 0) else "ALIVE-REVERSED"
-        elif r["estimate"] - 2 * r["se"] >= -band and r["estimate"] + 2 * r["se"] <= band:
+        elif fe - 2 * se_fe >= -band and fe + 2 * se_fe <= band:
             r["decision"] = "DEAD"
         else:
             r["decision"] = "INCONCLUSIVE"
-        r["secondary"] = {sm: test(f, sm) for sm in secondaries(f)}
+        r["secondary"] = {sm: test(f, sm) for sm in secondaries(f, prim)}
         out[f] = r
     return {"factors": out, "perm_runtime_s": round(perm_s, 2), "perms": perms, "launches": launches,
-            "tables": tables}
+            "tables": tables, "floor": floor}
 
 
 # ==================================================================================================== output
@@ -669,13 +711,19 @@ def fnum(x, nd=4):
 
 def report(res: dict, head: list[str], partial: bool) -> list[str]:
     lines = list(head)
-    lines.append(f"{'factor':<15}{'primary':<17}{'pred':>5}{'estimate':>10}{'SE':>9}{'p':>8}  {'null band':<42}decision")
+    lines.append(f"{'factor':<15}{'primary':<17}{'pred':>5}{'estimate':>10}{'SE':>9}{'p':>8}{'FE slope':>10}{'SE(FE)':>9}"
+                 f"  {'null band (FE slope)':<42}decision")
     for f, r in res["factors"].items():
         band = f"+/-{fnum(r['null_band'], 2)} {r['unit']} {r['null_band_source']}"
         dec = PARTIAL if partial else r["decision"]
         flag = " [measure constant: floor]" if r["constant"] else ""
         lines.append(f"{f:<15}{r['measure']:<17}{r['predicted']:>5}{fnum(r['estimate']):>10}{fnum(r['se']):>9}"
-                     f"{fnum(r['p'], 4):>8}  {band:<42}{dec}{flag}")
+                     f"{fnum(r['p'], 4):>8}{fnum(r.get('fe_slope')):>10}{fnum(r.get('se_fe')):>9}  {band:<42}{dec}{flag}")
+    fl = res.get("floor") or {}
+    if fl:
+        lines.append(f"control floor rule: {fnum(fl['control_events_total'], 0)} off-track + spin events in the batch "
+                     f"(threshold {fl['floor_events']}) -> control primary {fl['control_primary']}"
+                     + (" (FALLBACK)" if fl["control_fallback"] else ""))
     lines.append("secondaries (no decision): estimate / SE / p")
     for f, r in res["factors"].items():
         lines.append(f"  {f:<15}" + "; ".join(f"{m} {fnum(x['estimate'], 3)}/{fnum(x['se'], 3)}/{fnum(x['p'], 3)}"
@@ -951,6 +999,29 @@ def selftest() -> int:
     rev, ra = synth_launch_data(seed, {"reaction_speed": ("reaction_s", +0.05)})
     chk("a planted effect in the wrong direction is ALIVE-REVERSED",
         analyse(rev, ra, seed, 1000)["factors"]["reaction_speed"]["decision"] == "ALIVE-REVERSED")
+    # prereg v3 labels: a significant effect whose FE slope sits inside the null band is ALIVE-SMALL
+    sm, sa = synth_launch_data(seed, {"speed_in": ("entry_all_kph", +0.8)})
+    smr = analyse(sm, sa, seed, 1000)["factors"]["speed_in"]
+    chk("a significant effect inside the band (speed_in +0.8 km/h, band +/-2) is ALIVE-SMALL",
+        smr["decision"] == "ALIVE-SMALL", f"p {fnum(smr['p'], 4)} FE slope {fnum(smr['fe_slope'])}")
+    big, ba = synth_launch_data(seed, {"speed_in": ("entry_all_kph", +3.0)})
+    bgr = analyse(big, ba, seed, 1000)["factors"]["speed_in"]
+    chk("all-pass corner pace is speed_in's primary, and +3 km/h (outside the band) is ALIVE",
+        bgr["measure"] == "entry_all_kph" and bgr["decision"] == "ALIVE", f"FE slope {fnum(bgr['fe_slope'])}")
+    # the control floor fallback: decided by the batch's total event count only
+    fl0 = primaries(data)[1]
+    chk("control floor: < 10 off-track + spin events in the batch -> primary exit_all_kph (fallback)",
+        fl0["control_fallback"] and fl0["control_primary"] == "exit_all_kph", str(fl0))
+    ev = {k2: v2 for k2, v2 in data.items()}
+    for L in ev.values():
+        for r0 in L["races"]:
+            for v0 in r0["drivers"].values():
+                v0["offtracks_spins"] = abs(v0["offtracks_spins"]) + 0.2
+    fl1 = primaries(ev)[1]
+    chk("control floor: >= 10 events -> primary stays offtracks_spins",
+        not fl1["control_fallback"] and fl1["control_primary"] == "offtracks_spins",
+        f"{fl1['control_events_total']:.0f} events")
+    data, assigns = synth_launch_data(seed, {"reaction_speed": ("reaction_s", -0.05)})   # restore the base batch
     fp = tests = 0
     for k in range(10):
         nd, na = synth_launch_data(seed + k, {}, rng_seed=100 + k)
