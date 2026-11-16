@@ -173,6 +173,17 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         $result = 'no sandbox'; break
     }
     Log "sandbox: $($run.FullName) ($((Get-Content (Join-Path $run.FullName 'sandbox.json') -Raw).Trim()))"
+    # the game's PID, as our test shell wrote it in sandbox.json before the intro: record it now, so a pause during the
+    # intro can quit it (pause of 2026-11-15 21:55: the game was only recorded at the agent's first answer, ~80 s in)
+    # adopted only if it's a live F1_25, started after our launch, and not under a swofty-launcher (supervisor's rules)
+    $sbPid = try { [int]((Get-Content (Join-Path $run.FullName 'sandbox.json') -Raw | ConvertFrom-Json).pid) } catch { 0 }
+    $snapG = Get-ProcSnapshot
+    $g = $snapG | Where-Object { $_.Id -eq $sbPid } | Select-Object -First 1
+    $underLauncher = $false; $cur = $g; $hops = 0
+    while ($cur -and $hops -lt 32) { if ($cur.Name -match '^swofty-launcher') { $underLauncher = $true; break }; $cur = $snapG | Where-Object { $_.Id -eq $cur.ParentId } | Select-Object -First 1; $hops++ }
+    if ($g -and $g.Name -match '^F1_25' -and $g.Start -and ([datetime]$g.Start) -ge $t0.AddSeconds(-2) -and -not $underLauncher) {
+        Ours-AddId $sbPid "game (attempt $attempt, sandbox.json pid)" | Out-Null; $script:gamePid = $sbPid; Log "game pid $sbPid (sandbox.json)"
+    } elseif ($sbPid) { Log "sandbox.json pid $sbPid not adopted (not a live F1_25 started after our launch, or under a launcher)" }
     $results = Join-Path $run.FullName 'agent\results.jsonl'
 
     $commands = Join-Path $run.FullName 'agent\commands.jsonl'
@@ -320,6 +331,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         if (-not (Ours-Stop 'shell did not exit 120 s after quit' $attemptRoles)) { $script:foreign = $true }
     }
     if (-not $p.HasExited) { Log "shell (pid $($p.Id)) still running; left alone$(if ($script:foreign) { ': a process that is not ours is running' })" }
+    else { Ours-RecordExit $p }
     if ($outTask.Wait(5000)) { $outTask.Result | Set-Content (Join-Path $Out 'shell_stdout.txt') -Encoding utf8 }
     if ($errTask.Wait(5000)) { $errTask.Result | Set-Content (Join-Path $Out 'shell_stderr.txt') -Encoding utf8 }
     Log "run folder: $($run.Name)"

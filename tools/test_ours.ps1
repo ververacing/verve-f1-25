@@ -61,6 +61,24 @@ Check 'a game launched through a Steam our shell started is foreign' ($for2 -con
 $recSteam = $rec + @([pscustomobject]@{ Id = 600; Start = $t.AddSeconds(5).ToString('o') })
 Check 'steam is never ours, even if recorded' (@(Get-OursTree $recSteam $snap2 | Where-Object { $_.Name -match '^steam' }).Count -eq 0)
 Check 'no fallback adoption exists (a game is ours only by a reported PID)' (-not (Get-Command Ours-AdoptNewGame -ErrorAction SilentlyContinue))
+# orphans (pause of 2026-11-15 21:56): a recorded shell that has exited leaves its children with its PID as parent
+$snap3 = @(
+    [pscustomobject]@{ Id = 802; ParentId = 800; Name = 'swofty'; Start = $t.AddSeconds(1) }      # child of the exited shell
+    [pscustomobject]@{ Id = 803; ParentId = 800; Name = 'swofty'; Start = $t.AddMinutes(30) }     # started after the shell's exit
+    [pscustomobject]@{ Id = 804; ParentId = 800; Name = 'F1_25'; Start = $t.AddSeconds(2) }       # a game is never ours by descent
+    [pscustomobject]@{ Id = 805; ParentId = 900; Name = 'swofty'; Start = $t.AddSeconds(1) }      # same name, unrelated parent
+)
+$rec3 = @([pscustomobject]@{ Id = 800; Start = $t.ToString('o'); Name = 'swofty'; Exit = $t.AddMinutes(13).ToString('o') })
+$tree3 = @(Get-OursTree $rec3 $snap3 | ForEach-Object { $_.Id } | Sort-Object)
+Check 'orphan rule: a child of our exited shell, started before its recorded exit, is ours (802 only)' (($tree3 -join ',') -eq '802') ($tree3 -join ',')
+$for3 = @(Get-ForeignProcs $rec3 $snap3 | ForEach-Object { $_.Id } | Sort-Object)
+Check 'orphan rule: same name under an unrelated parent, a later start, and a game are foreign' (($for3 -join ',') -eq '803,804,805') ($for3 -join ',')
+$snap4 = $snap3 + @([pscustomobject]@{ Id = 800; ParentId = 1; Name = 'notepad'; Start = $t.AddMinutes(20) })   # PID 800 reused
+Check 'orphan rule: a reused recorded PID (alive, later start) adopts no orphans' (@(Get-OursTree $rec3 $snap4).Count -eq 0)
+$snap5 = $snap3 + @([pscustomobject]@{ Id = 300; ParentId = 1; Name = 'swofty-launcher'; Start = $t.AddMinutes(14) })
+Check 'orphan rule: with the launcher up, no orphan is ours' (@(Get-OursTree $rec3 $snap5).Count -eq 0)
+$rec3b = @([pscustomobject]@{ Id = 800; Start = $t.ToString('o'); Name = 'swofty'; Exit = '' })
+Check 'orphan rule: without a recorded exit, no orphan is ours' (@(Get-OursTree $rec3b $snap3).Count -eq 0)
 
 # ---- part 2: live foreign dummies ----
 if ($PureOnly) { 'part 2 (live dummies) not run: -PureOnly'; exit ([int]($failed -gt 0)) }

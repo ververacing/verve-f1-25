@@ -17,7 +17,11 @@ Prints, writes to state\pause_result.txt and shows in a popup ("Verve: SAFE TO P
 exit 0 SAFE TO PLAY, 1 WAIT, 2 not due (-IfDue only).
 Rules it keeps: it only ever stops processes recorded as ours (tools/ours.ps1), scoped to the running attempt; it
 runs no Swofty step while a game or launcher that isn't ours is up (it says WAIT and defers them to pre-flight).
-Test hooks (tools/test_pause.ps1): -Repo, -StateDir, -NoPopup, -SkipChecks, -QuitWaitS, -RunnerWaitS.
+Test hooks (tools/test_pause.ps1): -Repo, -StateDir, -NoPopup, -SkipChecks, -QuitWaitS, -RunnerWaitS, -HoldBeforeChecksS
+(sleep just before the checks step) and -ChecksMarker (a file written the moment the checks step starts).
+The 5 s persistence only delays the WAIT verdict (supervisor's condition): while ANY foreign hit is present, confirmed or
+not, nothing runs (no quit, no stop, no Swofty or Steam-userdata read); it waits and re-checks, and each action re-checks
+right before it runs.
 #>
 param(
     [string] $At = '',
@@ -30,7 +34,9 @@ param(
     [switch] $NoPopup,
     [switch] $SkipChecks,
     [int] $QuitWaitS = 60,
-    [int] $RunnerWaitS = 150
+    [int] $RunnerWaitS = 150,
+    [int] $HoldBeforeChecksS = 0,
+    [string] $ChecksMarker = ''
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'ours.ps1')
@@ -42,6 +48,9 @@ $flag = Join-Path $StateDir 'paused.txt'
 $atFile = Join-Path $StateDir 'pause_at.txt'
 $resultFile = Join-Path $StateDir 'pause_result.txt'
 $t0 = Get-Date
+# a foreign process must still be there 5 s later before we WAIT: our shell's helpers are briefly unaccounted for
+# between the shell's exit and the runner recording that exit (pause of 2026-11-15 21:57)
+function Foreign-Steady { for ($i = 0; $i -lt 10; $i++) { if (-not @(Ours-Foreign).Count) { return $false }; Start-Sleep -Milliseconds 500 }; $true }
 function Say([string] $s) { "$((PT).ToString('HH:mm:ss')) $s" }
 
 if ($Clear) {
@@ -88,7 +97,7 @@ foreach ($f in $sets) {
     $recs = @(Import-Csv $f.FullName)
     if (@(Get-OursTree $recs (Get-ProcSnapshot)).Count) { $live = $f; break }
 }
-if (@(Ours-Foreign).Count -and -not $live) {
+if (-not $live -and (Foreign-Steady)) {
     Finish "WAIT, Tyler's game or the launcher is open (not ours); the post-run checks run at the next pre-flight" 1
 }
 
@@ -105,6 +114,7 @@ if ($live) {
     # 3. quit through the test agent: append to its command file (the run folder's transcript names it)
     $sb = Select-String (Join-Path $run 'transcript.txt') -Pattern '^sandbox: (.+?) \(\{' -ErrorAction SilentlyContinue | Select-Object -Last 1
     $alive = { param($r) $r -and @(Get-OursTree @($r) (Get-ProcSnapshot)).Count }
+    if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher is open (not ours); our race is left as it is and the checks wait for the next pre-flight" 1 }
     if ($game -and (& $alive $game) -and $sb -and -not @(Ours-Foreign).Count) {
         $cmds = Join-Path $sb.Matches[0].Groups[1].Value 'agent\commands.jsonl'
         if (Test-Path $cmds) {
@@ -118,7 +128,7 @@ if ($live) {
         if (@(Ours-Foreign).Count) { break }
         Start-Sleep -Milliseconds 500
     }
-    if (@(Ours-Foreign).Count) { Finish "WAIT, Tyler's game or the launcher opened during the pause; our race is left as it is and the checks wait for the next pre-flight" 1 }
+    if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the pause; our race is left as it is and the checks wait for the next pre-flight" 1 }
     if ((& $alive $game) -or (& $alive $shell)) {
         Say "still up after $QuitWaitS s: stopping attempt $attempt only (recorded PIDs)"
         Ours-Stop "PAUSE ($Why)" $roles | Out-Null
@@ -135,11 +145,16 @@ do {
     $busy = @(Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue |
         Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match $scriptRx -and $_.CommandLine -notmatch 'pause\.ps1' })
     if (-not $busy.Count) { break }
-    if (@(Ours-Foreign).Count) { Finish "WAIT, Tyler's game or the launcher opened during the pause; the checks wait for the next pre-flight" 1 }
+    if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the pause; the checks wait for the next pre-flight" 1 }
     Start-Sleep -Seconds 1
 } while ((Get-Date) -lt $end)
 if ($busy.Count) { Finish "WAIT, cleanup running ($(($busy | ForEach-Object { [regex]::Match($_.CommandLine, $scriptRx).Value }) -join ', ') still up after $RunnerWaitS s)" 1 }
 
+if ($HoldBeforeChecksS) { Start-Sleep -Seconds $HoldBeforeChecksS }
+# no Swofty or Steam-userdata step while anything foreign is up: wait up to 5 s for it to go, else WAIT
+if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher is open (not ours); the checks wait for the next pre-flight" 1 }
+if (@(Ours-Foreign).Count) { Finish "WAIT, a process that isn't ours came and went during the checks; run pause.ps1 again" 1 }
+if ($ChecksMarker) { Set-Content $ChecksMarker "checks started $((PT).ToString('s'))" -Encoding ascii }
 if ($SkipChecks) { Finish 'SAFE TO PLAY (test: checks skipped)' 0 }
 # 6. Tyler's saves vs the newest last-known-good snapshot
 $lkg = Get-ChildItem (Join-Path $env:LOCALAPPDATA 'verve-f1-25\save-backups') -Directory -Filter '*-lkg-*' -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
@@ -157,6 +172,7 @@ if ($lkg) {
     Say "saves = last-known-good ($($lkg.Name))"
 }
 # 7. post_run_check, cleanup, deferred saves check, and nothing of ours or foreign up
+if (@(Ours-Foreign).Count -and (Foreign-Steady)) { Finish "WAIT, Tyler's game or the launcher opened during the checks; the rest waits for the next pre-flight" 1 }
 $v = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'safe_to_play.ps1') -Repo $Repo
 $code = $LASTEXITCODE
 Finish (("$v" -replace '^WAIT: ', 'WAIT, ').Trim()) $code

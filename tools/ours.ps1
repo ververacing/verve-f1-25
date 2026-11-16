@@ -46,12 +46,25 @@ function Get-OursTree($records, $snapshot) {
     $live = @{}
     foreach ($p in $snapshot) { $live[$p.Id] = $p }
     $out = @{}
+    $launcherUp = @($snapshot | Where-Object { $_.Name -match '^swofty-launcher' }).Count -gt 0
     $queue = New-Object System.Collections.Queue
     foreach ($r in $records) {
         $p = $live[[int]$r.Id]
         if ($p -and $p.Name -notmatch $script:NeverOurs -and (Same-Start $p.Start ([datetime]$r.Start))) {
             $out[$p.Id] = $p
             if ($p.Name -notmatch $script:Barrier) { $queue.Enqueue($p) }   # a recorded game is ours, its children aren't searched
+        } elseif (-not $p -and $r.Exit -and -not $launcherUp -and [string]$r.Name -notmatch $script:Barrier -and [string]$r.Name -notmatch $script:NeverOurs) {
+            # orphans (supervisor's rules, 2026-11-15, after the 21:56 pause): a recorded process of ours that has EXITED,
+            # with its exit RECORDED, leaves its children with its PID as their parent (Windows doesn't re-parent). A
+            # child is ours only if it started at or after the parent's recorded start and before its recorded exit, its
+            # name isn't a barrier, and no swofty-launcher is running. Anything else stays foreign: better to WAIT wrongly.
+            $rs = [datetime]$r.Start; $rx = [datetime]$r.Exit
+            foreach ($c in @($byParent[[int]$r.Id])) {
+                if ($c -and $c.Name -notmatch $script:Barrier -and $c.Start -and ([datetime]$c.Start) -ge $rs.AddSeconds(-1) -and
+                    ([datetime]$c.Start) -lt $rx -and -not $out.ContainsKey($c.Id)) {
+                    $out[$c.Id] = $c; $queue.Enqueue($c)
+                }
+            }
         }
     }
     while ($queue.Count) {
@@ -81,7 +94,26 @@ function Ours-Init([string] $runDir) {
 
 function Ours-Records {
     if (-not $script:OursFile -or -not (Test-Path $script:OursFile)) { return @() }
-    @(Import-Csv $script:OursFile)
+    $recs = @(Import-Csv $script:OursFile)
+    # recorded exits (ours_exits.csv: Id,Start,Exit), matched by PID and start time
+    $ex = Join-Path (Split-Path $script:OursFile) 'ours_exits.csv'
+    $exits = if (Test-Path $ex) { @(Import-Csv $ex) } else { @() }
+    foreach ($r in $recs) {
+        $e = $exits | Where-Object { $_.Id -eq $r.Id -and (Same-Start $_.Start $r.Start) } | Select-Object -Last 1
+        $r | Add-Member -NotePropertyName Exit -NotePropertyValue $(if ($e) { $e.Exit } else { '' }) -Force
+    }
+    $recs
+}
+
+function Ours-RecordExit($proc) {
+    # a process we started has exited: record when (its children may outlive it; see Get-OursTree's orphan rule)
+    if (-not $script:OursFile -or -not $proc -or -not $proc.HasExited) { return }
+    $rec = @(Import-Csv $script:OursFile | Where-Object { [int]$_.Id -eq [int]$proc.Id }) | Select-Object -Last 1
+    if (-not $rec) { return }
+    $ex = Join-Path (Split-Path $script:OursFile) 'ours_exits.csv'
+    if (-not (Test-Path $ex)) { Set-Content $ex 'Id,Start,Exit' -Encoding utf8 }
+    $when = try { $proc.ExitTime } catch { Get-Date }
+    Add-Content $ex ('{0},{1},{2}' -f $rec.Id, $rec.Start, ([datetime]$when).ToString('o')) -Encoding utf8
 }
 
 function Ours-AddId([int] $id, [string] $role) {
