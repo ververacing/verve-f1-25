@@ -1,0 +1,195 @@
+# GRID (#131): gp_menu_full_press_dry_hungary.plan plus a Custom grid with the player last (Starting Grid add-on).
+# HUNGARY (B-0018, #120): gp_menu_full_press_dry.plan with round 1 at the Hungaroring.
+# DRY-LOCKED (#118): gp_menu_full_press.plan plus Quick Weather = Clear (Dry), found by the H-dry discovery on build
+# 26566308 (2026-11-16). The runner's weather_check --locked then requires weather 0 and a dry forecast throughout.
+# A full menu Grand Prix for behaviour batches (#71): as gp_menu_race.plan, at AI difficulty 100, run to the results
+# screen. Tools/b0014_check.py reads the difficulty back from UDP, and any race not at 100 is invalid.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+@expect fe_f1_world
+@raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}
+@sleep 6
+@expect f1_world_activity_container
+# the Grand Prix card
+pad a 250
+@sleep 6
+# the season: one right is F1 2025
+pad right 250
+@sleep 3
+pad a 250
+@sleep 6
+@expect solo_container
+# round 1's track: fifteen right from Australia is Hungary (Hungaroring, UDP track id 9). On build 26566308 the
+# list has reversed layouts in it: Austria is ten right, Great Britain (R) thirteen, Belgium fourteen, Hungary fifteen.
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+# team: four right from McLaren is Aston Martin. Then the driver: Stroll is the default
+pad right 200
+pad right 200
+pad right 200
+pad right 200
+@sleep 2
+pad a 250
+@sleep 7
+@expect solo_container
+pad a 250
+@sleep 7
+@expect settings_container
+# Difficulty 100: from Start Event, right then down is the Difficulty tile. Holding right reaches the cap of 110 from
+# any start, and ten presses left from there is exactly 100. Then back to the hub (Difficulty selected).
+pad right 250
+@sleep 2
+pad down 250
+@sleep 2
+pad a 250
+@sleep 4
+pad right 6000
+@sleep 2
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+pad left 200
+@sleep 2
+pad b 250
+@sleep 4
+# #131 workaround grid (msyeett.starting-grid 0.1.4, enabled in verve-test): down from Difficulty is Weekend Structure
+# (Qualifying Format Off, Starting Grid Realistic). Five down is Grid Editor; opening it makes Starting Grid Custom.
+# The player (Stroll) starts at P1 with the cursor on him; X moves him down one, 19 presses put him 20th (last)
+# and every AI car moves up one in the game's order. B asks Confirm Changes (A), B again is the hub on Weekend
+# Structure, and up is Difficulty again for the weather steps. Found by runs/2026-11-16-H-grid-discovery.
+pad down 250
+@sleep 2
+pad a 250
+@sleep 4
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+@sleep 1
+pad a 250
+@sleep 4
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+@sleep 2
+pad b 250
+@sleep 4
+# Confirm Changes
+pad a 250
+@sleep 4
+pad b 250
+@sleep 4
+pad up 250
+@sleep 2
+# #118 weather lock: up then right from Difficulty is the Weather and Time of Day tile. Its first row, Quick Weather,
+# starts at Dynamic (random weather); one press right is Clear (Dry), which holds for the whole weekend.
+pad up 250
+@sleep 2
+pad right 250
+@sleep 2
+pad a 250
+@sleep 4
+pad right 250
+@sleep 3
+# back to the hub (Weather selected), then two left is Start Event
+pad b 250
+@sleep 4
+pad left 250
+@sleep 2
+pad left 250
+@sleep 3
+# back on the hub, Start Event selected
+pad a 250
+@sleep 8
+# one press inside the grid rundown, before lights out (about 108 s into the session), for #65
+@sleep 125
+# only press inside the rundown: on the grid, this press would fire Start Race. All 3 test runs read this state
+@expect \|hud\|#fe9b028c\|
+pad a 250
+@sleep 4
+status
+wait screen=garage_monitor_container 300
+@sleep 8
+@expect garage_monitor_container
+pad a 700
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+@sleep 2
+@raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+# 5 laps: the flag at about 354 s, the results screen up to about 100 s later
+@sleep 340
+status
+wait screen=session_results_container 200
+@sleep 5
+status

@@ -1,0 +1,64 @@
+﻿pad down 250
+@sleep 2
+pad a 250
+@sleep 4
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 1
+pad down 200
+@sleep 2
+pad a 250
+@sleep 4
+pad x 250
+@sleep 3
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+pad x 250
+@sleep 1
+@sleep 3
+pad b 250
+@sleep 4
+pad a 250
+@sleep 4
+pad b 250
+@sleep 4
+pad up 250
+@sleep 3
+@end
