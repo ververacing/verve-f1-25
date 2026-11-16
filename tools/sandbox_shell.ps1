@@ -79,6 +79,10 @@ function Log([string] $s) { Write-Host $s; Add-Content $transcript $s -Encoding 
 Ours-Init $Out
 $script:foreign = $false   # set once a game or launcher that isn't ours shows up: then no post-race Swofty steps at all
 if (@(Ours-Foreign).Count) { throw 'F1 25 or a Swofty process (launcher) is running that this run did not start; start sandbox runs with both closed.' }
+# the shell itself and its helpers are recorded too (supervisor, after the 14:55 pause): their roles never match
+# pause.ps1's stop scope (^test shell|^game), so a pause still lets this script run its own quit, guard and cleanup
+Ours-AddId $PID 'sandbox_shell (plan runner; never in a pause stop scope)' | Out-Null
+$pauseFlagPath = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt'
 if ($ExpProfile -notlike 'verve-*') { throw "-ExpProfile $ExpProfile isn't one of ours (verve-*); never run a test on Tyler's profiles" }
 $profileFile = Join-Path $env:LOCALAPPDATA "Swofty\profiles\$ExpProfile.json"
 if (-not (Test-Path $profileFile)) { throw "no profile $ExpProfile ($profileFile)" }
@@ -225,6 +229,12 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         }
         $o | ConvertTo-Json -Compress -Depth 4
     }
+    function BlockReason {
+        # why a long step must end now: a PAUSE (the flag tools/pause.ps1 sets first) or our game gone
+        if (Test-Path $pauseFlagPath) { return 'pause flag' }
+        if ($script:gamePid -and -not (Get-Process -Id $script:gamePid -ErrorAction SilentlyContinue)) { $script:gameGone = $true; return 'game exited' }
+        return $null
+    }
     function Send([string] $cmd, [int] $timeoutS = 400) {
         $script:seq++
         $json = ToJson $cmd
@@ -297,7 +307,16 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     # return value would be mixed with log lines)
     function Step([string] $s) {
         $script:stop = $null
-        if ($s -match '^@sleep (\d+)') { Start-Sleep -Seconds ([int]$Matches[1]); return }
+        if ($s -match '^@sleep (\d+)') {
+            # long sleeps (the 125 s grid rundown) end at once on a PAUSE or a game exit
+            $left = [int]$Matches[1]
+            while ($left -gt 0) {
+                $why = BlockReason
+                if ($why) { Log "sleep: stopped ($why) with $left s left"; $script:stop = "sleep: $why"; return }
+                $n = [Math]::Min(5, $left); Start-Sleep -Seconds $n; $left -= $n
+            }
+            return
+        }
         if ($s -match '^@expect (.+)$') {
             $want = $Matches[1]; $scr = Screen
             if ($scr -notmatch $want) { Log "EXPECT FAILED: screen '$scr' !~ $want; stopping the plan"; $script:stop = "stopped at expect $want" }
@@ -318,17 +337,30 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             $max = $Matches[1]; $after = if ($Matches[2]) { $Matches[2] } else { '150' }
             if (-not $Udp -or -not $udpBin) { Log 'udpfinish: no -Udp capture to watch; stopping the plan'; $script:stop = 'udpfinish without -Udp'; return }
             # several races per launch (@restart): skip the races already ended in this run, or it returns at once on race 1
-            $wArgs = @('-I', (Join-Path $PSScriptRoot 'udp_finish_watch.py'), '--bin', $udpBin, '--max-s', $max, '--after-leader-s', $after)
+            $wArgs = @('-I', (Join-Path $PSScriptRoot 'udp_finish_watch.py'), '--bin', $udpBin, '--max-s', $max, '--after-leader-s', $after,
+                       '--stop-file', $pauseFlagPath)
+            if ($script:gamePid) { $wArgs += @('--game-pid', "$script:gamePid") }
             if ($script:doneUids.Count) { $wArgs += @('--exclude-uids', ($script:doneUids -join ',')) }
             $script:raceNo++
-            Log "udpfinish: race $script:raceNo, watching (max $max s, leader + $after s; excluding $($script:doneUids.Count) earlier race uid(s))"
-            $watch = @(& $Python @wArgs 2>&1 | ForEach-Object { "$_" })
-            $wCode = $LASTEXITCODE
+            Log "udpfinish: race $script:raceNo, watching (max $max s, leader + $after s; excluding $($script:doneUids.Count) earlier race uid(s); ends at once on the pause flag or a game exit)"
+            # started as its own process so it is recorded in ours.csv (role 'udp finish watch', never a pause stop scope)
+            $wOut = Join-Path $Out ("udpfinish_race{0}.txt" -f $script:raceNo)
+            $wp = Start-Process -FilePath $Python -ArgumentList ($wArgs | ForEach-Object { '"' + $_ + '"' }) -NoNewWindow -PassThru `
+                -RedirectStandardOutput $wOut -RedirectStandardError "$wOut.err"
+            $null = $wp.Handle   # PS 5.1: keep the handle, or ExitCode is empty after WaitForExit
+            Ours-AddId $wp.Id "udp finish watch (race $script:raceNo)" | Out-Null
+            $wp.WaitForExit()
+            $wCode = $wp.ExitCode
+            $watch = @(@(Get-Content $wOut -ErrorAction SilentlyContinue) + @(Get-Content "$wOut.err" -ErrorAction SilentlyContinue) | Where-Object { $_ } | ForEach-Object { "$_" })
             $wUid = ''
             foreach ($l in $watch) { if ($l -match '^(finished|timeout) uid (\d+)') { $wUid = $Matches[2] } }
             if ($wUid) { $script:doneUids += $wUid }
             Log "udpfinish: race $script:raceNo exit $wCode uid $(if ($wUid) { $wUid } else { '-' }): $($watch -join ' | ') "
             Add-Content (Join-Path $Out 'udp_races.txt') -Encoding utf8 -Value ("race {0} {1:s} exit {2} uid {3} | {4}" -f $script:raceNo, (Get-Date), $wCode, $(if ($wUid) { $wUid } else { '-' }), ($watch -join ' | '))
+            if ($wCode -eq 5) {
+                $why = if (($watch -join ' ') -match 'game exited') { $script:gameGone = $true; 'game exited' } else { 'pause flag' }
+                Log "udpfinish: race $script:raceNo stopped at once ($why); stopping the plan"; $script:stop = "udpfinish: $why"
+            }
             return
         }
         if ($s -match '^@restart(?: (\d+))?$') {
@@ -337,6 +369,8 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             # (garage_monitor_container); A held 700 ms starts the race. Every sub-step is logged.
             $garageS = if ($Matches[1]) { [int]$Matches[1] } else { 60 }
             $script:restartNo++
+            $why = BlockReason
+            if ($why) { Log "restart $script:restartNo`: not restarting ($why); stopping the plan"; $script:stop = "restart: $why"; return }
             Log "restart $script:restartNo`: screen before '$(Screen)'"
             Log "restart $script:restartNo`: pad start (pause menu)"
             Send 'pad start' | Out-Null; Start-Sleep -Seconds 3
@@ -349,6 +383,8 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             $tR = Get-Date; $scr = ''
             while (((Get-Date) - $tR).TotalSeconds -lt $garageS) {
                 if ($p.HasExited -or $script:gameGone) { break }
+                $why = BlockReason
+                if ($why) { Log "restart $script:restartNo`: stopped waiting for the garage ($why); stopping the plan"; $script:stop = "restart: $why"; return }
                 Start-Sleep -Seconds 2
                 $scr = Screen
                 if ($scr -match 'garage_monitor_container') { break }

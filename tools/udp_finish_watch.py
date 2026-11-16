@@ -13,6 +13,8 @@ Exit 0 all AI done; 1 timeout at the leader's finish + --after-leader-s (the fir
 2 --max-s passed with no finish (or no race session); 3 no capture file; 4 the LapData layout from tools/udp_parse.py
 isn't the expected one (57-byte entry, resultStatus at byte 45), so nothing is watched. Prints one summary line, then
 `finished uid <uid>` (exit 0) or `timeout uid <uid>` (exit 1): the race session uid it ended on.
+--stop-file <pause flag> and --game-pid <pid>: exit 5 at once ("stopped: pause flag" / "stopped: game exited") when the
+flag appears or the game is gone. The liveness check is read-only (OpenProcess + GetExitCodeProcess, never os.kill).
 
 Several races per launch (V-1, `@restart` in tools/sandbox_shell.ps1): each restart is a new session uid in the same
 capture. --exclude-uids lists race session uids to ignore (the races already ended in this launch), so a later call
@@ -76,11 +78,41 @@ class Watch:
         return bool(self.status) and all(s >= 3 for s in self.status.values())
 
 
+def pid_alive(pid: int) -> bool:
+    """Read-only liveness check (never os.kill: on Windows any signal but the CTRL events terminates the process)."""
+    if os.name != "nt":
+        return Path(f"/proc/{pid}").exists()
+    import ctypes
+    k32 = ctypes.windll.kernel32
+    h = k32.OpenProcess(0x1000, False, pid)          # PROCESS_QUERY_LIMITED_INFORMATION
+    if not h:
+        return False
+    try:
+        code = ctypes.c_ulong()
+        return bool(k32.GetExitCodeProcess(h, ctypes.byref(code))) and code.value == 259   # STILL_ACTIVE
+    finally:
+        k32.CloseHandle(h)
+
+
+def stop_check(stop_file: Path | None, game_pid: int | None, alive=pid_alive):
+    """A callable giving the reason to stop at once (the pause flag, or our game gone), or None."""
+    def check():
+        if stop_file is not None and stop_file.exists():
+            return "pause flag"
+        if game_pid is not None and not alive(game_pid):
+            return "game exited"
+        return None
+    return check
+
+
 def run(path: Path, max_s: float, after_leader_s: float, clock=time.time, sleep=time.sleep,
-        exclude: frozenset = frozenset()) -> tuple[int, str, int | None]:
-    """(exit code, summary, the race session uid it ended on, or None)."""
+        exclude: frozenset = frozenset(), stop=lambda: None) -> tuple[int, str, int | None]:
+    """(exit code, summary, the race session uid it ended on, or None). Exit 5 = stopped at once (stop() said why)."""
     t0 = clock()
     while not path.exists():
+        why = stop()
+        if why:
+            return 5, f"stopped: {why}", None
         if clock() - t0 > 30:
             return 3, f"no capture at {path}", None
         sleep(1)
@@ -106,6 +138,9 @@ def run(path: Path, max_s: float, after_leader_s: float, clock=time.time, sleep=
         n_ai = len(w.status)
         fin = sum(1 for s in w.status.values() if s == 3)
         now = clock()
+        why = stop()
+        if why:   # a PAUSE (tools/pause.ps1) or the game gone: end now, not at max_s (the 14:55 pause waited 10 min)
+            return 5, f"stopped: {why} ({fin} of {n_ai} AI cars finished)", w.race_uid
         if w.leader_wall is not None and now - w.leader_wall > after_leader_s:
             return 1, (f"timeout {after_leader_s:.0f} s after the leader's finish: {fin} of {n_ai} AI cars finished"), w.race_uid
         if now - t0 > max_s:
@@ -189,6 +224,34 @@ def selftest() -> int:
         code, msg, uid = run(p, 60, 150, fake_clock, fake_sleep, exclude=frozenset({7, 8}))
         ok &= code == 2 and uid is None
         print("case two races, exclude 7,8 -> no race left (max):", code, msg, "uid", uid)
+        # a PAUSE or the game gone ends the watch at once (the 14:55 pause sat on a 900 s watch): exit 5, uid kept
+        flag = Path(d) / "paused.txt"
+        clock["t"] = 1000.0
+        write(two)
+        calls = {"n": 0}
+
+        def flag_on_third_sleep(s):
+            fake_sleep(s)
+            calls["n"] += 1
+            if calls["n"] == 3:
+                flag.write_text("PAUSE")
+        code, msg, uid = run(p, 900, 150, fake_clock, flag_on_third_sleep, exclude=frozenset({7}),
+                             stop=stop_check(flag, None))
+        ok &= code == 5 and "pause flag" in msg and uid == 8 and clock["t"] < 1100
+        print("case pause flag mid-watch -> stopped at once:", code, msg, "uid", uid, f"after {clock['t'] - 1000:.0f} s")
+        flag.unlink()
+        clock["t"] = 1000.0
+        code, msg, uid = run(p, 900, 150, fake_clock, fake_sleep, exclude=frozenset({7}),
+                             stop=stop_check(None, 4242, alive=lambda pid: False))
+        ok &= code == 5 and "game exited" in msg and clock["t"] < 1010
+        print("case game gone -> stopped at once:", code, msg, "uid", uid)
+        clock["t"] = 1000.0
+        code, msg, uid = run(p, 60, 150, fake_clock, fake_sleep, exclude=frozenset({7}),
+                             stop=stop_check(flag, 4242, alive=lambda pid: True))
+        ok &= code == 2
+        print("case no flag, game alive -> normal max:", code, msg)
+        ok &= pid_alive(os.getpid()) and not pid_alive(0x7FFFFFF0)
+        print("case pid_alive (read-only): this process alive, a free pid not:", pid_alive(os.getpid()), pid_alive(0x7FFFFFF0))
     ok &= layout_ok()
     print("case layout:", f"LapData entry {LAP_SIZE} bytes, resultStatus at byte {RSTATUS_OFF}",
           "ok" if layout_ok() else f"WRONG (expected {EXPECT_LAP_SIZE} / {EXPECT_RSTATUS_OFF})")
@@ -217,7 +280,9 @@ def main() -> int:
         except (IndexError, ValueError):
             print("udp finish watch: --exclude-uids needs a comma list of session uids (exit 3)")
             return 3
-    code, msg, uid = run(path, max_s, after, exclude=exclude)
+    stop_file = Path(a[a.index("--stop-file") + 1]) if "--stop-file" in a else None
+    game_pid = int(a[a.index("--game-pid") + 1]) if "--game-pid" in a else None
+    code, msg, uid = run(path, max_s, after, exclude=exclude, stop=stop_check(stop_file, game_pid))
     print(f"udp finish watch: {msg} (exit {code})" + (f"; {len(exclude)} earlier race uid(s) excluded" if exclude else ""))
     if code == 0 and uid is not None:
         print(f"finished uid {uid}")
