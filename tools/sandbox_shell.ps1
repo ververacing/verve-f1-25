@@ -134,6 +134,13 @@ function PostCheck {
     if ($LASTEXITCODE -eq 4) { Write-Host 'post-run: SKIPPED: F1 25 or the launcher is running; check again when both have closed'; $script:urgent = $true }
     $o | ForEach-Object { Write-Host "post-run: $_" }
 }
+# `swofty test shell` reads its stdin until EOF ("... quit); end with Ctrl-D"): after the game quits it waits there
+# forever. Every race of 2026-11-15 hit the 120 s timeout after `quit` and was then stopped; closing stdin ends it.
+function CloseStdin {
+    if ($p -and -not $p.HasExited) {
+        try { $p.StandardInput.Close(); Log "stdin closed (EOF) at $((Get-Date).ToString('HH:mm:ss'))" } catch { Log "stdin close failed: $_" }
+    }
+}
 $result = 'not run'
 $t0 = Get-Date   # also read after the loop, so set it even when nothing launches
 for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
@@ -229,6 +236,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         # docs/harness.md: "a skipped intro means quitting and relaunching". Quit cleanly first, so the game exits on
         # its own (a stopped game kept skipping: race 3 of 2026-11-15 skipped 3 of 3); stop this attempt only if it won't
         Send 'quit' 60 | Out-Null
+        CloseStdin
         $qEnd = (Get-Date).AddSeconds(90)
         while (-not $p.HasExited -and (Get-Date) -lt $qEnd) { if (@(Ours-Foreign).Count) { $script:foreign = $true; break }; Start-Sleep -Milliseconds 500 }
         if ($script:foreign) { $result = 'not ours running'; Log 'ABORT: a process that is not ours is running; no relaunch'; break }
@@ -300,6 +308,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     }
     } catch { $result = "plan error: $_"; Log $result }
     try { if (-not $p.HasExited -and -not $script:gameGone) { Send 'quit' 120 | Out-Null } } catch { Log "quit failed: $_" }
+    CloseStdin   # EOF: the shell ends on its own ("end with Ctrl-D"); without it every race waited the full 120 s, then stopped it
     # wait up to 120 s for the shell to finish its own restore; if a process that isn't ours appears meanwhile (Tyler
     # opened the launcher or the game), stop waiting and touch nothing more (incident 2026-11-15)
     $waitEnd = (Get-Date).AddSeconds($(if ($script:gameGone) { 30 } else { 120 }))   # the game is already gone: the shell gets 30 s
