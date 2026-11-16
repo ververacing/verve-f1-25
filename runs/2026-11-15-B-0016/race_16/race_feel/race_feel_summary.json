@@ -1,0 +1,319 @@
+{
+  "session_uid": 7383521767555048010,
+  "track_id": 17,
+  "track_length_m": 4323,
+  "laps": 5,
+  "ai_difficulty": 100,
+  "player_car": 19,
+  "ai_cars": 19,
+  "median_green_lap_s": 68.972,
+  "lap1_loss_median_s": 7.595,
+  "lap1_positions_changed": 19,
+  "lap1_held_changes": 27,
+  "lap1_spread_s": 11.329,
+  "lap1_collisions": 9,
+  "train_time_share": 0.5614,
+  "held_passes_net_2plus": 10,
+  "held_passes_2plus_as_71": 29,
+  "ovtk_raw": 141,
+  "longest_train_median": 10.5,
+  "longest_train_max": 12,
+  "early_brakes_total": 34,
+  "early_brakes_in_traffic": 33,
+  "phantom_brakes": 1,
+  "phantom_brakes_clear2s": 0,
+  "phantom_cars_scored": 18,
+  "phantom_onsets_scored_share": 0.984,
+  "phantom_ref_counts": {
+    "own": 63,
+    "field": 417
+  },
+  "phantom_by_ref": {
+    "own": 3,
+    "field": 31
+  },
+  "corners": {
+    "total": 7,
+    "scored": 7
+  },
+  "rear_end_contacts": 6,
+  "pit_cycle_passes": 0,
+  "contacts": [
+    {
+      "t": 8.636,
+      "cars": [
+        6,
+        10
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "6": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "10": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 8.669,
+      "cars": [
+        8,
+        7
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "8": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 24.337,
+      "cars": [
+        0,
+        15
+      ],
+      "kind": "side",
+      "outcome": {
+        "0": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "15": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 24.954,
+      "cars": [
+        6,
+        2
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "6": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "2": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 26.756,
+      "cars": [
+        15,
+        16
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "15": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "16": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 34.14,
+      "cars": [
+        12,
+        9
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "12": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "9": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 51.074,
+      "cars": [
+        16,
+        7
+      ],
+      "kind": "side",
+      "outcome": {
+        "16": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "7": {
+          "wing_hit": true,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 26,
+          "costly": true
+        }
+      }
+    },
+    {
+      "t": 56.912,
+      "cars": [
+        16,
+        7
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "16": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 57.531,
+      "cars": [
+        1,
+        8
+      ],
+      "kind": "side",
+      "outcome": {
+        "1": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "8": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 82.242,
+      "cars": [
+        7,
+        16
+      ],
+      "kind": "side",
+      "outcome": {
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "16": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 294.354,
+      "cars": [
+        7,
+        3
+      ],
+      "kind": "side",
+      "outcome": {
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "3": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    }
+  ],
+  "costly_contact_cars": 1,
+  "lap1_costly_contacts": 1,
+  "front_wing_increments": 1,
+  "guards": {
+    "collisions": 11,
+    "wing_damage_added": 26,
+    "dnfs": 0,
+    "penalties": 1,
+    "median_green_lap_s": 68.972
+  },
+  "damage_packets_seen": true,
+  "bad_sizes": {}
+}

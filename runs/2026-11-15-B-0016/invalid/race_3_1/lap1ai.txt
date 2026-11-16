@@ -1,0 +1,3 @@
+﻿addons.json: MISSING
+installed swofty.lap1-ai version: 1.0.0
+loader.log: MISSING

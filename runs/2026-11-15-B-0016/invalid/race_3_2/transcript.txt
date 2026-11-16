@@ -1,0 +1,27 @@
+saves before: 32 entries; profile verve-test (652BB5A0C51E2E620438EB15C4ECFD9E3124C7345391A40B156D7966CE987793) +addons ; active profile tyler
+udp capture pid 10608
+attempt 1 started 09:36:15
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261115-173615-1 ({"schema":1,"run":"shell-20261115-173615-1","state":"armed","pid":9440,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261115-173615-1\\saves\\remote","why":""})
+09:38:07 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":82610}
+09:38:07 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":9440,"run":"shell-20261115-173615-1","ticks":4503,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+game pid 9440 (test agent)
+intro played (splash after 83 s)
+09:38:28 > pad ls 15000  =>  {"seq":3,"status":"ok","ms":20500}
+09:38:29 > pad ls  =>  {"seq":4,"status":"ok","ms":250}
+09:38:33 > pad ls 2000  =>  {"seq":5,"status":"ok","ms":4000}
+09:38:33 > pad ls  =>  {"seq":6,"status":"ok","ms":266}
+09:38:38 > home  =>  {"seq":7,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4765}
+09:38:42 > @raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}  =>  {"seq":8,"status":"ok","value":{"from":"home"},"ms":454}
+09:38:47 > status  =>  {"seq":9,"status":"ok","value":{"v":1,"pid":9440,"run":"shell-20261115-173615-1","ticks":6441,"phase":"|fe_f1_world|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+09:38:52 > @raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}  =>  {"seq":10,"status":"ok","value":{"from":"screen"},"ms":5000}
+09:38:58 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":9440,"run":"shell-20261115-173615-1","ticks":7108,"phase":"|f1_world_activity_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+09:38:59 > pad a 250  =>  {"seq":12,"status":"ok","ms":500}
+09:39:06 > pad right 250  =>  {"seq":13,"status":"ok","ms":500}
+09:39:09 > pad a 250  =>  {"seq":14,"status":"ok","ms":500}
+09:39:16 > status  =>  {"seq":15,"status":"ok","value":{"v":1,"pid":9440,"run":"shell-20261115-173615-1","ticks":8120,"phase":"|f1_world_activity_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"ok","title":"ok","resume":"ok","advance":"ok"},"tests":[]},"ms":0}
+EXPECT FAILED: screen '|f1_world_activity_container|#5f9ae18b|' !~ solo_container; stopping the plan
+09:39:16 > quit  =>  {"seq":16,"status":"ok","value":{"windows":1},"ms":0}
+run folder: shell-20261115-173615-1
+result: stopped at expect solo_container
+udp recording: 935 bytes
+saves unchanged (32 entries)

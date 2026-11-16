@@ -1,0 +1,7 @@
+python.exe : no sessions in the capture
+At %USERPROFILE%\Documents\verve-f1-25\tools\b0016_run.ps1:100 char:5
++     & python -I (Join-Path $PSScriptRoot 'race_feel.py') (Join-Path $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (no sessions in the capture:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

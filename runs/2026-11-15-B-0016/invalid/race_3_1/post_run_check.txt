@@ -1,0 +1,36 @@
+﻿post-run: NOT CLEAN (drift lines 12, doctor's open journals 1 [18e847e4b1c51988-11996], journal files 1, version.dll present)
+  drift              journal 18e847e4b1c51988-11996 is open
+  drift              2025_asset_groups/ui_package/common_front_end.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/databases.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_f1_world.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_frontend.erp differs from the baseline
+sidestep for: teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+storage sidestep 20261115-092541: active profile tyler; addons teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+moved empty teamsimplified.mods\tyler -> verve-f1-25-recovery\20261115-092541\teamsimplified.mods\tyler
+moved empty dromodf.skip-cutscenes\tyler -> verve-f1-25-recovery\20261115-092541\dromodf.skip-cutscenes\tyler
+moved empty twilight.offline-quiet\tyler -> verve-f1-25-recovery\20261115-092541\twilight.offline-quiet\tyler
+swofty restore exit 0: restored: the game folder matches the baseline for build 25251167
+after restore: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
+post-run: NOT CLEAN (drift lines 12, doctor's open journals 1 [18e847f1ecd57f9c-25568], journal files 1, version.dll present)
+  drift              journal 18e847f1ecd57f9c-25568 is open
+  drift              2025_asset_groups/ui_package/common_front_end.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/databases.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_f1_world.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_frontend.erp differs from the baseline
+sidestep for: teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+storage sidestep 20261115-092637: active profile tyler; addons teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+nothing to move
+swofty restore exit 0: restored: the game folder matches the baseline for build 25251167
+after restore: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
+post-run: NOT CLEAN (drift lines 12, doctor's open journals 1 [18e847feef04c414-8116], journal files 1, version.dll present)
+  drift              journal 18e847feef04c414-8116 is open
+  drift              2025_asset_groups/ui_package/common_front_end.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/databases.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_f1_world.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_frontend.erp differs from the baseline
+sidestep for: teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+storage sidestep 20261115-092733: active profile tyler; addons teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, twilight.offline-quiet
+nothing to move
+swofty restore exit 0: restored: the game folder matches the baseline for build 25251167
+after restore: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
+post-run: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)

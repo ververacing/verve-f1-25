@@ -1,0 +1,9 @@
+﻿post-run: NOT CLEAN (drift lines 12, doctor's open journals 1 [18e844ef557cb610-30780], journal files 1, version.dll present)
+  drift              journal 18e844ef557cb610-30780 is open
+  drift              2025_asset_groups/ui_package/common_front_end.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/databases.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_f1_world.erp differs from the baseline
+  drift              2025_asset_groups/ui_package/flow_frontend.erp differs from the baseline
+sidestep for: teamsimplified.mods, swofty.core, dromodf.skip-cutscenes, jonno.smarter-ai-strategies, jonno.team-orders, kizi.ai-driver-behaviour, swofty.lap1-ai, twilight.offline-quiet
+URGENT: the sidestep refused (see above); restore not tried. Stop all testing; Tyler must not launch the game.
+post-run: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)

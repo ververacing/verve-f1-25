@@ -1,0 +1,59 @@
+race_1 (arm A): VALID
+race_2 (arm B): VALID
+race_3 (arm A): VALID
+race_4 (arm B): VALID
+race_5 (arm A): VALID
+race_6 (arm B): VALID
+race_7 (arm A): VALID
+race_8 (arm B): VALID
+race_9 (arm A): VALID
+race_10 (arm B): VALID
+race_11 (arm A): VALID
+race_12 (arm B): VALID
+race_13 (arm A): VALID
+race_14 (arm B): VALID
+race_15 (arm A): VALID
+race_16 (arm B): VALID
+race_17 (arm A): VALID
+race_18 (arm B): VALID
+race_19 (arm A): VALID
+race_20 (arm B): VALID
+
+20 valid of 20 races (A 10, B 10)
+
+Primary P3, lap-1 held changes (net) per race: B - A +1.30, bootstrap SE 1.73, 2-SE interval [-2.16, +4.76] (null band +-4)
+Guard, lap-1 costly contacts: B - A +0.30 (SE 0.25)
+Co-primary lap1_loss_median_s: B - A -0.823, SE 0.488, 2-SE [-1.799, +0.153]
+Co-primary lap1_spread_s: B - A -0.355, SE 0.720, 2-SE [-1.795, +1.085]
+Secondary lap1_collisions: B - A +1.4000 (SE 1.1241)
+Secondary held_passes_net_2plus: B - A +1.5000 (SE 1.4506)
+Secondary train_time_share: B - A +0.0027 (SE 0.0288)
+Secondary longest_train_median: B - A +0.0000 (SE 0.8876)
+Secondary early_brakes_total: B - A +5.4000 (SE 3.8084)
+Secondary front_wing_increments: B - A +0.0000 (SE 0.1320)
+Secondary median_green_lap_s: B - A -2.9767 (SE 1.5099)
+Secondary dnfs: B - A +0.0000 (SE 0.0000)
+
+Per race (arm, P3, guard, P1, P2):
+  race_1: A 18 0 6.715 9.711
+  race_2: B 20 0 5.818 9.484
+  race_3: A 14 0 5.895 8.855
+  race_4: B 15 0 5.835 9.662
+  race_5: A 19 1 6.435 10.824
+  race_6: B 19 0 4.184 7.712
+  race_7: A 14 0 7.045 9.679
+  race_8: B 21 2 6.931 14.858
+  race_9: A 19 0 8.755 8.439
+  race_10: B 18 0 5.443 7.299
+  race_11: A 15 0 7.836 11.619
+  race_12: B 23 1 8.076 8.485
+  race_13: A 20 0 5.634 9.234
+  race_14: B 14 0 5.884 8.291
+  race_15: A 18 1 6.157 8.798
+  race_16: B 27 1 7.595 11.329
+  race_17: A 27 0 8.272 10.827
+  race_18: B 22 1 5.661 8.556
+  race_19: A 25 0 6.04 9.986
+  race_20: B 23 0 5.127 8.742
+
+RESULT: INCONCLUSIVE
