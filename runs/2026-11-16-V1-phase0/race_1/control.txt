@@ -1,0 +1,38 @@
+﻿@sleep 75
+pad start 250
+@sleep 3
+pad a 250
+@sleep 3
+pad up 250
+@sleep 2
+pad a 250
+@sleep 5
+status
+pad a 700
+@sleep 75
+pad start 250
+@sleep 3
+pad a 250
+@sleep 3
+pad up 250
+@sleep 2
+pad a 250
+@sleep 5
+status
+pad a 700
+@sleep 75
+pad start 250
+@sleep 3
+pad a 250
+@sleep 3
+pad up 250
+@sleep 2
+pad a 250
+@sleep 5
+status
+pad a 700
+@sleep 5
+status
+@sleep 3
+status
+@end
