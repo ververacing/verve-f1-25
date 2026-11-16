@@ -242,8 +242,9 @@ def manifest(addon_id: str, name: str, author: str, version: str, n_drivers: int
         "license": "MIT",
         "category": "ai",
         "kind": ["database"],
-        # pinned to the build the stock values in docs/stock/ were dumped from; widen after re-dumping on a new build
-        "compat": {"game": "f1_25", "game_builds": ["25251167"], "launcher": ">=1.5.13"},
+        # pinned to the builds the stock anchors in docs/stock/ are known for; widen after re-dumping on a new build.
+        # 26566308 (1.0.145): docs/stock/26566308/ is identical line for line to the 25251167 dump (2026-11-16)
+        "compat": {"game": "f1_25", "game_builds": ["25251167", "26566308"], "launcher": ">=1.5.13"},
         "requires": [{"id": "swofty.core", "version": ">=0.2.13"}],
         "saves": {"affects": False},
         "operations": {"database": ["db/verve.json"]},
