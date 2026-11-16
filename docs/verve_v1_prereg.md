@@ -7,8 +7,10 @@ corner pace, decision labels). Scope: Verve Drivers (docs/process.md). Evidence 
 [verve_drivers_plan.md](verve_drivers_plan.md).
 
 The values marked **[discovery]** are filled from the Austria discovery launch, and those marked **[readback]** from the
-v1_make readback, both before race 1. The map numbers marked **[re-dump]** are re-checked against the 26566308 stock
-dump. If any stock corner differs, the table is regenerated and the supervisor is told.
+v1_make readback, both before race 1. **The 26566308 stock re-dump (#156) changed nothing** that V-1 uses. The 7 live maps
+(all 66 lines), the six characteristics on the 20 f1_2025 seats and the 6 bundle keys on all 21 rows are identical to
+25251167, so the tables below stand. **Season:** the 2025 and 2026 grids share the driver rows, so the product keeps
+the season option, with 2026 as the default.
 
 **V-1 START RULE** (supervisor): V-1 starts once (i) this v3 is approved, (ii) `@restart` is merged (#153), and (iii) the
 v1_make readback passes on 26566308: the package select works, the 235 ops are applied and the gamedb count matches.
@@ -75,7 +77,7 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
   reaction_speed, mistakes, aggression, control, speed_in and speed_out.
 - **Bundles** (approved on #148; tick-read keys only; never `cede_position.*`, `yellow_flag_*` or `flying_lap_yield_*`):
 
-| Bundle | Key (`ai_driver_config.`) | Stock **[re-dump]** | 0 | 1 |
+| Bundle | Key (`ai_driver_config.`) | Stock (26566308, all rows) | 0 | 1 |
 |---|---|---|---|---|
 | DEFEND | blocking.max_blocking_distance | 18 | 5 | 45 |
 | DEFEND | blocking.max_blocking_distance_at_race_start | 18 | 5 | 45 |
@@ -100,7 +102,8 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
 | throttle_on_time | control | 0 | 0.6 | 6.6 | **1.8** |
 | alongside_awareness, brake_off_time, slide_confidence, wet_weather_ability | control | | | | dead, untouched |
 
-  The stock corners above are from the 25251167 dump **[re-dump]**.
+  The stock corners above are the same on 25251167 and 26566308 (#156). The f1_2026 package (vehicle_package_15)
+  differs in one value (throttle_on_time hl is 0.2), but V-1 writes vehicle_package_10 only.
   - **The one exception to the cap (ruling on #148): throttle_exit_fallibility.** The cap would make it a no-op
     (hl = ll = 1). "Rare vs frequent mistakes" is a headline trait for Tyler, so its hl corner is set to 1.5
     (0.75 + 3 × 0.25), past ll. The per-car exit_fallibility caps still bound the error.
