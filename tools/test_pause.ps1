@@ -4,7 +4,9 @@ harmless dummies (copies of ping.exe named PING, never F1_25 or swofty), no popu
 
 Usage:
     powershell -File tools/test_pause.ps1      # exit 0 = all pass
+    powershell -File tools/test_pause.ps1 -PureOnly   # the pure cases only (merge_pr, outside a window or while paused)
 #>
+param([switch] $PureOnly)
 $ErrorActionPreference = 'Continue'
 . (Join-Path $PSScriptRoot 'ours.ps1')
 $failed = 0
@@ -24,6 +26,7 @@ Check 'a changed sha in a record -> a difference (WAIT)' (@(Compare-SteamRecords
 $vdfD = $vdfA -replace '(?s)\t"savegame@profile#B".*?\}', ''
 Check 'a record gone -> a difference (WAIT)' (@(Compare-SteamRecords $vdfD $lkgRows).Count -eq 1)
 
+if ($PureOnly) { 'live cases not run: -PureOnly'; exit ([int]($failed -gt 0)) }
 if (@(Get-ForeignProcs @() (Get-ProcSnapshot)).Count) {
     # pause.ps1 (rightly) says WAIT and does nothing while Tyler's game or launcher is up, so the cases can't run
     'SKIP: a real F1 25 or Swofty process is running; run the selftests with both closed'; exit 1
