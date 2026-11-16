@@ -1,0 +1,1 @@
+﻿<udp enabled="true" broadcast="false" ip="127.0.0.1" port="20777" sendRate="60" format="2026" yourTelemetry="restricted" onlineNames="off" />

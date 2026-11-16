@@ -1,0 +1,3 @@
+weather: DRY
+  0 clear: 4 session packets
+  1 light cloud: 716 session packets

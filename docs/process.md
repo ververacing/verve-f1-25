@@ -144,6 +144,7 @@ Native addons build with Zig, matching Swofty's template (`zig c++ -target x86_6
 | 2026-11-15 14:29 | PAUSE ("Pause"), the first through `tools/pause.ps1`: race 15 quit through the test agent, the shell stopped (attempt only) after the 60 s wait, SAFE TO PLAY at 14:30:55 (72 s). Race 15 invalid ("pause"). | Tyler, relayed by the supervisor |
 | 2026-11-15 19:46 | RESUME ("resume"). The agent's session had lost its connection about 14:32; a RESUME and a PAUSE queued in between were superseded by the supervisor's FINAL STATE (RESUME). Pause flag cleared, pre-flight OK; the extended window still stands (confirmed by the supervisor). B-0016 slot 15 rerun. | Tyler, relayed by the supervisor |
 | 2026-11-15 21:55 | PAUSE ("Pause", in the agent's chat). B-0015 race 2 had launched about 1 min before: pause.ps1 first saw our not-yet-recorded game as foreign (WAIT, no quit); rerun at 21:56:42 once it was recorded: quit, game and shell out in 25 s; then a false WAIT (our shell's orphaned helpers); a third run did the checks: SAFE TO PLAY at 21:57:33. Race 2 invalid ("pause"). Fixes in the PR after it. | Tyler, in the agent's chat |
+| 2026-11-15 22:32 | RESUME ("Resume", in the agent's chat). No game or launcher open; pause flag cleared; #115's live tests passed and it was merged; pre-flight OK; B-0015 slot 2 rerun. | Tyler, in the agent's chat |
 
 ## Housekeeping log
 
