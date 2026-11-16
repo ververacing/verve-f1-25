@@ -11,8 +11,11 @@ Reads every Session packet of the race session (session type 15-17):
   trackTemp, trackTempChange, airTemp, airTempChange, rainPercentage), for the race session's samples.
   Offsets checked on B-0016 race 7 (storm: weather 5, rain 90) and 13 dry races (rain 3-23, never 0) (#118).
 Without --locked (B-0015's rule, #100): "weather: DRY" or "weather: WET". Exit 0 dry, 1 wet, 2 no race session.
-With --locked (#118, the dry-weather lock): "weather: LOCKED" only if every weather byte is 0 AND every race forecast
-sample has weather 0 and rainPercentage 0. Otherwise "weather: NOT LOCKED (...)" or "weather: WET". Exit 0 locked, 1 not.
+With --locked (#118, the dry-weather lock, amended 2026-11-16): "weather: LOCKED" only if every weather byte is 0 AND
+every race forecast sample has weather 0 AND rainPercentage is one constant value <= RAIN_FLOOR (3). Rationale: under
+Quick Weather = Clear (Dry) on build 26566308, rain% was a flat 3 in all 228 race samples (B-0018 proof race); under
+Dynamic it varied 3-90, so a constant 3 with weather 0 throughout is the game's floor, not a wet risk (supervisor).
+Otherwise "weather: NOT LOCKED (...)" or "weather: WET". Exit 0 locked, 1 not, 2 no race session.
 """
 from __future__ import annotations
 
@@ -28,6 +31,7 @@ RACE_TYPES = {15, 16, 17}
 WET = {3, 4, 5}
 NAMES = {0: "clear", 1: "light cloud", 2: "overcast", 3: "light rain", 4: "heavy rain", 5: "storm"}
 FC_COUNT, FC_START, FC_SIZE = 126, 127, 8
+RAIN_FLOOR = 3   # the game's rain% floor under Clear (Dry) (#118 amendment, 2026-11-16)
 
 
 def race_weather(packets) -> tuple[Counter, Counter, Counter]:
@@ -67,7 +71,8 @@ def locked_verdict(w: Counter, fw: Counter, fr: Counter) -> str:
         return "NONE"
     if any(k in WET for k in w):
         return "WET"
-    if set(w) == {0} and fw and set(fw) == {0} and set(fr) == {0}:
+    rain_ok = len(fr) == 1 and max(fr) <= RAIN_FLOOR   # one constant value, at most the floor
+    if set(w) == {0} and fw and set(fw) == {0} and rain_ok:
         return "LOCKED"
     why = []
     if set(w) != {0}:
@@ -77,8 +82,10 @@ def locked_verdict(w: Counter, fw: Counter, fr: Counter) -> str:
     else:
         if set(fw) != {0}:
             why.append("forecast weather " + ",".join(map(str, sorted(fw))))
-        if set(fr) != {0}:
-            why.append(f"rain% up to {max(fr)}")
+        if len(fr) > 1:
+            why.append("rain% not constant " + ",".join(map(str, sorted(fr))))
+        elif fr and max(fr) > RAIN_FLOOR:
+            why.append(f"rain% {max(fr)} above the floor {RAIN_FLOOR}")
     return "NOT LOCKED (" + "; ".join(why) + ")"
 
 
@@ -95,11 +102,15 @@ def selftest() -> int:
     wet = race_weather([pkt(0, 15)] * 5 + [pkt(3, 15)])                          # one packet of light rain makes it wet
     other = race_weather([pkt(4, 15, pid=2)])                                     # not a Session packet
     lock = race_weather([pkt(0, 15, fc=((15, 0, 0, 0), (15, 5, 0, 0), (10, 0, 2, 40)))] * 5)   # practice samples ignored
-    luck = race_weather([pkt(0, 15, fc=((15, 0, 0, 3),))] * 5)                    # clear now, rain chance 3%: not a lock
+    floor = race_weather([pkt(0, 15, fc=((15, 0, 0, 3), (15, 5, 0, 3)))] * 5)     # a flat 3% (Clear (Dry)): locked
+    vary = race_weather([pkt(0, 15, fc=((15, 0, 0, 3), (15, 5, 0, 0)))] * 5)      # 0 and 3 mixed: not constant
+    high = race_weather([pkt(0, 15, fc=((15, 0, 0, 5),))] * 5)                    # a flat 5%: above the floor
     ok = (verdict(dry[0]) == "DRY" and verdict(wet[0]) == "WET" and verdict(other[0]) == "NONE"
-          and locked_verdict(*lock) == "LOCKED" and locked_verdict(*luck).startswith("NOT LOCKED")
+          and locked_verdict(*lock) == "LOCKED" and locked_verdict(*floor) == "LOCKED"
+          and locked_verdict(*vary).startswith("NOT LOCKED") and locked_verdict(*high).startswith("NOT LOCKED")
           and locked_verdict(*dry).startswith("NOT LOCKED") and locked_verdict(*wet) == "WET")
-    print("selftest", "ok" if ok else "FAILED", locked_verdict(*lock), "|", locked_verdict(*luck), "|", locked_verdict(*dry))
+    print("selftest", "ok" if ok else "FAILED", locked_verdict(*lock), "|", locked_verdict(*floor), "|",
+          locked_verdict(*vary), "|", locked_verdict(*high), "|", locked_verdict(*dry))
     return 0 if ok else 1
 
 

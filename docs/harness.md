@@ -85,6 +85,24 @@ leave both verdicts INCONCLUSIVE. From now on `tools/b0016_run.ps1` writes `<rac
 version before launch and the in-game version from loader.log. It prints `LAUNCHER CHANGED` when a race differs from
 the one before, and that change gets flagged in the batch's issue.
 
+**The proof race and the ai_drives_player blocker (16 Nov, 08:01-08:15 PT).** The run is
+`runs/2026-11-16-B-0018/race_1`: Hungary, dry plan, stock, launcher 1.9.58. It was **INVALID** and is discarded as
+B-0018 race 1. `ai_drives_player` returned "unavailable: the player's car: the car field offsets are the KB build's
+and this is not that build". Swofty's `car_unbound()` (testagent/agent.cpp) refuses whenever `runtime::same_build()`
+is false, and live_car's `kb_fields()` is "True on the KB build only". So on 26566308 nobody drives the player's car:
+it was black-flagged (penalty type 6 at 20 s, RTMT reason 6 at 30 s), and there was no CHQF for the player.
+- **Held on 1.0.145:** the hud expect before the rundown press, the garage monitor, track id 9 at fifteen rights,
+  difficulty 100, and the save guard.
+- **Weather:** weather 0 in all 76 race Session packets, and all 228 race forecast samples at weather 0 with rain% a
+  flat 3. The supervisor amended #118's lock rule to "rain% <= 3, constant" (Dynamic varied 3-90). Under the amended
+  `weather_check --locked` this race is LOCKED.
+- **Upstream:** a draft issue for Swofty is in `docs/upstream/swofty_live_car_1.0.145.md`. It isn't posted; Tyler
+  decides.
+
+**Launcher 1.9.59** (16 Nov, about 08:20 PT, Tyler's standing OK): `swofty update` 1.9.58 → 1.9.59. Its commits are
+EA-app 1.0.145 bindings and save work, with no car-field port. Doctor: build 26566308, plus only the benign
+`exe-sha256.tsv` line.
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
