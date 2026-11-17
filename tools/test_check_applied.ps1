@@ -108,6 +108,21 @@ Loader $log '0.6'
 $r = Run @('-Loader', $log, '-Folder', $folder, '-Baseline', '56', '-KeyCache', $cache)
 Check 'build check: a wrong value is exit 1 (MISMATCH)' ($r.code -eq 1 -and ($r.out -join "`n") -match 'MISMATCH') ($r.out -join ' | ')
 
+# 6. C-1's build check offline on the same cache: c1_make's launch 1 (56 ops at 0.20 / 0.35 / 0.65, D1's 76 paths)
+$genC = Join-Path $d 'genc1'
+& $Python -I (Join-Path $PSScriptRoot 'c1_make.py') --seed 2026111705 --launch 1 --out $genC | Out-Null
+$folder = Join-Path $genC 'verve.c1-L01'
+$ops = (Get-Content (Join-Path $folder 'db\c1.json') -Raw | ConvertFrom-Json).ops
+Check 'c1_make wrote 56 ops at three levels' (@($ops).Count -eq 56 -and (@($ops | ForEach-Object { $_.value } | Sort-Object -Unique) -join ',') -eq '0.20,0.35,0.65')
+Loader $log "$(@($ops)[0].value)"
+$r = Run @('-Loader', $log, '-Folder', $folder, '-Baseline', '56', '-KeyCache', $cache)
+$t = $r.out -join "`n"
+Check 'C-1 build check: exit 0, no db get (no new path), 56 applied, expected 56 + 56 = 112' ($r.code -eq 0 -and $r.calls -eq 0 -and $t -match 'ops 56: 56 applied' -and $t -match 'expected 56 \+ 56 = 112' -and $t -match 'all 56 paths cached') ($r.out -join ' | ')
+$wrong = if (@($ops)[0].value -eq '0.20') { '0.35' } else { '0.20' }
+Loader $log $wrong
+$r = Run @('-Loader', $log, '-Folder', $folder, '-Baseline', '56', '-KeyCache', $cache)
+Check 'C-1 build check: another level in the game is exit 1 (MISMATCH)' ($r.code -eq 1 -and ($r.out -join "`n") -match 'MISMATCH') ($r.out -join ' | ')
+
 Remove-Item $d -Recurse -Force
 if ($fails) { "test_check_applied: $fails FAILED"; exit 1 }
 'test_check_applied: all ok'

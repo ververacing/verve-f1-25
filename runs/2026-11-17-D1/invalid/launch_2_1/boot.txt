@@ -1,0 +1,4 @@
+﻿boot: skip-relaunches 0
+  attempt 1 started 02:09:56 (93 s since the last game exit)
+  intro played (splash after 75 s)
+session check: none (no session_check.txt: the plan never reached @sessioncheck)

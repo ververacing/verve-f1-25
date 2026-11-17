@@ -40,6 +40,17 @@ Plan file, one step per line ('#' comments):
                                  stops), 8 s settle, `pad a 700` (start the race). If the screen is still the garage 5 s
                                  later, one more `pad a 700`; still there, the plan stops. Each restart is a new UDP
                                  session uid; the grid stays the same within a launch
+    @startwait <cutoff s> [<max s>]
+                                 (needs -Udp) C-1 start-only restarts (docs/verve_c1_prereg.md): no finish is waited for.
+                                 tools/udp_finish_watch.py --start-only <cutoff>: the newest race uid not already done
+                                 (--exclude-uids, as @udpfinish) must show its lights out (LGOT) within <max s> (default
+                                 120), then the wait lasts until the capture's wall time is >= LGOT + <cutoff s>. The
+                                 uid joins the done list (so the next @startwait, after a @restart, waits for the new
+                                 race); each start is logged to <Out>/udp_starts.txt (start number, time, exit, uid).
+                                 Recorded in ours.csv (role 'udp start wait', never a pause stop scope), with
+                                 --stop-file / --game-pid. Any exit but 0 stops the plan with a reason (`startwait:
+                                 start N: ...`): 2 no lights out within <max s> or the capture stalled, 5 the pause
+                                 flag or a game exit (3 no capture); the normal quit, guard and cleanup run
 
 Safety:
 - Tyler's `remote\` files and Steam's per-file remotecache records are snapshotted before and after; any change
@@ -389,6 +400,42 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             }
             return
         }
+        if ($s -match '^@startwait (\d+)(?: (\d+))?$') {
+            # C-1 start-only restarts (docs/verve_c1_prereg.md): wait for the new race's lights out (LGOT), then until the
+            # capture is LGOT + <cutoff> s in; no finish. The uid joins the done list, as @udpfinish's does
+            $cut = $Matches[1]; $sMax = if ($Matches[2]) { $Matches[2] } else { '120' }
+            $script:startNo++
+            if (-not $Udp -or -not $udpBin) { Log 'startwait: no -Udp capture to watch; stopping the plan'; $script:stop = 'startwait without -Udp'; return }
+            $sArgs = @('-I', (Join-Path $PSScriptRoot 'udp_finish_watch.py'), '--bin', $udpBin, '--start-only', $cut, '--max-s', $sMax,
+                       '--stop-file', $pauseFlagPath)
+            if ($script:gamePid) { $sArgs += @('--game-pid', "$script:gamePid") }
+            if ($script:doneUids.Count) { $sArgs += @('--exclude-uids', ($script:doneUids -join ',')) }
+            Log "startwait: start $script:startNo, waiting for lights out (max $sMax s), then LGOT + $cut s (excluding $($script:doneUids.Count) earlier race uid(s); ends at once on the pause flag or a game exit)"
+            # its own process, recorded in ours.csv (role 'udp start wait', never a pause stop scope), as the watcher
+            $sOut = Join-Path $Out ("startwait_start{0}.txt" -f $script:startNo)
+            $sp = Start-Process -FilePath $Python -ArgumentList ($sArgs | ForEach-Object { '"' + $_ + '"' }) -NoNewWindow -PassThru `
+                -RedirectStandardOutput $sOut -RedirectStandardError "$sOut.err"
+            $null = $sp.Handle   # PS 5.1: keep the handle, or ExitCode is empty after WaitForExit
+            Ours-AddId $sp.Id "udp start wait (start $script:startNo)" | Out-Null
+            $sp.WaitForExit()
+            $sCode = $sp.ExitCode
+            $sw = @(@(Get-Content $sOut -ErrorAction SilentlyContinue) + @(Get-Content "$sOut.err" -ErrorAction SilentlyContinue) | Where-Object { $_ } | ForEach-Object { "$_" })
+            $sUid = ''
+            foreach ($l in $sw) { if ($l -match '^started uid (\d+)') { $sUid = $Matches[1] } }
+            if ($sCode -eq 0 -and $sUid) { $script:doneUids += $sUid }
+            $sUidText = if ($sUid) { $sUid } else { '-' }
+            Log "startwait: start $script:startNo exit $sCode uid $sUidText`: $($sw -join ' | ')"
+            Add-Content (Join-Path $Out 'udp_starts.txt') -Encoding utf8 -Value ("start {0} {1:s} exit {2} uid {3} | {4}" -f $script:startNo, (Get-Date), $sCode, $sUidText, ($sw -join ' | '))
+            if ($sCode -eq 0 -and $sUid) { return }
+            if ($sCode -eq 5) {
+                $why = if (($sw -join ' ') -match 'game exited') { $script:gameGone = $true; 'game exited' } else { 'pause flag' }
+                Log "startwait: start $script:startNo stopped at once ($why); stopping the plan"; $script:stop = "startwait: start $script:startNo`: $why"; return
+            }
+            $sWhy = if ($sCode -eq 2) { "no lights out within $sMax s, or the capture stalled" } elseif ($sCode -eq 0) { 'no uid reported' } else { "exit $sCode" }
+            Log "STARTWAIT FAILED: start $script:startNo, $sWhy; stopping the plan"
+            $script:stop = "startwait: start $script:startNo`: $sWhy"
+            return
+        }
         if ($s -match '^@sessioncheck (\d+) (-?\d+) (\d+)(?: (\d+))?$') {
             # V-1 guard (supervisor's ruling, 2026-11-17; launch 6 ran at difficulty 99, found 35 min later): at race 1's
             # lights out, the live capture's Session packet must read this difficulty, track and weather. A mismatch ends
@@ -487,7 +534,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
 
     $result = 'plan done'
     # @udpfinish / @restart state: race session uids already ended in this run (excluded from the next watch)
-    $script:doneUids = @(); $script:raceNo = 0; $script:restartNo = 0
+    $script:doneUids = @(); $script:raceNo = 0; $script:restartNo = 0; $script:startNo = 0
     # a bad step must still reach the quit, the restore and the hash check below
     try {
     foreach ($s in $steps | Select-Object -Skip 1) {
