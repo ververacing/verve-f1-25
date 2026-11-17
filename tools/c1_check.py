@@ -16,9 +16,11 @@ no gen/ and arm.txt "SMOKE ...". Writes <batch>/c1_check/{summary.json, per_star
 START-ONLY VALIDITY per start uid (a start-only variant of tools/aionly_check.py; the starts are the capture's race
 sessions with a lights-out event, LGOT, in capture order; the window is LGOT to LGOT + CUTOFF_S 20 s, wall time of
 arrival). A start counts only if:
-  (a) the launch's race-1 session check holds: session_check.txt reads `session ok` for race 1's uid (an `unverified`
-      check is redone offline on race 1's Session packet at lights out: difficulty 100, track 17, weather 0), and
-      there is no invalid.txt;
+  (a) the launch's race-1 session check holds: session_check.txt reads `session ok` for race 1's uid (path "live"), or
+      it was `unverified` and is redone offline ONLY from this launch's own race-1 Session packet (the first at or
+      after lights out, else race 1's latest) with all three of difficulty 100, track 17, weather 0 (path "offline
+      redo from race-1 Session packet"; a missing packet or any other value fails); and there is no invalid.txt. The
+      path is printed per launch and kept in summary.json (supervisor's ruling 4, 2026-11-17);
   (b) the player car (header playerCarIndex, car 19) has no COLL (as vehicle or other) and no PENA (as vehicle) in
       the window (the Event packets);
   (c) all 19 AI cars move: a LapData totalDistance gain >= MOVE_M (0.3 m) over the last pre-LGOT frame by the cutoff;
@@ -43,12 +45,15 @@ ANALYSIS (the prereg, approved; only these are scored):
   (0.20 / 0.35 / 0.65): slope b_L, intercept a_L. Pooled = the mean over the 2 launches, SE = |b1 - b2| / 2.
 - Low end: RESOLVED if 0.20 reads >= RESOLVED_S (0.075 s) below 0.35 in both launches; else FLOOR, and the slope is
   refit on 0.35 / 0.65 (that refit is then the line).
+- Under FLOOR every verdict is tagged "(FLOOR: 2-point fit)" (stdout and summary.json), with the 0.20 level's mean
+  printed beside it (ruling 1).
 - Offset criterion on the line's slope: CONSTANT if within 1 +/- 0.1 in both launches and pooled; GROWS if > 1.1 in
   both and pooled; SHRINKS if < 0.9 in both and pooled; otherwise MIXED.
 - Shape: LINEAR if the 0.35 mean is within +/- 0.02 s of the chord from 0.20 to 0.65 in both launches; else CURVED
   (the two segment slopes reported).
 - Reproduction (not scored, reported FIRST): the 0.65 level within one frame (0.017 s) of D1's 0.936 s (0.9363), in
-  both launches. If not, the start-only route has changed the chain, and no calibration claim stands before review.
+  both launches. If not, the start-only route has changed the chain, and no calibration claim stands before review:
+  a "REPRODUCTION MISS" line right after the header (and at the end, and in summary.json), still not scored (ruling 3).
 - For V-2 (reported, not scored): the offset per level (mean - value), launch_m per level ("pure delay" if the three
   level means are within 0.5 m in both launches), the stock distribution (car-start values, the per-start fastest
   stock car), and the median per-start fastest stock reaction and the stock median, each inverted through the
@@ -101,6 +106,7 @@ RESOLVED_S = 0.075           # half the 0.15 s step from 0.20 to 0.35
 PURE_DELAY_M = 0.5           # V-1's launch_m band
 D1_065_S = 0.9363            # D1: all 18 pinned car-launches at 0.65
 FRAME_S = 0.017              # one frame, as the prereg rounds it
+FLOOR_TAG = "(FLOOR: 2-point fit)"   # supervisor, 2026-11-17: on every FLOOR verdict, stdout and summary.json
 PRIMARY = "reaction_s"
 SECONDARY = {"launch_m": "m", "speed_1s_kph": "km/h", "gain_t1": "places"}
 MEASURES = [PRIMARY] + list(SECONDARY)
@@ -250,9 +256,18 @@ def saves_guard(ld: Path) -> tuple[bool, str]:
     return False, "saves: no saves check on record (no `saves unchanged` in transcript.txt)"
 
 
-def session_problems(ld: Path, scan: dict[int, dict], race1: int | None) -> tuple[list[str], str]:
-    """(a): the launch's race-1 session check, and invalid.txt. Returns (problems, note)."""
+SC_LIVE = "live"
+SC_OFFLINE = "offline redo from race-1 Session packet"
+SC_NONE = "none"
+
+
+def session_problems(ld: Path, scan: dict[int, dict], race1: int | None) -> tuple[list[str], str, str]:
+    """(a): the launch's race-1 session check, and invalid.txt. Returns (problems, note, path): path SC_LIVE (the
+    plan's @sessioncheck read `session ok`), SC_OFFLINE (it was `unverified`: redone ONLY from this launch's own
+    race-1 Session packet, the first at or after lights out, else race 1's latest; all three values must match, and
+    a missing packet fails), or SC_NONE (no session_check.txt, or a check that failed)."""
     probs = []
+    path = SC_NONE
     inv = ld / "invalid.txt"
     if inv.exists():
         probs.append(f"(a) the launch is marked invalid.txt ({(text_of(inv).strip().splitlines() or ['(empty)'])[0]})")
@@ -262,22 +277,33 @@ def session_problems(ld: Path, scan: dict[int, dict], race1: int | None) -> tupl
     if not sc.exists():
         probs.append("(a) no session_check.txt (the plan never reached @sessioncheck)")
     elif line.startswith("session ok"):
+        path = SC_LIVE
         m = re.search(r"uid (\d+)", line)
         if race1 is not None and (not m or int(m[1]) != race1):
             probs.append(f"(a) the session check read uid {m[1] if m else '?'}, not race 1's uid {race1}")
     elif line.startswith("unverified"):
+        path = SC_OFFLINE
         d = scan.get(race1) if race1 is not None else None
-        vals = (d["sess_at_lgot"] or d["sess_latest"]) if d else None
-        if vals is None:
-            probs.append(f"(a) the session check was unverified ({line}) and race 1 has no Session packet to redo it")
+        vals, which = None, ""
+        if d and d.get("sess_at_lgot"):
+            vals, which = d["sess_at_lgot"], "the first at or after lights out"
+        elif d and d.get("sess_latest"):
+            vals, which = d["sess_latest"], "race 1's latest (none after lights out)"
+        if vals is None or len(vals) != 3:
+            probs.append(f"(a) the session check was unverified ({line}) and this launch's race 1 has no Session packet "
+                         f"to redo it from")
+            note = f"{line} -> offline redo FAILED: no race-1 Session packet"
         elif tuple(vals) != WANT_SESSION:
-            probs.append(f"(a) the session check was unverified; offline race 1 reads difficulty {vals[0]} track "
-                         f"{vals[1]} weather {vals[2]}, expected {WANT_SESSION}")
+            probs.append(f"(a) the session check was unverified; this launch's race-1 Session packet reads difficulty "
+                         f"{vals[0]} track {vals[1]} weather {vals[2]}, expected {WANT_SESSION[0]} / {WANT_SESSION[1]} / "
+                         f"{WANT_SESSION[2]}")
+            note = f"{line} -> offline redo FAILED: difficulty {vals[0]} track {vals[1]} weather {vals[2]}"
         else:
-            note = f"{line} -> redone offline on race 1's Session packet: difficulty {vals[0]} track {vals[1]} weather {vals[2]}"
+            note = (f"{line} -> redone offline from race 1's Session packet ({which}): difficulty {vals[0]} track "
+                    f"{vals[1]} weather {vals[2]}")
     else:
         probs.append(f"(a) the race-1 session check does not hold: {line or '(empty)'}")
-    return probs, note
+    return probs, note, path
 
 
 def weather_problems(ld: Path) -> list[str]:
@@ -300,7 +326,8 @@ def process_launch(n: int, ld: Path, n_ops: int, cutoff: float = CUTOFF_S, log=p
     ok_saves, saves_note = saves_guard(ld)
     if not ok_saves:
         launch_probs.append(saves_note)
-    a_probs, a_note = session_problems(ld, scan, uids[0] if uids else None)
+    a_probs, a_note, a_path = session_problems(ld, scan, uids[0] if uids else None)
+    log(f"  launch {n}: session check: {a_path} ({a_note or 'no session_check.txt'})")
     launch_probs += a_probs + weather_problems(ld)
     listed = read_starts_file(ld)
     listed_n = Counter(r["uid"] for r in listed or [])
@@ -349,6 +376,7 @@ def process_launch(n: int, ld: Path, n_ops: int, cutoff: float = CUTOFF_S, log=p
         log(f"    {NA_LINE}")
         starts.append(start)
     return {"launch": n, "starts": starts, "launch_problems": launch_probs, "session_note": a_note,
+            "session_path": a_path,
             "saves_note": saves_note, "listed": listed, "uids": [str(x) for x in uids]}
 
 
@@ -450,24 +478,38 @@ def analyse(launch_data: dict[int, dict], arms: dict[int, dict[str, int]], parti
         line = {n: ({"a": f["a"], "b": f["b"]} if resolved else f["floor_fit"]) for n, f in fits.items()}
         b1, b2 = line[1]["b"], line[2]["b"]
         pooled = {"a": (line[1]["a"] + line[2]["a"]) / 2, "b": (b1 + b2) / 2, "se_b": abs(b1 - b2) / 2,
-                  "source": "OLS on 0.20 / 0.35 / 0.65" if resolved else "FLOOR: refit on 0.35 / 0.65"}
+                  "source": "OLS on 0.20 / 0.35 / 0.65" if resolved else "FLOOR: 2-point fit on 0.35 / 0.65"}
+        y20 = {n: per[n]["levels"][PRIMARY]["0.20"]["mean"] for n in fits}
         res.update({
             "low_end": "RESOLVED" if resolved else "FLOOR",
             "line": {str(n): v for n, v in line.items()}, "pooled": pooled,
-            "offset": offset_class([b1, b2, pooled["b"]]),
+            "offset": offset_class([b1, b2, pooled["b"]]) + ("" if resolved else " " + FLOOR_TAG),
+            "level_020_mean_s": {str(n): v for n, v in y20.items()},
             "shape": "LINEAR" if f1["linear"] and f2["linear"] else "CURVED",
             "reproduction": "REPRODUCED" if f1["reproduced"] and f2["reproduced"] else "NOT REPRODUCED"})
+        res["reproduction_065_s"] = {str(n): per[n]["levels"][PRIMARY]["0.65"]["mean"] for n in fits}
+        if res["reproduction"] != "REPRODUCED":
+            res["reproduction_miss"] = (f"REPRODUCTION MISS (not scored): the 0.65 level reads "
+                                        + " / ".join(f"{res['reproduction_065_s'][str(n)]:.4f}" for n in sorted(fits))
+                                        + f" s in launches {' / '.join(str(n) for n in sorted(fits))}, not within "
+                                        f"{FRAME_S} s of D1's {D1_065_S} s in both: the start-only route has changed "
+                                        f"the chain; reported before any calibration claim")
         rngs = [per[n]["launch_m_range_m"] for n in need]
         res["launch_m"] = ("pure delay" if all(r is not None and r <= PURE_DELAY_M + 1e-12 for r in rngs)
                            else "not pure delay: the per-level launch_m is V-2's second input")
         if "verdict" not in res:
-            res["verdict"], res["why"] = res["offset"], f"slopes {b1:.3f} / {b2:.3f}, pooled {pooled['b']:.3f}"
+            res["verdict"] = res["offset"]
+            res["why"] = f"slopes {b1:.3f} / {b2:.3f}, pooled {pooled['b']:.3f}" + (
+                "" if resolved else "; 0.20 reads " + " / ".join(f"{y20[n]:.4f}" for n in sorted(y20))
+                + " s, 0.35 " + " / ".join(f"{per[n]['levels'][PRIMARY]['0.35']['mean']:.4f}" for n in sorted(y20)) + " s")
     allv, fastest = stock_values({n: launch_data[n] for n in have}, arms)
     stock = {"car_starts": len(allv), "starts": len(fastest)}
     if allv:
         stock.update({"min": min(allv), "median": statistics.median(allv), "mean": statistics.fmean(allv),
                       "max": max(allv), "fastest_median": statistics.median(fastest) if fastest else None})
         p = res.get("pooled")
+        if p and res.get("low_end") == "FLOOR":
+            stock["line"] = FLOOR_TAG
         if p and p["b"]:
             stock["median_game_s"] = (stock["median"] - p["a"]) / p["b"]
             if stock["fastest_median"] is not None:
@@ -560,6 +602,10 @@ def fnum(x, nd=3, unit=""):
 
 def report(res: dict, head: list[str]) -> list[str]:
     lines = list(head)
+    if res.get("reproduction_miss"):
+        lines.append(res["reproduction_miss"])
+    floor = res.get("low_end") == "FLOOR"
+    tag = f" {FLOOR_TAG}" if floor else ""
     if "reproduction" in res:
         per = res["per_launch"]
         devs = ", ".join(f"launch {n} {per[n]['levels'][PRIMARY]['0.65']['mean']:.4f} s ({fnum(per[n]['fit']['repro_dev_s'], 4)})"
@@ -577,7 +623,7 @@ def report(res: dict, head: list[str]) -> list[str]:
             lines.append(f"    {m} ({unit}) per level (cars): {cells}" + ("" if m == PRIMARY else "  [not scored]"))
         f = v["fit"]
         if f:
-            lines.append(f"    line: reaction = {f['a']:.4f} + {f['b']:.4f} x value; offsets "
+            lines.append(f"    OLS line (3 levels): reaction = {f['a']:.4f} + {f['b']:.4f} x value; offsets "
                          + ", ".join(f"{k} {fnum(x, 4)}" for k, x in f["offsets_s"].items()))
             lines.append(f"    low end: 0.35 - 0.20 = {f['low_end_s']:.4f} s ({'>=' if f['resolved'] else '<'} {RESOLVED_S}); "
                          f"0.35 vs the chord {fnum(f['chord_dev_s'], 4)} s ({'within' if f['linear'] else 'outside'} "
@@ -586,10 +632,12 @@ def report(res: dict, head: list[str]) -> list[str]:
             lines.append(f"    launch_m: the three level means span {v['launch_m_range_m']:.2f} m")
     if "pooled" in res:
         p = res["pooled"]
-        lines.append(f"  low end: {res['low_end']}; line: {p['source']}; slopes launch 1 {res['line']['1']['b']:.4f}, "
-                     f"launch 2 {res['line']['2']['b']:.4f}, pooled {p['b']:.4f} (SE {p['se_b']:.4f}), intercept "
-                     f"{p['a']:.4f}")
-        lines.append(f"  offset criterion (1 +/- {SLOPE_TOL} in both launches and pooled): {res['offset']}")
+        y20 = ", ".join(f"launch {n} {v:.4f} s" for n, v in sorted(res["level_020_mean_s"].items()))
+        lines.append(f"  low end: {res['low_end']}{tag} (0.20 level mean: {y20}); line: {p['source']}; slopes launch 1 "
+                     f"{res['line']['1']['b']:.4f}, launch 2 {res['line']['2']['b']:.4f}, pooled {p['b']:.4f} "
+                     f"(SE {p['se_b']:.4f}), intercept {p['a']:.4f}")
+        lines.append(f"  offset criterion (1 +/- {SLOPE_TOL} in both launches and pooled): {res['offset']}"
+                     + (f" (0.20 level mean: {y20})" if floor else ""))
         lines.append(f"  shape: {res['shape']}" + ("" if res["shape"] == "LINEAR" else
                                                     " (segment slopes per launch above)"))
         lines.append(f"  launch_m (not scored): {res['launch_m']}")
@@ -599,12 +647,14 @@ def report(res: dict, head: list[str]) -> list[str]:
                      f"{st['median']:.4f} / mean {st['mean']:.4f} / max {st['max']:.4f} s; per-start fastest stock car "
                      f"median {st['fastest_median']:.4f} s over {st['starts']} starts")
         if "median_game_s" in st:
-            lines.append(f"  for V-2 (not scored): game time through the pooled line: stock median "
+            lines.append(f"  for V-2 (not scored): game time through the pooled line{tag}: stock median "
                          f"{st['median_game_s']:.4f} s, per-start fastest stock median "
                          f"{st.get('fastest_median_game_s', float('nan')):.4f} s")
     if res["ignored_launches"]:
         lines.append(f"  ignored: launch(es) {res['ignored_launches']} (the prereg has launches 1-{N_LAUNCHES})")
     lines.append(f"C-1 offset: {res['verdict']} ({res['why']})")
+    if res.get("reproduction_miss"):
+        lines.append("REPRODUCTION MISS: see the top (not scored)")
     return lines
 
 
@@ -666,7 +716,8 @@ def run_smoke(batch: Path, quiet: bool = False) -> int:
     say(f"SMOKE {'PASS' if ok else 'FAIL'}")
     js = {"batch": str(batch), "mode": "smoke", "verdict": "SMOKE PASS" if ok else "SMOKE FAIL",
           "criteria": [{"name": n, "ok": g, "detail": d} for n, g, d in crit], "starts": strip_starts({1: L}),
-          "launch_problems": L["launch_problems"], "session_check": L["session_note"],
+          "launch_problems": L["launch_problems"],
+          "session_check": {1: {"path": L["session_path"], "note": L["session_note"]}},
           "constants": {"CUTOFF_S": CUTOFF_S, "GAP_S": GAP_S, "MOVE_M": vc.MOVE_M, "SMOKE_STARTS": SMOKE_STARTS}}
     write_outputs(batch / "c1_check", {1: L}, arms, js)
     return 0 if ok else 1
@@ -706,7 +757,7 @@ def run(batch: Path, seed_arg: str | None, allow_partial: bool, quiet: bool = Fa
             "starts_valid": sum(s["valid"] for s in starts),
             "arms": {n: {ARM_LABEL[k]: [d for d in ROSTER if a[d] == k] for k in range(4)} for n, a in arms.items()},
             "starts": strip_starts(launch_data),
-            "session_check": {n: L["session_note"] for n, L in launch_data.items()},
+            "session_check": {n: {"path": L["session_path"], "note": L["session_note"]} for n, L in launch_data.items()},
             "constants": {"CUTOFF_S": CUTOFF_S, "GAP_S": GAP_S, "MOVE_M": vc.MOVE_M, "LAUNCH_S": vc.LAUNCH_S,
                           "SPEED_AT_S": vc.SPEED_AT_S, "T1_M": vc.T1_M, "SLOPE_TOL": SLOPE_TOL,
                           "LINEAR_BAND_S": LINEAR_BAND_S, "RESOLVED_S": RESOLVED_S, "PURE_DELAY_M": PURE_DELAY_M,
@@ -896,14 +947,55 @@ def selftest(real: Path | None = None) -> int:
     f1 = r["per_launch"][1]["fit"]
     chk("tables: a floor (0.20 reads as 0.35) -> FLOOR, the slope refit on 0.35 / 0.65 (= 1.0 -> CONSTANT)",
         r["low_end"] == "FLOOR" and r["pooled"]["source"].startswith("FLOOR") and abs(r["pooled"]["b"] - 1.0) < 0.06
-        and r["verdict"] == "CONSTANT" and f1["b"] < 0.9, f"OLS {f1['b']:.3f}, refit {r['pooled']['b']:.3f}")
+        and r["verdict"] == f"CONSTANT {FLOOR_TAG}" and f1["b"] < 0.9, f"OLS {f1['b']:.3f}, refit {r['pooled']['b']:.3f}")
+    rl = report(r, [])
+    y20s = [f"{r['level_020_mean_s'][str(n)]:.4f}" for n in (1, 2)]
+    chk("FLOOR: the tag '(FLOOR: 2-point fit)' on the verdict, the criterion, the low end and the game-time line, "
+        "with the 0.20 level's mean printed beside it",
+        r["offset"] == f"CONSTANT {FLOOR_TAG}" and rl[-1].startswith(f"C-1 offset: CONSTANT {FLOOR_TAG}")
+        and all(y in rl[-1] for y in y20s)
+        and any(ln.startswith("  offset criterion") and FLOOR_TAG in ln and all(y in ln for y in y20s) for ln in rl)
+        and any(ln.startswith("  low end: FLOOR " + FLOOR_TAG) and "0.20 level mean" in ln for ln in rl)
+        and any("for V-2" in ln and FLOOR_TAG in ln for ln in rl) and r["stock"]["line"] == FLOOR_TAG
+        and all(abs(r["level_020_mean_s"][str(n)] - 0.60) < 0.017 for n in (1, 2)), f"0.20 reads {y20s}")
+    r = analyse(tables(1.0), arms)
+    chk("RESOLVED: no FLOOR tag anywhere", FLOOR_TAG not in "\n".join(report(r, [])) and r["verdict"] == "CONSTANT"
+        and "line" not in r["stock"])
     r = analyse(tables(1.0, curve=0.05), arms)
     chk("tables: 0.35 bowed 0.05 s off the chord -> CURVED (segment slopes reported)", r["shape"] == "CURVED"
         and all(abs(r["per_launch"][n]["fit"]["chord_dev_s"] - 0.05) < 0.01 for n in (1, 2)))
     r = analyse(tables(1.0, at065=0.98), arms)
-    chk("tables: 0.65 at 0.98 s (> 1 frame off D1's 0.9363) -> NOT REPRODUCED, printed before the line",
-        r["reproduction"] == "NOT REPRODUCED" and report(r, [])[0].startswith("REPRODUCTION")
-        and "changed the chain" in report(r, [])[1])
+    rl = report(r, ["head"])
+    chk("tables: 0.65 at 0.98 s (> 1 frame off D1's 0.9363) -> a REPRODUCTION MISS line at the top (right after the "
+        "header), repeated at the end, not scored (the offset verdict stands)",
+        r["reproduction"] == "NOT REPRODUCED" and rl[1].startswith("REPRODUCTION MISS (not scored)")
+        and "0.98" in rl[1] and "changed the chain" in rl[1] and rl[-1].startswith("REPRODUCTION MISS")
+        and r["verdict"] == "CONSTANT" and r["reproduction_miss"] == rl[1], rl[1][:90])
+    r = analyse(tables(1.0), arms)
+    chk("tables: 0.65 at 0.936 -> REPRODUCED, no miss line", r["reproduction"] == "REPRODUCED"
+        and "reproduction_miss" not in r and not any("MISS" in ln for ln in report(r, [])))
+    # ruling 4: the offline redo of an unverified session check, ONLY from this launch's own race-1 Session packet
+    with tempfile.TemporaryDirectory() as t4:
+        sl = Path(t4)
+        (sl / "session_check.txt").write_text("unverified: no race session within 90 s\nexit 2\n", encoding="utf-8")
+        cases = {"at lights out, matching": ({"sess_at_lgot": (100, 17, 0), "sess_latest": (100, 17, 0)}, True),
+                 "latest only, matching": ({"sess_at_lgot": None, "sess_latest": (100, 17, 0)}, True),
+                 "no Session packet": ({"sess_at_lgot": None, "sess_latest": None}, False),
+                 "weather 1": ({"sess_at_lgot": (100, 17, 1), "sess_latest": (100, 17, 1)}, False),
+                 "difficulty 99": ({"sess_at_lgot": (99, 17, 0), "sess_latest": (99, 17, 0)}, False),
+                 "track 9": ({"sess_at_lgot": (100, 9, 0), "sess_latest": (100, 9, 0)}, False),
+                 "race 1 missing from the capture": (None, False)}
+        for name, (d, good) in cases.items():
+            pr, note, path = session_problems(sl, {} if d is None else {7: d}, 7)
+            chk(f"(a) unverified, offline redo: {name} -> {'holds' if good else 'FAILS'}, path recorded",
+                path == SC_OFFLINE and (not pr if good else (len(pr) == 1 and pr[0].startswith("(a)")))
+                and ("redone offline" in note if good else "FAILED" in note), f"{path}: {pr or note}")
+        (sl / "session_check.txt").write_text("session ok uid 7: difficulty 100 track 17 weather 0\nexit 0\n", encoding="utf-8")
+        pr, note, path = session_problems(sl, {}, 7)
+        chk("(a) a live `session ok` -> path 'live'", path == SC_LIVE and not pr)
+        (sl / "session_check.txt").unlink()
+        pr, note, path = session_problems(sl, {}, 7)
+        chk("(a) no session_check.txt -> FAILS, path 'none'", path == SC_NONE and pr)
     r = analyse(tables(1.0, lm={1: 19.0, 2: 19.2, 3: 19.3}), arms)
     r2 = analyse(tables(1.0, lm={1: 20.5, 2: 19.6, 3: 19.0}), arms)
     chk("tables: launch_m within 0.5 m -> pure delay; spread 1.5 m -> not (V-2's second input)",
@@ -932,12 +1024,12 @@ def selftest(real: Path | None = None) -> int:
     chk("ols by hand: 0.486 / 0.636 / 0.936 -> slope 1, intercept 0.286", abs(b - 1) < 1e-9 and abs(a - 0.286) < 1e-9)
 
     # ---- 2. synthetic captures through the whole tool
-    def specs_for(arm, slope, n_starts, rng, order=None, at065=0.936, per=None):
+    def specs_for(arm, slope, n_starts, rng, order=None, at065=0.936, per=None, floor=None):
         o = order or ROSTER[:]
         accel = {d: 9.0 + (i % 5) * 0.4 for i, d in enumerate(ROSTER)}
         out = []
         for k in range(n_starts):
-            sp = {"order": o, "react": synth_reactions(arm, slope, rng, at065), "accel": accel}
+            sp = {"order": o, "react": synth_reactions(arm, slope, rng, at065, floor), "accel": accel}
             sp.update((per or {}).get(k, {}))
             out.append(sp)
         return out
@@ -999,6 +1091,11 @@ def selftest(real: Path | None = None) -> int:
         chk("(a) a failed race-1 session check -> every start INVALID", all_invalid("(a) the race-1 session check"))
         (ld / "session_check.txt").write_text("unverified: no race session within 90 s\nexit 2\n", encoding="utf-8")
         chk("(a) an unverified session check is redone offline (difficulty 100, track 17, weather 0) -> PASS", clean())
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            LL = process_launch(1, ld, 56)
+        chk("(a) the path is recorded per launch: 'session check: offline redo from race-1 Session packet'",
+            LL["session_path"] == SC_OFFLINE and f"launch 1: session check: {SC_OFFLINE}" in buf.getvalue())
         (ld / "session_check.txt").write_text(keep, encoding="utf-8")
         (ld / "invalid.txt").write_text("invalid: difficulty 99 (session check)\n", encoding="utf-8")
         chk("(a) invalid.txt -> every start INVALID", all_invalid("invalid.txt"))
@@ -1033,8 +1130,11 @@ def selftest(real: Path | None = None) -> int:
             with redirect_stdout(buf):
                 rc = run(eb, None, False)
             js = json.loads((eb / "c1_check" / "summary.json").read_text(encoding="utf-8"))
-            chk(f"end to end: planted slope {slope} -> {want}, 6/6 starts valid, REPRODUCED", rc == 0
+            chk(f"end to end: planted slope {slope} -> {want}, 6/6 starts valid, REPRODUCED, session check 'live' "
+                f"recorded per launch", rc == 0
                 and js["verdict"] == want and js["starts_valid"] == 6 and js["reproduction"] == "REPRODUCED"
+                and all(js["session_check"][str(n)]["path"] == SC_LIVE for n in (1, 2))
+                and buf.getvalue().count(f": session check: {SC_LIVE} (") == 2
                 and f"C-1 offset: {want}" in buf.getvalue() and buf.getvalue().count(NA_LINE) == 6,
                 f"rc {rc}, pooled slope {js.get('pooled', {}).get('b')}")
             if slope == 1.0:
@@ -1048,6 +1148,28 @@ def selftest(real: Path | None = None) -> int:
                     all(abs(lv[k]["mean"] - (0.936 + (cm.LEVELS[cm.ARMS.index(k)] - 0.65))) < 0.017
                         for k in ("0.20", "0.35", "0.65")), str({k: round(v["mean"], 4) for k, v in lv.items()}))
                 good_batch = eb
+        # end to end: a floor at 0.60 s and the 0.65 level at 0.98 s -> the FLOOR tag and the REPRODUCTION MISS line in
+        # stdout and summary.json
+        fb = tmp / "e2e_floor"
+        for n in (1, 2):
+            write_synth_launch(fb / f"launch_{n}", n, specs_for(arms[n], 1.0, 3, random.Random(30 + n), order,
+                                                                at065=0.98, floor=0.64), seed)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = run(fb, None, False)
+        js = json.loads((fb / "c1_check" / "summary.json").read_text(encoding="utf-8"))
+        out = buf.getvalue()
+        outl = out.splitlines()
+        chk("end to end FLOOR: summary.json verdict and offset carry '(FLOOR: 2-point fit)', with the 0.20 means",
+            rc == 0 and js["verdict"].endswith(FLOOR_TAG) and js["offset"].endswith(FLOOR_TAG) and js["low_end"] == "FLOOR"
+            and all(abs(js["level_020_mean_s"][str(n)] - 0.64) < 0.017 for n in (1, 2))
+            and js["stock"]["line"] == FLOOR_TAG, f"{js['verdict']}, 0.20 {js['level_020_mean_s']}")
+        chk("end to end FLOOR: stdout carries the tag on the verdict line, with the 0.20 mean beside it",
+            any(ln.startswith("C-1 offset: ") and FLOOR_TAG in ln and "0.20 reads" in ln for ln in outl))
+        chk("end to end MISS: 'REPRODUCTION MISS' right after the header (stdout) and in summary.json, not scored",
+            outl[outl.index(next(ln for ln in outl if ln.startswith("C-1 check "))) + 1].startswith("REPRODUCTION MISS")
+            and js["reproduction"] == "NOT REPRODUCED" and js["reproduction_miss"].startswith("REPRODUCTION MISS")
+            and not js["verdict"].startswith("NOT"))
         part = tmp / "partial"
         write_synth_launch(part / "launch_1", 1, specs_for(arms[1], 1.0, 2, random.Random(4), order), seed)
         buf = io.StringIO()

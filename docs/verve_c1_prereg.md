@@ -98,6 +98,32 @@ As D1: each car's mean over the launch's valid starts, then the mean over the ar
 - Secondaries (speed_1s_kph, gain_t1) aren't scored. The Custom grid is the same every start, so a level's launch_m and
   gain_t1 carry its cars' grid slots. The rotation spreads them across the launches.
 
+## Scoring details (supervisor, 2026-11-17)
+Rulings on the tooling's five open decisions (#180), all accepted. `tools/c1_check.py` implements exactly these.
+1. **FLOOR:** if the low end is FLOOR, the 0.35 / 0.65 two-point line is the line: it is used for the offset
+   criterion and for the game-time conversions. Every verdict reached that way is tagged **"(FLOOR: 2-point fit)"**
+   wherever it appears (stdout and summary.json), with the 0.20 level's mean printed beside it.
+2. **launch_m "pure delay":** the three level means are within 0.5 m of each other (max - min <= 0.5 m) in both
+   launches.
+3. **The 0.65 reproduction:** within 0.017 s of D1's 0.9363 s in both launches. A miss is reported prominently (a
+   "REPRODUCTION MISS" line right after the report's header, repeated at its end, and in summary.json), and stays
+   not scored.
+4. **An "unverified" race-1 session check** is redone offline ONLY from this launch's own race-1 Session packet (the
+   first at or after lights out, else race 1's latest), and all three values must match: difficulty 100, track 17,
+   weather 0. A missing packet or any value that differs fails validity (a). The path is recorded per launch, in the
+   output and in summary.json: "session check: live" or "session check: offline redo from race-1 Session packet"
+   ("none" when there is no session_check.txt or the live check failed).
+5. **Smoke "player re-parked":** car 19's LapData driverStatus is 0 (garage) in every frame from LGOT to the cutoff,
+   and it has no totalDistance gain >= 0.3 m. The loader's "GARAGE: car 19 sent" lines are reported only (D1 launch 1
+   has 2 of them for 4 races).
+
+Non-scoring items, accepted:
+- `@startwait` logs each start to `<Out>\udp_starts.txt` (start number, time, exit, uid), not `udp_races.txt`.
+- The stall rule: after the LGOT, if the capture doesn't pass LGOT + cutoff within cutoff + 30 s, `@startwait`
+  exits 2 and the plan stops.
+- The pause-at estimates (`tools/v1_run.ps1 -LaunchMinutes`): 40 min for a C-1 launch, 16 for the smoke test.
+- The seed: **2026111705**, fixed before launch 1.
+
 ## Tooling (to build after approval, for review; within the current tools)
 - `tools/c1_make.py`: d1_make with a level map (arm → value) instead of the fixed 0.65, and the rotation above in place
   of the per-launch coin. Same op checks and FORBIDDEN rule. The key cache already holds the 76 race_start paths (D1).
