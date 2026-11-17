@@ -1,0 +1,1027 @@
+{
+ "batch": "runs\\2026-11-17-C1",
+ "mode": "c1",
+ "launches": [
+  1,
+  2
+ ],
+ "starts_total": 40,
+ "starts_valid": 40,
+ "arms": {
+  "1": {
+   "stock": [
+    "lewis_hamilton",
+    "fernando_alonso",
+    "oliver_bearman",
+    "isack_hadjar",
+    "nico_hulkenberg"
+   ],
+   "0.20": [
+    "oscar_piastri",
+    "yuki_tsunoda",
+    "andrea-kimi_antonelli",
+    "franco_colapinto",
+    "carlos_sainz-jr"
+   ],
+   "0.35": [
+    "charles_leclerc",
+    "esteban_ocon",
+    "liam_lawson",
+    "gabriel_bortoleto"
+   ],
+   "0.65": [
+    "lando_norris",
+    "max_verstappen",
+    "george_russell",
+    "pierre_gasly",
+    "alex_albon"
+   ]
+  },
+  "2": {
+   "stock": [
+    "lando_norris",
+    "max_verstappen",
+    "george_russell",
+    "fernando_alonso",
+    "pierre_gasly",
+    "alex_albon"
+   ],
+   "0.20": [
+    "lewis_hamilton",
+    "oliver_bearman",
+    "isack_hadjar",
+    "nico_hulkenberg"
+   ],
+   "0.35": [
+    "oscar_piastri",
+    "yuki_tsunoda",
+    "andrea-kimi_antonelli",
+    "franco_colapinto",
+    "carlos_sainz-jr"
+   ],
+   "0.65": [
+    "charles_leclerc",
+    "esteban_ocon",
+    "liam_lawson",
+    "gabriel_bortoleto"
+   ]
+  }
+ },
+ "starts": [
+  {
+   "launch": 1,
+   "start": 1,
+   "uid": "5491141006827809364",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 2,
+   "uid": "13434607623333898446",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 3,
+   "uid": "15780820209689493279",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 4,
+   "uid": "13379305790791159876",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 5,
+   "uid": "3084126556091578146",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 6,
+   "uid": "8358841725681870183",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 7,
+   "uid": "2904437889434957122",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 8,
+   "uid": "6620599005511033967",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 9,
+   "uid": "651856734366563344",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 10,
+   "uid": "3329058446233119659",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 11,
+   "uid": "10272722776770097732",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 12,
+   "uid": "9262800101207698457",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 13,
+   "uid": "18246578074871852556",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 14,
+   "uid": "768512620594394655",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 15,
+   "uid": "5622747215740207178",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 16,
+   "uid": "6225014814531222933",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 17,
+   "uid": "17497697073034034773",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 18,
+   "uid": "7748153535112682722",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 19,
+   "uid": "8441902811163896638",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1198
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 20,
+   "uid": "224818532409501135",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 1,
+   "uid": "6233822773673152957",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 2,
+   "uid": "4602532341144400835",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 3,
+   "uid": "12593090764334081832",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 4,
+   "uid": "16923733432827463681",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 5,
+   "uid": "16230515459603315186",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 6,
+   "uid": "2424821032412368599",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 7,
+   "uid": "15316455616663543940",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 8,
+   "uid": "11571384742782627211",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 9,
+   "uid": "17571069054618084116",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 10,
+   "uid": "584288659231090202",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 11,
+   "uid": "10730353128860700884",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 12,
+   "uid": "15684302916768657977",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 13,
+   "uid": "8478654713722401647",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 14,
+   "uid": "16986202515778999184",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 15,
+   "uid": "15711730094270480436",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 16,
+   "uid": "1702726856784329213",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 17,
+   "uid": "11343002894103236169",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 18,
+   "uid": "6627062531925863605",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 19,
+   "uid": "6448052394714989472",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1195
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 2,
+   "start": 20,
+   "uid": "12846894538773838983",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  }
+ ],
+ "session_check": {
+  "1": {
+   "path": "live",
+   "note": "session ok uid 5491141006827809364: difficulty 100 track 17 weather 0"
+  },
+  "2": {
+   "path": "live",
+   "note": "session ok uid 6233822773673152957: difficulty 100 track 17 weather 0"
+  }
+ },
+ "constants": {
+  "CUTOFF_S": 20.0,
+  "GAP_S": 5.0,
+  "MOVE_M": 0.3,
+  "LAUNCH_S": 2.0,
+  "SPEED_AT_S": 1.0,
+  "T1_M": 345.0,
+  "SLOPE_TOL": 0.1,
+  "LINEAR_BAND_S": 0.02,
+  "RESOLVED_S": 0.075,
+  "PURE_DELAY_M": 0.5,
+  "D1_065_S": 0.9363,
+  "FRAME_S": 0.017,
+  "N_LAUNCHES": 2,
+  "STARTS_PER_LAUNCH": 20
+ },
+ "per_launch": {
+  "1": {
+   "starts_valid": 20,
+   "starts_total": 20,
+   "levels": {
+    "reaction_s": {
+     "stock": {
+      "mean": 0.46825782537460325,
+      "n_cars": 5
+     },
+     "0.20": {
+      "mean": 0.48565159320831297,
+      "n_cars": 5
+     },
+     "0.35": {
+      "mean": 0.632378152012825,
+      "n_cars": 4
+     },
+     "0.65": {
+      "mean": 0.9357675147056579,
+      "n_cars": 5
+     }
+    },
+    "launch_m": {
+     "stock": {
+      "mean": 19.712605705261232,
+      "n_cars": 5
+     },
+     "0.20": {
+      "mean": 20.699362907409668,
+      "n_cars": 5
+     },
+     "0.35": {
+      "mean": 21.18691689968109,
+      "n_cars": 4
+     },
+     "0.65": {
+      "mean": 20.574315004348755,
+      "n_cars": 5
+     }
+    },
+    "speed_1s_kph": {
+     "stock": {
+      "mean": 19.15,
+      "n_cars": 5
+     },
+     "0.20": {
+      "mean": 19.31,
+      "n_cars": 5
+     },
+     "0.35": {
+      "mean": 16.2125,
+      "n_cars": 4
+     },
+     "0.65": {
+      "mean": 11.0,
+      "n_cars": 5
+     }
+    },
+    "gain_t1": {
+     "stock": {
+      "mean": 0.6900000000000001,
+      "n_cars": 5
+     },
+     "0.20": {
+      "mean": 0.9199999999999999,
+      "n_cars": 5
+     },
+     "0.35": {
+      "mean": 0.28750000000000003,
+      "n_cars": 4
+     },
+     "0.65": {
+      "mean": -1.8399999999999999,
+      "n_cars": 5
+     }
+    }
+   },
+   "fit": {
+    "a": 0.28386517260755817,
+    "b": 1.001834785086768,
+    "low_end_s": 0.14672655880451202,
+    "resolved": true,
+    "chord_dev_s": -0.003312081694602953,
+    "linear": true,
+    "segment_slopes": [
+     0.9781770586967469,
+     1.0112978756427762
+    ],
+    "floor_fit": {
+     "a": 0.27842389553785335,
+     "b": 1.0112978756427762
+    },
+    "repro_dev_s": -0.0005324852943421332,
+    "reproduced": true,
+    "offsets_s": {
+     "0.20": 0.28565159320831296,
+     "0.35": 0.282378152012825,
+     "0.65": 0.28576751470565787
+    }
+   },
+   "launch_m_range_m": 0.612601895332336
+  },
+  "2": {
+   "starts_valid": 20,
+   "starts_total": 20,
+   "levels": {
+    "reaction_s": {
+     "stock": {
+      "mean": 0.45322397351264954,
+      "n_cars": 6
+     },
+     "0.20": {
+      "mean": 0.48519904613494874,
+      "n_cars": 4
+     },
+     "0.35": {
+      "mean": 0.6346404361724853,
+      "n_cars": 5
+     },
+     "0.65": {
+      "mean": 0.9330416649580002,
+      "n_cars": 4
+     }
+    },
+    "launch_m": {
+     "stock": {
+      "mean": 20.352281951904295,
+      "n_cars": 6
+     },
+     "0.20": {
+      "mean": 20.38580822944641,
+      "n_cars": 4
+     },
+     "0.35": {
+      "mean": 20.914922590255735,
+      "n_cars": 5
+     },
+     "0.65": {
+      "mean": 20.84197407364845,
+      "n_cars": 4
+     }
+    },
+    "speed_1s_kph": {
+     "stock": {
+      "mean": 19.7,
+      "n_cars": 6
+     },
+     "0.20": {
+      "mean": 19.275,
+      "n_cars": 4
+     },
+     "0.35": {
+      "mean": 16.32,
+      "n_cars": 5
+     },
+     "0.65": {
+      "mean": 11.0,
+      "n_cars": 4
+     }
+    },
+    "gain_t1": {
+     "stock": {
+      "mean": 0.35000000000000003,
+      "n_cars": 6
+     },
+     "0.20": {
+      "mean": -0.0125,
+      "n_cars": 4
+     },
+     "0.35": {
+      "mean": 0.09,
+      "n_cars": 5
+     },
+     "0.65": {
+      "mean": -0.625,
+      "n_cars": 4
+     }
+    }
+   },
+   "fit": {
+    "a": 0.28624196259748375,
+    "b": 0.9951293828941526,
+    "low_end_s": 0.1494413900375366,
+    "resolved": true,
+    "chord_dev_s": 0.00016051709651943025,
+    "linear": true,
+    "segment_slopes": [
+     0.9962759335835774,
+     0.9946707626183828
+    ],
+    "floor_fit": {
+     "a": 0.28650566925605137,
+     "b": 0.9946707626183828
+    },
+    "repro_dev_s": -0.0032583350419997936,
+    "reproduced": true,
+    "offsets_s": {
+     "0.20": 0.28519904613494873,
+     "0.35": 0.28464043617248536,
+     "0.65": 0.2830416649580002
+    }
+   },
+   "launch_m_range_m": 0.5291143608093236
+  }
+ },
+ "ignored_launches": [],
+ "low_end": "RESOLVED",
+ "line": {
+  "1": {
+   "a": 0.28386517260755817,
+   "b": 1.001834785086768
+  },
+  "2": {
+   "a": 0.28624196259748375,
+   "b": 0.9951293828941526
+  }
+ },
+ "pooled": {
+  "a": 0.285053567602521,
+  "b": 0.9984820839904602,
+  "se_b": 0.003352701096307642,
+  "source": "OLS on 0.20 / 0.35 / 0.65"
+ },
+ "offset": "CONSTANT",
+ "level_020_mean_s": {
+  "1": 0.48565159320831297,
+  "2": 0.48519904613494874
+ },
+ "shape": "LINEAR",
+ "reproduction": "REPRODUCED",
+ "reproduction_065_s": {
+  "1": 0.9357675147056579,
+  "2": 0.9330416649580002
+ },
+ "launch_m": "not pure delay: the per-level launch_m is V-2's second input",
+ "verdict": "CONSTANT",
+ "why": "slopes 1.002 / 0.995, pooled 0.998",
+ "stock": {
+  "car_starts": 220,
+  "starts": 40,
+  "min": 0.33374714851379395,
+  "median": 0.4680999517440796,
+  "mean": 0.4600575425408103,
+  "max": 0.5851655006408691,
+  "fastest_median": 0.38527119159698486,
+  "median_game_s": 0.18332465557119348,
+  "fastest_median_game_s": 0.1003699771897173
+ }
+}

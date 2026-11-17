@@ -93,6 +93,23 @@ high difficulty (2.1-2.4, 2.6, and 2.5/2.7 weakly) have never been tested in a r
 The converter's predicted start spread is small: sd 0.014 s for reaction and 0.007 for b over the grid, at gain 0.5
 (`README.md`). Even the proven levers give modest differences between drivers as the converter writes them today.
 
+**C-1 calibration (F-51):** UDP reaction = game-time race_start reaction + 0.285 s (slope 0.998, linear over
+0.20-0.65 s). The stock game-time draw has a median of about 0.18 s (the fastest per start about 0.10 s, the slowest
+about 0.30 s).
+
+**V-2 start design notes** (supervisor, 2026-11-17; notes, not a prereg):
+- **Use BOUNDS, not pins**, so starts keep their natural variation. For example:
+  - Max [0.06, 0.14];
+  - an average driver at about the stock spread, [0.10, 0.30];
+  - a weak starter [0.18, 0.40].
+  - The exact values come from the season profiles later.
+- **Below 0.20 s is untested.** Before V-2 relies on about 0.10 s, a tiny **C-1b** on the start-only route: pins
+  0.05 / 0.10 / 0.15 plus stock, 1 launch × 20 starts, with C-1's checks and rules. It's queued after S-1, or in any gap
+  where S-1 can't run. It needs a short prereg addendum to C-1 (self-merge OK if it only adds levels and keeps C-1's
+  rules).
+- **launch_m is a separate input** (C-1: not a pure function of reaction). Open question: does any key move it, perhaps
+  race_start's other keys? That's a desk check of the race_start family for launch or throttle keys in the dump.
+
 ## 4. Per-driver `ai_driver_config` (84 keys, none written by the converter)
 
 Path: `entrants.drivers.driver[_metadata_=<label>].ai_driver_config.<group>.<key>`. Keys resolve by hash (F-11, F-31).

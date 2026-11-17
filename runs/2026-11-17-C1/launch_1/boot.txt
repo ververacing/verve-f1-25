@@ -1,0 +1,4 @@
+﻿boot: skip-relaunches 0
+  attempt 1 started 05:45:11 (35 s since the last game exit)
+  intro played (splash after 75 s)
+session check: session ok uid 5491141006827809364: difficulty 100 track 17 weather 0

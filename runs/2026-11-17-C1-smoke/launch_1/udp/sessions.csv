@@ -1,0 +1,6 @@
+session_uid,format,game_version,session_type,track_id,total_laps,n_active,player_car,lights_out_s,lapdata_grid_order,bad_sizes,packets,ai_difficulty
+0,2026,25.1.27,,,,,19,,spec,,event=161;session_history=80,
+5092187218470270808,2026,25.1.27,race,17,5,20,19,0.0,spec,,motion=1723;session=59;lap_data=1723;event=35;participants=7;car_setups=59;car_telemetry=1723;car_status=1723;car_damage=290;session_history=555;tyre_sets=579;motion_ex=1723;lap_positions=30;car_telemetry_2=1723,100
+17118336613692456930,2026,25.1.27,race,17,5,20,19,0.0,spec,,motion=1667;session=57;lap_data=1667;event=33;participants=7;car_setups=57;car_telemetry=1667;car_status=1667;car_damage=281;session_history=537;tyre_sets=561;motion_ex=1667;lap_positions=29;car_telemetry_2=1667,100
+1343656139630064514,2026,25.1.27,race,17,5,20,19,0.0,spec,,motion=1614;session=56;lap_data=1614;event=28;participants=7;car_setups=56;car_telemetry=1614;car_status=1614;car_damage=272;session_history=519;tyre_sets=543;motion_ex=1614;lap_positions=29;car_telemetry_2=1614,100
+14710917351788189642,2026,25.1.27,race,17,5,20,19,0.0,spec,,motion=1548;session=54;lap_data=1548;event=24;participants=7;car_setups=54;car_telemetry=1548;car_status=1548;car_damage=262;session_history=498;tyre_sets=522;motion_ex=1548;lap_positions=28;car_telemetry_2=1548,100

@@ -1,0 +1,2 @@
+﻿== 2026-11-17T04:56:25 reinstall_addon.ps1 -Folder %USERPROFILE%\Documents\verve-f1-25\runs\2026-11-17-D4\launch_2\gen\verve.d4-L02 (exit 0)
+installed verve.d4-l02 0.0.1

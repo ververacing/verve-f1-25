@@ -33,9 +33,11 @@ Pre-registered in [docs/verve_d1_d2_prereg.md](../../docs/verve_d1_d2_prereg.md)
 The measurement chain works, and per-driver `ai_driver_config` rows reach the AI in GP on 26566308. So V-1's
 reaction_speed null (F-48) isn't a broken chain or route; it's specific to the `driver_characteristics` path (**F-49**).
 
-## Hypothesis, not a finding
+## Hypothesis: REFUTED by C-1 (2026-11-17)
 
-The effect (+0.46 s) is larger than the +0.25-0.35 s expected. In game time the pinned cars draw 0.65 s, but their
-relative UDP reaction is 0.936 s, an offset of about +0.29 s. At stock, the offset is about +0.1-0.2 s (if the stock
-draws are about 0.28-0.42 s). One possible reason: a later reaction also gives a slower first motion, so the car takes
-longer to reach the 0.3 m movement threshold. Unproven. C-1 (start calibration) is the test for it.
+The effect (+0.46 s) was larger than the +0.25-0.35 s expected. The hypothesis was that the offset grows with
+reaction (a later reaction also giving a slower first motion to the 0.3 m threshold).
+
+**C-1 refuted it** (`runs/2026-11-17-C1`, F-51): the UDP reaction is game time + a CONSTANT 0.285 s (slope 0.998). The
+bigger D1 effect came from the stock draws being shorter than assumed. Their game-time median is about 0.18 s, not
+0.28-0.42 s, so a 0.65 pin is about 0.47 s later than a typical stock draw.

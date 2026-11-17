@@ -683,6 +683,31 @@
       "implications": "race_start rows are a CONFIRMED per-driver start lever in GP on 26566308. The V-1 null for reaction_speed narrows to the driver_characteristics path (D2 is stopped: the benchmark can't be sandboxed). D4 tests the ratings route; C-1 calibrates game-time reaction to UDP reaction and launch distance.",
       "related_questions": [],
       "status": "verified (D1)"
+    },
+    {
+      "id": "F-50",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "D4: in GP on 26566308, the racecraft rating set flat at 0.05 vs 0.99 (default and 2026 datasets, 9 vs 9 cars) changed UDP start reaction by +0.013/+0.017 s (NULL; model −0.103 s), with no sign in passes or lap-1 gain. With V-1 (F-48) and D1 (F-49): in GP the start reaction follows the per-driver ai_driver_config race_start bounds, while neither the reaction_speed trait override nor the racecraft rating moved it. Whether ratings act on anything else (pace, other behaviour) is untested.",
+      "confidence": "pre-registered (docs/verve_d4_prereg.md, #175): 2 launches x 4 races, 8/8 valid; NULL rule |HIGH - LOW| < 0.02 s in both launches; 36/36 curve ops key-checked. Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-17-D4 (summary.md, d4_check/summary.json, per_car_launch.csv)"
+      ],
+      "implications": "Verve Drivers is built on per-driver ai_driver_config rows (the supervisor's lever direction); S-1 screens them.",
+      "related_questions": [],
+      "status": "verified (D4)"
+    },
+    {
+      "id": "F-51",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "C-1: in GP on 26566308, UDP start reaction = game-time race_start reaction + 0.285 s (slope 0.998 ± 0.003, linear and resolved over 0.20-0.65 s; below 0.20 s untested). Stock draws have a game-time median of about 0.18 s (fastest per start about 0.10 s, slowest about 0.30 s), so a 0.20 pin is slower than the stock median. Launch distance (launch_m) is not a pure function of reaction.",
+      "confidence": "pre-registered (docs/verve_c1_prereg.md, #179/#180): 2 launches x 20 start-only starts, 40/40 valid; offset CONSTANT (1 +/- 0.1 in both launches and pooled), LINEAR, RESOLVED; the 0.65 level reproduced D1 within one frame. Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-17-C1 (summary.md, c1_check/summary.json, per_start.csv, per_car_launch.csv)",
+        "runs/2026-11-17-C1-smoke (smoke PASS)"
+      ],
+      "implications": "V-2 sets start personality with race_start BOUNDS (not pins), in game time: UDP minus 0.285 s. Below 0.20 s needs C-1b before V-2 relies on it. launch_m is a separate input (open: which key moves it).",
+      "related_questions": [],
+      "status": "verified (C-1)"
     }
   ]
 }

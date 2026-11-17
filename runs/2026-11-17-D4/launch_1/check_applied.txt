@@ -1,0 +1,3 @@
+﻿key cache: all 36 paths cached (no swofty call)
+ops 36: 36 applied (0 value-checked, 36 curves written at the right key but their value isn't logged), 0 dropped as equal to stock (), 0 problem(s)
+loader total 92 overwritten; expected 56 + 36 = 92

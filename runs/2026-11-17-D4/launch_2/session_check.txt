@@ -1,0 +1,3 @@
+﻿session ok uid 6192294552949214002: difficulty 100 track 17 weather 0
+source: the first Session packet at or after lights out (LGOT) (session time 0.1 s) (exit 0)
+exit 0

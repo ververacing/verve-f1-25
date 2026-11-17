@@ -1,0 +1,3 @@
+﻿addons.json: {}
+addons.json names a verve test add-on: no (stock smoke, as expected)
+loader.log: present (no add-on lines to list)

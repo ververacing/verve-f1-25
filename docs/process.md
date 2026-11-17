@@ -249,6 +249,15 @@ standing version**:
     sleeping. Windows power and display settings are Tyler's: never touched.
   - Launch 7 itself stands, subject to the per-uid aionly_check: the saves guard is a safety stop, not a race-validity
     rule.
+- **Run-records PRs: MOVE, don't copy** (supervisor, 2026-11-17):
+  - Move the non-raw files of the run folders from the main checkout into the branch worktree. `raw\` stays in place,
+    since it's gitignored.
+  - Scrub the home paths there, commit, merge, and fast-forward main, which brings the scrubbed copies back.
+  - Copying left untracked, unscrubbed duplicates that blocked every fast-forward.
+  - Do the move only when nothing is running or about to run, and merge in the SAME gap. Check that the run folders read
+    back (summary, CSVs, logs) before the next launch.
+  - `%LOCALAPPDATA%\verve-f1-25\local-backup\` is local-only: never commit from it, and never delete it without the
+    supervisor's OK.
 - **Launcher freeze LIFTED 2026-11-17** (supervisor, once V-1 was scored): the standing update OK applies again. The
   next update is followed by one stock Austria route check (boot, the startup_intro default, gamedb, the session check,
   @restart) before any scored run.

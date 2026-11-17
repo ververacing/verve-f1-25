@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "ops": [
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.35"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.20"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.race_start.min_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.race_start.min_reaction_time_upper_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.race_start.max_reaction_time_lower_bound",
+      "value": "0.65"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.race_start.max_reaction_time_upper_bound",
+      "value": "0.65"
+    }
+  ]
+}
