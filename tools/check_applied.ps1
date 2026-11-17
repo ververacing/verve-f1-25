@@ -17,8 +17,14 @@ param(
     [Parameter(Mandatory)] [string] $Loader,
     [Parameter(Mandatory)] [string] $Folder,
     [int] $Baseline = 52,
-    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe"
+    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
+    # every db get names our test profile: never the active one, which is Tyler's (V-1 readback, 16 Nov)
+    [string] $Profile = 'verve-test',
+    # path,hash,stock cache (V-1: every launch writes the same 235 paths, only the values change): a cached path needs
+    # no swofty call, so a launch's check runs offline in seconds; misses are looked up and added
+    [string] $KeyCache = ''
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
 $inv = [Globalization.CultureInfo]::InvariantCulture
 function Fnv1a([string] $s) { $h = [uint32]2166136261; foreach ($b in [Text.Encoding]::UTF8.GetBytes($s)) { $h = [uint32](([uint64]($h -bxor $b) * 16777619) % 4294967296) }; '0x{0:x8}' -f $h }
@@ -36,13 +42,21 @@ foreach ($l in Get-Content $Loader) {
 }
 $ops = foreach ($f in Get-ChildItem (Join-Path $Folder 'db') -Filter *.json) { (Get-Content $f.FullName -Raw | ConvertFrom-Json).ops }
 $found = 0; $dropped = 0; $bad = 0; $unread = 0; $droppedBy = @{}
+$cache = @{}; $misses = 0
+if ($KeyCache -and (Test-Path $KeyCache)) { foreach ($r in Import-Csv $KeyCache) { $cache[$r.path] = $r } }
 foreach ($o in $ops) {
     $path = "$($o.select).$($o.field)"
-    $out = & $Swofty db get $path
-    if ($LASTEXITCODE -ne 0) { $bad++; "NO KEY $path"; continue }
-    if (-not (($out | Select-Object -First 1) -match '\((0x[0-9a-f]{16}), type \d+\)')) { $bad++; "NO HASH $path"; continue }
-    $hash = $Matches[1]
-    $stock = ($out | Where-Object { $_ -match '^\s*value: ' } | Select-Object -First 1) -replace '^\s*value: ', ''
+    if ($cache.ContainsKey($path)) {
+        $hash = $cache[$path].hash; $stock = $cache[$path].stock
+    } else {
+        $misses++
+        $out = & $Swofty db get --profile $Profile $path
+        if ($LASTEXITCODE -ne 0) { $bad++; "NO KEY $path"; continue }
+        if (-not (($out | Select-Object -First 1) -match '\((0x[0-9a-f]{16}), type \d+\)')) { $bad++; "NO HASH $path"; continue }
+        $hash = $Matches[1]
+        $stock = ($out | Where-Object { $_ -match '^\s*value: ' } | Select-Object -First 1) -replace '^\s*value: ', ''
+        $cache[$path] = [pscustomobject]@{ path = $path; hash = $hash; stock = $stock }
+    }
     if ($over.ContainsKey($hash)) {
         $found++
         if ($over[$hash].new -match '^record at ') { $unread++; continue }
@@ -50,6 +64,8 @@ foreach ($o in $ops) {
     } elseif (SameValue $stock "$($o.value)") { $dropped++; $droppedBy[$o.field] = 1 + [int]$droppedBy[$o.field] }
     else { $bad++; "MISSING $path ($hash): wrote $($o.value), stock $stock, no overwrite line" }
 }
+if ($KeyCache -and $misses) { $cache.Values | Sort-Object path | Export-Csv $KeyCache -NoTypeInformation -Encoding UTF8; "key cache: $misses path(s) looked up and added ($($cache.Count) in $KeyCache)" }
+elseif ($KeyCache) { "key cache: all $($ops.Count) paths cached (no swofty call)" }
 $expect = $Baseline + $found
 "ops $($ops.Count): $found applied ($($found - $unread) value-checked, $unread curves written at the right key but their value isn't logged), $dropped dropped as equal to stock ($(($droppedBy.GetEnumerator() | ForEach-Object { "$($_.Key) $($_.Value)" }) -join ', ')), $bad problem(s)"
 "loader total $total overwritten; expected $Baseline + $found = $expect$(if ($total -ne $expect) { ' (DIFFERS: something else wrote records)' })"

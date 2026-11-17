@@ -502,9 +502,28 @@ def validity(ld: Path, uid: int, sessions: dict, gamedb: int | None, track: str,
     return ac.verdict(inv, fails), [f"INVALID: {x}" for x in inv] + [f"FAIL: {x}" for x in fails]
 
 
+def launch_gamedb(ld: Path, gamedb: int | None) -> tuple[int | None, list[str]]:
+    """This launch's expected overwrite count: v1_run's gamedb_expected.txt (from check_applied, because which
+    equal-to-stock writes the build drops varies by launch), else --gamedb. A failed build check invalidates the launch."""
+    probs = []
+    ca = ld / "check_applied.txt"
+    if ca.exists():
+        t = ca.read_text(encoding="utf-8-sig", errors="replace")
+        if not re.search(r"(?<!\d)0 problem\(s\)", t) or "DIFFERS" in t:
+            probs.append("INVALID: the build check (check_applied.txt) found problems")
+    ge = ld / "gamedb_expected.txt"
+    if ge.exists():
+        try:
+            return int(ge.read_text(encoding="utf-8-sig").strip()), probs
+        except ValueError:
+            probs.append("INVALID: gamedb_expected.txt unreadable")
+    return gamedb, probs
+
+
 def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, log=print) -> dict:
     """Every race of one launch: validity and, for the valid ones, the measures per roster driver."""
     cap = ld / "raw" / "udp.bin"
+    gamedb, build_probs = launch_gamedb(ld, gamedb)
     scan = scan_capture(cap)
     races = []
     for k, uid in enumerate(race_uids(scan), 1):
@@ -518,6 +537,8 @@ def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, 
         verdict, reasons = validity(ld, uid, sessions, gamedb, track, out / f"launch_{n}" / f"race_{k}")
         if probs:
             verdict, reasons = "INVALID", reasons + [f"INVALID: {p}" for p in probs]
+        if build_probs:
+            verdict, reasons = "INVALID", reasons + build_probs
         race = {"launch": n, "race": k, "uid": str(uid), "verdict": verdict, "valid": verdict == "PASS",
                 "reasons": reasons, "drivers": {}, "info": {}}
         if race["valid"]:
@@ -806,8 +827,10 @@ def run(batch: Path, gamedb: int | None, seed_arg: str | None, track: str, perms
                       f"real randomisation"))
             return 3
         assigns[n] = a
-    if gamedb is None and _VALIDITY_OVERRIDE is None:
-        print(pre("REFUSED: --gamedb <expected overwritten count> is required (fix it from race 1's readback)"))
+    if gamedb is None and _VALIDITY_OVERRIDE is None and not all(
+            (ld / "gamedb_expected.txt").exists() for ld in find_launches(batch).values()):
+        print(pre("REFUSED: --gamedb <expected overwritten count> is required unless every launch has v1_run's "
+                  "gamedb_expected.txt"))
         return 2
     out = batch / "v1_check"
     t0 = time.perf_counter()
@@ -1040,6 +1063,19 @@ def selftest() -> int:
         fp += sum(r[f]["p"] < ALPHA for f in FACTORS)
     chk("type I error: 10 null batches x 8 factors, p < 0.05 in about 5% (allowed <= 12 of 80)", fp <= 12,
         f"{fp}/{tests}")
+
+    # per-launch gamedb from v1_run's build check (the readback: drops of equal-to-stock writes vary by launch)
+    with tempfile.TemporaryDirectory() as gd:
+        g = Path(gd)
+        c0 = launch_gamedb(g, 56)
+        (g / "gamedb_expected.txt").write_text("289\n", encoding="ascii")
+        (g / "check_applied.txt").write_text("ops 235: 233 applied, 0 problem(s)\nexpected 56 + 233 = 289\n", encoding="utf-8")
+        c1 = launch_gamedb(g, 56)
+        (g / "check_applied.txt").write_text("ops 235: 230 applied, 10 problem(s)\n", encoding="utf-8")
+        c2 = launch_gamedb(g, 56)
+        chk("per-launch gamedb: --gamedb without v1_run's files; gamedb_expected.txt with a clean build check; "
+            "'10 problem(s)' invalidates the launch",
+            c0 == (56, []) and c1 == (289, []) and c2[0] == 289 and len(c2[1]) == 1, f"{c0} {c1} {c2}")
 
     # ---- 2. the launch is the block
     base = analyse(data, assigns, seed, 1000)["factors"]
