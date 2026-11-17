@@ -7,8 +7,8 @@ corner pace, decision labels, pass null bands). v1_check (#155) is approved; its
 rate of 4.83% (95% CI 4.26-5.48) over 4,800 null tests. Scope: Verve Drivers (docs/process.md). Evidence base:
 [verve_drivers_plan.md](verve_drivers_plan.md).
 
-The values marked **[discovery]** are filled from the Austria discovery launch, and those marked **[readback]** from the
-v1_make readback, both before race 1. **The 26566308 stock re-dump (#156) changed nothing** that V-1 uses. The 7 live maps
+The **[discovery]** values below come from the Austria discovery launch (16:00-16:06, `runs/2026-11-16-V1-austria-disc`;
+2 stock races, both valid). The **[readback]** values come from the v1_make readback, before race 1. **The 26566308 stock re-dump (#156) changed nothing** that V-1 uses. The 7 live maps
 (all 66 lines), the six characteristics on the 20 f1_2025 seats and the 6 bundle keys on all 21 rows are identical to
 25251167, so the tables below stand. **Season:** the 2025 and 2026 grids share the driver rows, so the product keeps
 the season option, with 2026 as the default.
@@ -56,6 +56,27 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
   - per-car SD across restarts 0.044 s;
   - launch 16-23 m.
   - For scale: the F-39 model predicts about 0.11 s between reaction_speed 0 and 1, so the resolution is enough.
+
+## Austria discovery result (runs/2026-11-16-V1-austria-disc, stock, not scored)
+- **The plan works at Austria:**
+  - The menu path reaches lights out at track 17, difficulty 100, with the weather LOCKED dry.
+  - Both races are valid by aionly_check per uid, with 19 of 19 AI finished in each.
+- **`@restart` works live** (#153):
+  - From race 1's finish to the next race starting took about 26 s.
+  - Each race has a new session uid. The grid is the same in both races.
+  - The multi-race watcher ended each race on its own uid.
+  - The pause menu and the Restart confirm dialog share one screen string (`|pause|#ba16bc16|`), so `@restart` checks
+    only that each A press is on the pause stack.
+- **Green lap:** 69.8 s and 69.4 s (median of the field). The lap-1 loss is 5.1 s and 5.7 s.
+- **Stock net held passes on laps 2+:** 8 and 15 per race, a mean of 11.5. That's inside the supervisor's 4-16 range, so
+  the ±0.10 pass bands stand, and there is no pass floor.
+- **Off-tracks + spins at stock: 0** in both races, so the control floor fallback is likely (it's decided on the batch
+  total only).
+- **Start measures** (38 car-starts): reaction 0.33-0.57 s, and launch 16.7-23.3 m. The same driver's launch differs by
+  an SD of **1.08 m** from one start to the next (19 drivers × 2 starts).
+- **Corners** (race_feel brake onsets): 345, 1276, 2075, 2626, 2956, 3699 and 3926 m. The first is at 345-348 m in both
+  races.
+- **Launch time:** 8.3 min from launch to race 1's start, then 6.0-6.1 min per race.
 
 ## Design
 - **Size, fixed before race 1:** **12 launches × 4 races** = 48 races, 5 laps, Austria. Races within a launch share the
@@ -137,7 +158,7 @@ They are compared only between levels, never read as absolute times.
 | Factor | Primary | Predicted at 1 | Null band (FE slope) |
 |---|---|---|---|
 | reaction_speed | reaction (s) | shorter | ±0.02 s |
-| mistakes | launch (m) | **longer**: mistakes is a skill, higher = fewer mistakes (F-29, F-37) | ±0.5 m **[discovery]** |
+| mistakes | launch (m) | **longer**: mistakes is a skill, higher = fewer mistakes (F-29, F-37) | ±0.5 m |
 | aggression | held passes made, net, laps 2+, per race | more | ±0.10 per race |
 | control | off-tracks + spins per race (see below) | fewer | ±0.1 per race |
 | speed_in | corner-entry pace, all passes, field-relative (km/h) | faster | ±2 km/h |
@@ -153,8 +174,12 @@ They are compared only between levels, never read as absolute times.
   - If the discovery's stock rate is under 4 or over 16 per race, the supervisor re-fixes the band before race 1.
   - aggression and ATTACK share passes_made, which is fine in a factorial; the report shows the two lines side by side.
   - DEFEND's primary isn't normalised by exposure, which randomisation balances in expectation.
-- **Launch null band, ±0.5 m:** it's about 2.5% of a 20 m launch. It will be fixed against the per-car launch SD
-  across starts in the discovery launch **[discovery]**, with that reasoning written here before race 1.
+- **Launch null band, ±0.5 m (fixed):**
+  - It's about 2.5% of a 20 m launch, and about half the 1.08 m start-to-start SD of one driver's launch (discovery).
+  - A 0.5 m change is about a car-length ahead after 2 s only in the extreme, so anything inside it is too small to read
+    as personality.
+  - With 12 launches × 4 starts per driver, the FE slope's SE for launch is expected to be well under 0.5 m, so the band
+    can be resolved.
 - **control: definitions.** UDP has no off-track event, and LapData's currentLapInvalid and cornerCuttingWarnings never
   move for AI cars (0 across 510k car-frames in Phase 0). So:
   - **off-track** = at least 2 wheels on an unpaved CarTelemetry surfaceType (rock, gravel, mud, sand, grass, water).
@@ -175,12 +200,12 @@ They are compared only between levels, never read as absolute times.
   - The value is each car's mean over corners of its median minus the field median, in km/h.
   - **All passes is primary.** The clean-pass version (no car within 2.0 s ahead in the 300 m before the onset) is the
     secondary, because it left only 4 of 19 cars with a value in a train-heavy race.
-- **Pass floor:** the stock net held passes on laps 2+ per race come from the discovery launch **[discovery]**. If its
-  two races average **under 4**, the supervisor is told before V-1 starts.
+- **Pass floor:** the discovery's two stock races average **11.5** net held passes on laps 2+, which is not under 4, so
+  there is no floor.
 - **Secondaries, all factors, not scored:**
   - speed at 1 s after lights out;
-  - positions gained to T1 (at the first lap-1 lapDistance ≥ `T1_M` = **[discovery]** m, set from the Austria capture
-    at the first braking zone) and at the end of lap 1;
+  - positions gained to T1 (at the first lap-1 lapDistance ≥ `T1_M` = **345 m**, the first brake onset in both
+    discovery races) and at the end of lap 1;
   - ATTACK's effect on passes suffered, and DEFEND's on passes made (cross-effects);
   - for DEFEND, the seconds attackers are held: race_feel `train_s_behind`, the seconds other cars spend within 1.0 s
     behind the car on laps 2+;
@@ -214,11 +239,12 @@ Only if reaction_speed or mistakes comes out INCONCLUSIVE after the 12 launches:
 about 2 min each. The same assignment generator, measures and analysis apply. It is sized and approved before it runs.
 
 ## Hours
-- **One launch** takes about 36 min:
-  - launch overhead about 8.7 min, including race 1's rundown;
-  - race 1 about 6.5 min (5 laps at Austria, green lap about **[discovery]** s);
-  - 3 × (a restart of about 0.5 min + a race of about 6.5 min).
-- **12 launches ≈ 7.2 h**, plus skipped-intro retries (the 300 s cool-down, #144) and Tyler's daily 1 h pause.
+- **One launch** takes about 34 min (discovery timings):
+  - 8.3 min from the launch to race 1's start, including the intro and the menu;
+  - 4 races of about 6.1 min (5 laps, green lap about 69.6 s);
+  - 3 restarts of about 0.5 min each;
+  - about 1 min for the quit, guard and add-on removal.
+- **12 launches ≈ 6.8 h**, plus skipped-intro retries (the 300 s cool-down, #144) and Tyler's daily 1 h pause.
 
 ## Not in V-1
 - Realistic values, strength and stacking with community add-ons (item 3, the compat audit).
