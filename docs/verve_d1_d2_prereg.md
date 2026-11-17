@@ -1,6 +1,7 @@
 # D1 and D2 pre-registration: do the per-driver rows reach the AI on 26566308?
 
-Status: **DRAFT for the supervisor's approval** (2026-11-17). Nothing runs until it's approved.
+Status: **APPROVED by the supervisor** (2026-11-17, #170), with the D1 secondaries and the two FAIL readings added.
+Order: the 1.9.63 route check → D1 (2 launches) → the D2.0 feasibility probe → D2 if feasible.
 
 **Why.** V-1 (#160, #169; F-48) found reaction_speed DEAD in GP on 26566308 (FE slope −0.006 s). B-0006 and B-0008 found
 about −0.11 s per unit for the same row write in benchmark on 25251167. V-1 can't tell (H1) "the overrides reach the AI
