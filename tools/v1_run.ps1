@@ -4,6 +4,7 @@ with it switched on, remove it. One call per launch, so control comes back betwe
 
 Usage:
     powershell -File tools/v1_run.ps1 -Launch <n> -Batch runs/<date>-V-1 -Seed <int> [-Plan <plan>] [-Amp 3] [-NoUncapped]
+    (-IsRetry is set only by v1_run itself, on its one rerun after a failed session check; see 10.)
 
 Steps, all logged in <Batch>\launch_<n>\:
 1. Refusals as tools/b0016_run.ps1: a PAUSE or a due pause-at (exit 12), a game or launcher running that it didn't
@@ -23,11 +24,21 @@ Steps, all logged in <Batch>\launch_<n>\:
    is enabled or disabled either way.
 8. launcher.txt (as b0016_run), v1addon.txt (addons.json and the loader.log lines naming the add-on), and the capture
    copied to <launch>\raw\udp.bin (gitignored). The per-race split is udp_races.txt (written by sandbox_shell).
+   boot.txt: the boot's skip-relaunches (the shell's `intro skipped` lines) beside the session check, per launch
+   (supervisor, 2026-11-17: does difficulty 99 only follow a skip-relaunch?).
+9. The build check (check_applied).
+10. The session check (supervisor's ruling, 2026-11-17; the plan's `@sessioncheck 100 17 0` at race 1's lights out,
+   <launch>\session_check.txt): if it says `invalid:` or `unverified:`, the launch is marked <launch>\invalid.txt
+   ("invalid: difficulty N (session check)"). After the uninstall, the tyler.json hash check and the build check above
+   have run for that attempt (and only if none of them stops the batch), v1_run reruns the same launch ONCE with
+   -IsRetry (same -Launch/-Batch/-Seed/-Plan/-Amp/-NoUncapped); the rerun moves this attempt to invalid\ and its exit
+   is v1_run's exit. If the rerun's session check fails too: exit 19.
 
 Exit codes as b0016_run.ps1: the guard's exit (0 plan done, 6 plan stopped, 7 URGENT, 11 deferred), 5 saves changed,
-9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored, 15 generate or install failed (nothing launched) and 16 the
-build check failed (check_applied: the game didn't hold this launch's ops; stop the batch). gamedb_expected.txt is that
-launch's expected overwrite count for v1_check.
+9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored, 15 generate or install failed (nothing launched), 16 the
+build check failed (check_applied: the game didn't hold this launch's ops; stop the batch) and 19 the session check
+failed twice for this launch (STOP: tell the supervisor). gamedb_expected.txt is that launch's expected overwrite count
+for v1_check.
 Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
 #>
 param(
@@ -40,7 +51,8 @@ param(
     [int] $LaunchMinutes = 80,   # for pause-at: the menu (~9 min) + 4 races at the plan's @udpfinish cap, worst case
     [string] $ExpProfile = 'verve-test',
     [string] $Python = 'python',
-    [int] $SkippedIntroS = 40
+    [int] $SkippedIntroS = 40,
+    [switch] $IsRetry   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -92,8 +104,9 @@ $folder = Join-Path $gen "verve.v1-L$ll"
 if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: v1_make failed (exit $mkCode, v1_make.txt); nothing installed or launched"; exit 15 }
 $id = (Get-Content (Join-Path $folder 'swofty.json') -Raw | ConvertFrom-Json).id
 if ($id -ne "verve.v1-l$ll") { "${tag}: the generated add-on id is '$id', not verve.v1-l$ll; nothing installed or launched"; exit 15 }
-Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan"
-"${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan"
+$retryNote = if ($IsRetry) { ' (rerun after a failed session check)' } else { '' }
+Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote"
+"${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan$retryNote"
 
 # 3./4. profile hashes, leftovers, install
 $profDir = Join-Path $env:LOCALAPPDATA 'Swofty\profiles'
@@ -149,9 +162,25 @@ $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $
     '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
 if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
 powershell @shellArgs |
-    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED' }
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK' }
 $code = $LASTEXITCODE
 "guard exit: $code"
+
+# 10. the session check at race 1's lights out (session_check.txt, first line the verdict): mark a failed one now, so
+# the mark stands whatever happens below; the rerun waits until the uninstall, hash and build checks have run
+$scFile = Join-Path $out 'session_check.txt'
+$scFailed = $false; $scWhy = ''
+$scLine = if (Test-Path $scFile) { [string](Get-Content $scFile -TotalCount 1) } else { 'none (no session_check.txt: the plan never reached @sessioncheck)' }
+"session check: $scLine"
+if ($scLine -match '^(invalid: .+?)(?: \(uid \d+\))?$') { $scFailed = $true; $scWhy = "$($Matches[1]) (session check)" }
+elseif ($scLine -match '^unverified: (.*)$') { $scFailed = $true; $scWhy = "invalid: unverified (session check: $($Matches[1]))" }
+if ($scFailed) { Set-Content (Join-Path $out 'invalid.txt') -Encoding utf8 -Value $scWhy; "${tag}: $scWhy; marked invalid (invalid.txt)" }
+# boot: how many skip-relaunches this launch's boot took (the shell's `intro skipped` lines), beside the session check
+$tr = Join-Path $out 'transcript.txt'
+$bootLines = @(if (Test-Path $tr) { Get-Content $tr | Where-Object { $_ -match '^(attempt \d+ started|intro (skipped|played))' } })
+$boot = if (Test-Path $tr) { "boot: skip-relaunches $(@($bootLines | Where-Object { $_ -match '^intro skipped' }).Count)" } else { 'boot: unknown (no transcript.txt)' }
+Set-Content (Join-Path $out 'boot.txt') -Encoding utf8 -Value (@($boot) + @($bootLines | ForEach-Object { "  $(Scrub $_)" }) + @("session check: $scLine"))
+$boot
 
 # 7. remove the add-on (never while a game or Swofty process is up: no Swofty steps then, incident 2026-11-15)
 $tylerRestored = $true
@@ -238,6 +267,17 @@ if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
 if ($code -eq 7) { exit 7 }
 if (-not $tylerRestored) { exit 14 }
 if (-not $buildOk) { exit 16 }
+# 10. a failed session check: rerun this launch ONCE (it moves this attempt to invalid\); failing twice is a stop
+if ($scFailed) {
+    if ($IsRetry) { "STOP: the session check failed twice for launch $Launch; tell the supervisor"; exit 19 }
+    "${tag}: rerunning the launch once ($scWhy)"
+    $re = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, '-Launch', "$Launch", '-Batch', $Batch, '-Seed', "$Seed",
+        '-Plan', $Plan, '-Amp', "$Amp", '-LaunchMinutes', "$LaunchMinutes", '-ExpProfile', $ExpProfile, '-Python', $Python,
+        '-SkippedIntroS', "$SkippedIntroS", '-IsRetry')
+    if ($NoUncapped) { $re += '-NoUncapped' }
+    & powershell @re
+    exit $LASTEXITCODE
+}
 # a pause-at the next launch wouldn't make: pause now, at the end of this one (no turn of the agent needed)
 if (-not (Test-Path $pauseFlag)) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($LaunchMinutes + 5)
