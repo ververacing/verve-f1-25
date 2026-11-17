@@ -241,6 +241,9 @@ standing version**:
     sleeping. Windows power and display settings are Tyler's: never touched.
   - Launch 7 itself stands, subject to the per-uid aionly_check: the saves guard is a safety stop, not a race-validity
     rule.
+- **Launcher freeze LIFTED 2026-11-17** (supervisor, once V-1 was scored): the standing update OK applies again. The
+  next update is followed by one stock Austria route check (boot, the startup_intro default, gamedb, the session check,
+  @restart) before any scored run.
 - **Launcher freeze during V-1** (supervisor, 2026-11-16, after the daily review found launcher 1.9.60 released and
   1.9.61 with swofty.core 0.2.14 ready):
   - No launcher update until V-1 is scored; Tyler's standing update OK is suspended until then.

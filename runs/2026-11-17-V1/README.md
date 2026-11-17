@@ -4,7 +4,11 @@ Austria, 12 launches × 4 races, 5 laps, seed **20261117**, run with `tools/v1_r
 build 26566308, Swofty Launcher 1.9.59. Validity only is reported here during the batch. No measures, effects or
 per-driver numbers appear before launch 12 is done and `tools/v1_check.py` has run on the full batch.
 
-## v1_check output: PENDING THE SUPERVISOR'S REVIEW (nothing here is a result until reviewed)
+## v1_check output: REVIEWED 2026-11-17 (supervisor: accepted as scored under prereg v3)
+
+Six traits DEAD; DEFEND, ATTACK and aggression INCONCLUSIVE (underpowered: the pass rate was 2.4x the band's base
+rate, and no band was moved after the data); the starts session is not triggered. **F-48** (findings.json) records what
+V-1 shows and what it doesn't: whether the overrides reach the per-car AI record is untested, which D1-D3 address.
 
 `python -I tools/v1_check.py runs/2026-11-17-V1 --seed 20261117`:
 - 12 launches, **48/48 races valid**. Launch 6's first attempt is in `invalid\` and isn't analysed.
