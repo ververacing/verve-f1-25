@@ -1,6 +1,6 @@
 # S-1 pre-registration: a screen of six per-driver `ai_driver_config` keys
 
-**Status: DRAFT, awaiting the supervisor's approval. Nothing runs before it's approved.** It follows the supervisor's
+**Status: APPROVED (supervisor, 2026-11-17)**, with one fix and two additions, applied below. It follows the supervisor's
 rulings on #181. Written from repo files only (no game, launcher or `swofty` call). The design, sources and size
 reasoning are in [verve_s1_design.md](verve_s1_design.md). The frame is V-1's ([verve_v1_prereg.md](verve_v1_prereg.md),
 `tools/v1_check.py`).
@@ -8,11 +8,14 @@ reasoning are in [verve_s1_design.md](verve_s1_design.md). The frame is V-1's ([
 **Purpose.** A SCREEN: it finds the keys that are ALIVE at their extremes. It doesn't set out to prove anything DEAD.
 DEAD is reported where the bands allow it. Any result other than ALIVE means "not a lever we'll use for now".
 
+**Accepted by the supervisor (2026-11-17):** the COMMIT key, the TRAIN drop, the smoke's HIGH half from
+`draw(2026111707, 1)`, stall stepping on the stalled cars' levels, the PENA decision (§6), the seeds, and the order below.
+
 **Order** (each step is gated on the one before):
-1. Approval of this prereg.
+1. Approval of this prereg (done, 2026-11-17).
 2. The key-cache prefill (§7).
 3. The **stock baseline** (§3).
-4. The **bands amendment PR**, merged.
+4. The **bands amendment PR**, merged; it's committed before S-1 launch 1.
 5. The **extremes validity smoke** (§4), plus a levels amendment if any step was taken.
 6. **S-1**: 16 launches × 4 races.
 
@@ -85,8 +88,12 @@ gamedb count is 56 + the ops found, per launch.
 The analysis needs all 16 complete launches. No interim looks: `s1_check` exits 3 on a partial batch. `--allow-partial`
 prints NOT SCORED on every line.
 
-Stalled AI cars (§4's definition) are reported per race. They don't invalidate a race (V-1's rules), but more than one
-stalled race in a launch stops the batch for the supervisor.
+Stalled AI cars (§4's definition) are reported per race (accepted). They don't invalidate a race (V-1's rules), but more
+than one stalled race in a launch stops the batch for the supervisor.
+
+**Stall sensitivity (not scored).** `s1_check` recomputes every factor's result without the races that had a stalled
+car: the same statistic, permutation test and labels on the remaining valid races. It prints that result on a
+SENSITIVITY line beside each primary. The decision stays the primary's, on all valid races.
 
 ## 3. Stock baseline, and the band computation (fixed now; the baseline only plugs in numbers)
 
@@ -148,7 +155,16 @@ The amendment PR writes M_p, M_h, M_c, C_race and the four bands, rounded to 3 s
   - A level that still fails at 0.25 is set to stock. A factor with both levels at stock is dropped from S-1, and the drop is recorded.
 - **Which levels are implicated:**
   - A stall or a race that doesn't finish implicates every factor, at the level the stalled car(s) held.
-  - Contacts above 3 × C_race implicate the HIGH levels of YIELD, OVERLAP, COMMIT, BLK_SPEED and BLK_THREAT. Those are the hold-the-line, commit-early and defend-more ends. EXIT_ERR's HIGH is implicated only through a stall.
+  - Contacts above 3 × C_race implicate each factor's **predicted contact-raising extreme**, named by value in the table below. EXIT_ERR is excluded: it's implicated only through a stall. The two-sided factors step BOTH extremes.
+
+  | Factor | Contact-raising extreme stepped on excess contacts | Why |
+  |---|---|---|
+  | YIELD | 0.5 (low yield; §1's HIGH) | yields less when alongside: the predicted contact side (§5) |
+  | OVERLAP | flat 0.05 (§1's HIGH) | commits with little overlap |
+  | COMMIT | 0.1 (§1's HIGH) | aborts later into the braking zone |
+  | BLK_SPEED | both: 0.15 and 2.4 | sign unknown (two-sided) |
+  | BLK_THREAT | both: 0.7 and 0.04375 | sign unknown (two-sided) |
+  | EXIT_ERR | none (excluded) | throttle errors, no contact mechanism; stall rule only |
 
 **The steps, pre-registered:**
 
@@ -191,7 +207,7 @@ per car of any code, descriptive only (§6). The measure definitions are v1_chec
 - Per factor: average each driver's measure over the launch's valid races, centre each driver's launch-means across launches (driver fixed effects), then take the mean over launches of (mean centred value at HIGH − mean at LOW).
 - The permutation test uses **10,000 redraws**. Each redraw replaces every launch's assignment with `draw(seed_k, launch)` for a fresh seed_k. The p-value is two-sided.
 - SE = the SD of the permutation null. The FE slope's SE comes from its own permutation null.
-- α = 0.05 per factor. No multiplicity correction: it's a screen, and ALIVE levers get a confirmatory test before the product uses them.
+- α = 0.05 per factor. No multiplicity correction, because it's a screen (accepted). **Any ALIVE factor is CONFIRMED in a focused follow-up before it goes into a Verve Drivers release.**
 
 **Labels.** The p-value comes from the centred statistic; the band comparison uses the FE slope.
 
@@ -251,7 +267,7 @@ ALIVE-REVERSED. Any result other than ALIVE means "not a lever we'll use for now
 - **`tools/s1_check.py`**, v1_check-style:
   - the §5 PRIMARY, two-sided labels, secondaries and NULL_BAND;
   - `costly_contacts`, `front_wing_added` and `penalties` taken from race_feel rows;
-  - stall reporting;
+  - stall reporting, and the stall SENSITIVITY line (§2);
   - `--baseline`, which writes the §3 statistics and the bands.
 - **`harness/sessions/s1_smoke_2races.plan`**: V-1's 4-race plan cut to its first 2 races, otherwise unchanged.
 - **The smoke check** (`s1_check --smoke`, or `tools/s1_smoke_check.py`): the four PASS rules of §4 per race, the implicated levels on a FAIL, and the next step's values.
