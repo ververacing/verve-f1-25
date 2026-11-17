@@ -25,7 +25,9 @@ Steps, all logged in <Batch>\launch_<n>\:
    copied to <launch>\raw\udp.bin (gitignored). The per-race split is udp_races.txt (written by sandbox_shell).
 
 Exit codes as b0016_run.ps1: the guard's exit (0 plan done, 6 plan stopped, 7 URGENT, 11 deferred), 5 saves changed,
-9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored and 15 generate or install failed (nothing launched).
+9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored, 15 generate or install failed (nothing launched) and 16 the
+build check failed (check_applied: the game didn't hold this launch's ops; stop the batch). gamedb_expected.txt is that
+launch's expected overwrite count for v1_check.
 Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
 #>
 param(
@@ -208,11 +210,27 @@ if ($bin -and (Test-Path $bin)) {
 } else { 'udp capture: none found for this launch' }
 $ur = Join-Path $out 'udp_races.txt'
 if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else { 'udp_races: none (no @udpfinish ran)' }
+
+# 9. the build check per launch (V-1 readback, 16 Nov): the game must hold every op this launch's add-on wrote. Which
+# equal-to-stock writes the build drops varies (2 of 4 at seed 1 launch 1), so each launch gets its own expected
+# gamedb count (gamedb_expected.txt, read by v1_check). Offline: every path is in the 26566308 key cache, no swofty.
+$buildOk = $true
+if (Test-Path $llog) {
+    $keyCache = Join-Path (Split-Path $PSScriptRoot -Parent) 'docs\stock\v1_key_cache_26566308.csv'
+    $ca = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'check_applied.ps1') -Loader $llog -Folder $folder -Baseline 56 -KeyCache $keyCache 2>&1 | ForEach-Object { "$_" })
+    $caCode = $LASTEXITCODE
+    $ca | Set-Content (Join-Path $out 'check_applied.txt') -Encoding utf8
+    $ca | ForEach-Object { "check_applied: $_" }
+    $em = $ca | Select-String 'expected \d+ \+ \d+ = (\d+)' | Select-Object -First 1
+    if ($em) { Set-Content (Join-Path $out 'gamedb_expected.txt') $em.Matches[0].Groups[1].Value -Encoding ascii }
+    if ($caCode -ne 0) { $buildOk = $false; "BUILD CHECK FAILED (check_applied exit $caCode): the game did not hold this launch's ops; stop the batch and tell the supervisor" }
+} else { $buildOk = $false; 'BUILD CHECK: no loader.log; stop the batch and tell the supervisor' }
 if ((Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)) { "${tag}: paused during the launch; its races are invalid and rerun on RESUME" }
 
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
 if ($code -eq 7) { exit 7 }
 if (-not $tylerRestored) { exit 14 }
+if (-not $buildOk) { exit 16 }
 # a pause-at the next launch wouldn't make: pause now, at the end of this one (no turn of the agent needed)
 if (-not (Test-Path $pauseFlag)) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($LaunchMinutes + 5)
