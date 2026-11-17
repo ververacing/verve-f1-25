@@ -64,6 +64,33 @@ Check 'process check: on unless -NoProcessCheck' ((Get-Content $tool -Raw) -matc
 # 8. the shell calls it only for resolution-only diffs, and exits 5 otherwise
 $sh = Get-Content (Join-Path $PSScriptRoot 'sandbox_shell.ps1') -Raw
 Check 'sandbox_shell: resolution-only diff goes to hw_display_restore' ($sh -match 'hw_display_restore\.ps1' -and $sh -match 'resolution@\(width\|height\)')
+# 9. -LogName: the start-of-run check logs to its own file, and the default name is unchanged
+$ref = Join-Path $d 'ln.ref.xml'; $live = Join-Path $d 'ln.live.xml'; $out = Join-Path $d 'ln.out'
+New-Item -ItemType Directory $out | Out-Null
+[IO.File]::WriteAllText($ref, (Xml '1920' '1080'), (New-Object Text.UTF8Encoding $false))
+[IO.File]::WriteAllText($live, (Xml '1024' '768'), (New-Object Text.UTF8Encoding $false))
+& powershell -NoProfile -ExecutionPolicy Bypass -File $tool -Out $out -LogName 'display_fallback_start.txt' -File $live -Reference $ref -SnapDir (Join-Path $d 'ln.snap') -NoProcessCheck | Out-Null
+Check 'LogName: restored, exit 0' ($LASTEXITCODE -eq 0)
+Check 'LogName: logged to display_fallback_start.txt only' ((Test-Path (Join-Path $out 'display_fallback_start.txt')) -and -not (Test-Path (Join-Path $out 'display_fallback.txt')))
+& powershell -NoProfile -ExecutionPolicy Bypass -File $tool -Out $out -File $live -Reference $ref -SnapDir (Join-Path $d 'ln.snap') -NoProcessCheck | Out-Null
+Check 'LogName: default is display_fallback.txt, and nothing to do now' ($LASTEXITCODE -eq 0 -and (Get-Content (Join-Path $out 'display_fallback.txt') -Raw) -match 'nothing to do')
+# 9b. -FallbackOnly: restores only the exact 1024x768 fallback; another resolution (maybe Tyler's own) is left untouched
+$ref2 = Join-Path $d 'fo.ref.xml'; $live2 = Join-Path $d 'fo.live.xml'
+[IO.File]::WriteAllText($ref2, (Xml '1920' '1080'), (New-Object Text.UTF8Encoding $false))
+[IO.File]::WriteAllText($live2, (Xml '1280' '720'), (New-Object Text.UTF8Encoding $false))
+$o2 = & powershell -NoProfile -ExecutionPolicy Bypass -File $tool -FallbackOnly -File $live2 -Reference $ref2 -SnapDir (Join-Path $d 'fo.snap') -NoProcessCheck
+Check 'FallbackOnly: 1280x720 refused, exit 1' ($LASTEXITCODE -eq 1 -and ($o2 -join ' ') -match 'FallbackOnly')
+Check 'FallbackOnly: 1280x720 left as it is' ((Get-Content $live2 -Raw) -match 'width="1280"')
+[IO.File]::WriteAllText($live2, (Xml '1024' '768'), (New-Object Text.UTF8Encoding $false))
+& powershell -NoProfile -ExecutionPolicy Bypass -File $tool -FallbackOnly -File $live2 -Reference $ref2 -SnapDir (Join-Path $d 'fo.snap') -NoProcessCheck | Out-Null
+Check 'FallbackOnly: 1024x768 restored, exit 0' ($LASTEXITCODE -eq 0 -and (Get-Content $live2 -Raw) -match 'width="1920" height="1080"')
+Check 'sandbox_shell: start-of-run check uses -FallbackOnly' ($sh -match "display_fallback_start\.txt' -FallbackOnly")
+# 10. the shell runs the start-of-run check before the saves-before snapshot, logging to its own file, with no new stop
+$iStart = $sh.IndexOf("-LogName 'display_fallback_start.txt'"); $iSnap = $sh.IndexOf('$before = Snapshot')
+Check 'sandbox_shell: start-of-run check before the snapshot' ($iStart -gt 0 -and $iSnap -gt $iStart)
+if ($iStart -gt 0 -and $iSnap -gt $iStart) {
+    Check 'sandbox_shell: start-of-run check adds no exit or throw' ($sh.Substring($iStart, $iSnap - $iStart) -notmatch '\bexit\b|\bthrow\b')
+}
 
 Remove-Item -Recurse -Force $d
 if ($fails) { "test_hw_display_restore: $fails FAILED"; exit 1 }
