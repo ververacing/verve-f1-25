@@ -1,0 +1,220 @@
+<#
+Run one V-1 LAUNCH (docs/verve_v1_prereg.md): generate that launch's test add-on, install it, run the four-race plan
+with it switched on, remove it. One call per launch, so control comes back between launches (docs/process.md).
+
+Usage:
+    powershell -File tools/v1_run.ps1 -Launch <n> -Batch runs/<date>-V-1 -Seed <int> [-Plan <plan>] [-Amp 3] [-NoUncapped]
+
+Steps, all logged in <Batch>\launch_<n>\:
+1. Refusals as tools/b0016_run.ps1: a PAUSE or a due pause-at (exit 12), a game or launcher running that it didn't
+   start (exit 9), test-* profiles left over (exit 10), a missing plan (exit 13).
+2. `python -I tools/v1_make.py --seed --launch --out <launch>\gen [--amp] [--no-uncapped]` (v1_make.txt), and the add-on
+   id read from gen\verve.v1-L<LL>\swofty.json, which must be v1_make's addon_id, verve.v1-l<LL> (exit 15 otherwise).
+3. Any verve.v1-l* add-on left installed by an earlier launch (an entry in verve-test.json) is removed first.
+4. The SHA-256 of tyler.json and verve-test.json before the install, after it, and after the removal (profile_hashes.txt).
+   `swofty addons install` adds the id to every profile as a DISABLED entry (docs/process.md); it is never enabled in
+   any profile file. Refused (exit 15) if tyler already lists the id enabled: that add-on would never be removed.
+5. `tools/reinstall_addon.ps1 -Folder <gen>\verve.v1-L<LL>` (install.txt; a failure is exit 15, nothing launched).
+6. tools/sandbox_shell.ps1 -Udp on the plan with `-Addon <id>`: the add-on is switched on only in the shell's copy of
+   verve-test, for this run. The guard (saves), the hardware-settings record and the post-run check live there.
+7. `tools/reinstall_addon.ps1 -Id <id> -Uninstall` (uninstall.txt), only with F1 25, the launcher and swofty all closed;
+   otherwise uninstall_deferred.txt says what to run later. tyler.json's hash must return to its before-install value:
+   if not, TYLER PROFILE CHANGED (exit 14). Its list only ever held a disabled entry for the id, so nothing of Tyler's
+   is enabled or disabled either way.
+8. launcher.txt (as b0016_run), v1addon.txt (addons.json and the loader.log lines naming the add-on), and the capture
+   copied to <launch>\raw\udp.bin (gitignored). The per-race split is udp_races.txt (written by sandbox_shell).
+
+Exit codes as b0016_run.ps1: the guard's exit (0 plan done, 6 plan stopped, 7 URGENT, 11 deferred), 5 saves changed,
+9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored and 15 generate or install failed (nothing launched).
+Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
+#>
+param(
+    [Parameter(Mandatory)] [int] $Launch,
+    [Parameter(Mandatory)] [string] $Batch,
+    [Parameter(Mandatory)] [int] $Seed,
+    [string] $Plan = 'harness\sessions\v1_austria_4races.plan',
+    [double] $Amp = 3,
+    [switch] $NoUncapped,
+    [int] $LaunchMinutes = 80,   # for pause-at: the menu (~9 min) + 4 races at the plan's @udpfinish cap, worst case
+    [string] $ExpProfile = 'verve-test',
+    [string] $Python = 'python',
+    [int] $SkippedIntroS = 40
+)
+$ErrorActionPreference = 'Stop'
+$tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
+$now = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
+$tag = "launch ${Launch}"
+# PAUSE (tools/pause.ps1): no launch while paused; a pause-at that this launch wouldn't finish before pauses now
+$pauseFlag = Join-Path $env:LOCALAPPDATA 'verve-f1-25\state\paused.txt'
+if (Test-Path $pauseFlag) { "${tag}: paused ($((Get-Content $pauseFlag -TotalCount 1))); not launching"; exit 12 }
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($LaunchMinutes + 5)
+if ($LASTEXITCODE -ne 2) { "${tag}: pause-at reached; paused instead of launching"; exit 12 }
+if (Get-Process F1_25 -ErrorAction SilentlyContinue) { "${tag}: a game is running that this batch didn't start; not launching"; exit 9 }
+if (Get-Process swofty-launcher -ErrorAction SilentlyContinue) { "${tag}: the Swofty Launcher is open; not launching"; exit 9 }
+$cleanup = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'cleanup_test_profiles.ps1')
+if ($LASTEXITCODE -ne 0) { "${tag}: test profiles are left over; not launching"; $cleanup | ForEach-Object { "  $_" }; exit 10 }
+if (-not (Test-Path $Plan)) { "${tag}: no plan $Plan; not launching"; exit 13 }
+
+$out = Join-Path $Batch "launch_$Launch"
+if (Test-Path $out) {
+    $aside = Join-Path $Batch 'invalid'
+    New-Item -ItemType Directory -Force $aside | Out-Null
+    $k = 1
+    while (Test-Path (Join-Path $aside "launch_${Launch}_$k")) { $k++ }
+    Move-Item $out (Join-Path $aside "launch_${Launch}_$k")
+    "${tag}: earlier attempt moved to invalid\launch_${Launch}_$k"
+}
+New-Item -ItemType Directory -Force $out | Out-Null
+$out = (Resolve-Path $out).Path
+function Scrub([string] $s) { $s -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' }
+function Busy { @(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue).Count -gt 0 }
+# tools/reinstall_addon.ps1 with its output (stderr too) in <launch>\<log>; returns its exit code
+function AddonCall([string[]] $a, [string] $log) {
+    $ErrorActionPreference = 'Continue'   # local to this function: a stderr line from the child must not throw
+    $o = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'reinstall_addon.ps1') @a *>&1 | ForEach-Object { Scrub "$_" }
+    $c = $LASTEXITCODE
+    Add-Content (Join-Path $out $log) -Encoding utf8 -Value (@("== $(Get-Date -Format s) reinstall_addon.ps1 $($a -join ' ') (exit $c)") + @($o))
+    return $c
+}
+
+# 2. the launch's add-on and assignment
+$gen = Join-Path $out 'gen'
+$ll = '{0:D2}' -f $Launch
+$mk = @('-I', (Join-Path $PSScriptRoot 'v1_make.py'), '--seed', "$Seed", '--launch', "$Launch", '--out', $gen, '--amp', "$Amp")
+if ($NoUncapped) { $mk += '--no-uncapped' }
+$ErrorActionPreference = 'Continue'
+& $Python @mk *> (Join-Path $out 'v1_make.txt')
+$mkCode = $LASTEXITCODE
+$ErrorActionPreference = 'Stop'
+$folder = Join-Path $gen "verve.v1-L$ll"
+if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: v1_make failed (exit $mkCode, v1_make.txt); nothing installed or launched"; exit 15 }
+$id = (Get-Content (Join-Path $folder 'swofty.json') -Raw | ConvertFrom-Json).id
+if ($id -ne "verve.v1-l$ll") { "${tag}: the generated add-on id is '$id', not verve.v1-l$ll; nothing installed or launched"; exit 15 }
+Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan"
+"${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan"
+
+# 3./4. profile hashes, leftovers, install
+$profDir = Join-Path $env:LOCALAPPDATA 'Swofty\profiles'
+$tylerFile = Join-Path $profDir 'tyler.json'
+$expFile = Join-Path $profDir "$ExpProfile.json"
+$hashLog = Join-Path $out 'profile_hashes.txt'
+function H([string] $f) { if (Test-Path $f) { (Get-FileHash $f -Algorithm SHA256).Hash } else { 'MISSING' } }
+function IdState([string] $f, [string] $want) {
+    # 'absent', 'disabled' or 'ENABLED': the state of one id in a profile's list (nothing else is read out)
+    if (-not (Test-Path $f)) { return 'no profile' }
+    $e = @((Get-Content $f -Raw | ConvertFrom-Json).addons | Where-Object { $_.id -eq $want })
+    if (-not $e.Count) { return 'absent' }
+    if (@($e | Where-Object { $_.enabled }).Count) { return 'ENABLED' }
+    return 'disabled'
+}
+function HashLine([string] $when) {
+    $l = "{0,-16} tyler {1}  {2} {3}  ({4} in tyler: {5}; in {2}: {6})" -f $when, (H $tylerFile), $ExpProfile, (H $expFile), $id, (IdState $tylerFile $id), (IdState $expFile $id)
+    Add-Content $hashLog $l -Encoding utf8
+    "profiles: $l"
+}
+if ((IdState $tylerFile $id) -eq 'ENABLED') { "${tag}: tyler lists $id ENABLED; never removed from Tyler's setup, so not installing"; exit 15 }
+# a verve.v1-l* add-on that an earlier launch left installed (its uninstall deferred or failed): ours, remove it first
+$left = @()
+if (Test-Path $expFile) {
+    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.v1-l\d+$' })
+}
+foreach ($lid in $left) {
+    if ((IdState $tylerFile $lid) -eq 'ENABLED') { "${tag}: leftover $lid is ENABLED in tyler; not touching it; not launching"; exit 15 }
+    "${tag}: leftover $lid from an earlier launch; removing it (exit $(AddonCall @('-Id', $lid, '-Uninstall') 'leftover_uninstall.txt'))"
+}
+HashLine 'before install'
+$tylerBefore = H $tylerFile
+$insCode = AddonCall @('-Folder', $folder) 'install.txt'
+HashLine 'after install'
+$expState = IdState $expFile $id
+$tylerState = IdState $tylerFile $id
+# expected: a disabled entry in every profile (docs/process.md). Enabled anywhere means it would run outside this launch
+if ($expState -eq 'absent') { "${tag}: note: the install added no $id entry to $ExpProfile (-Addon switches it on regardless)" }
+if ($insCode -ne 0 -or $expState -eq 'ENABLED' -or $tylerState -eq 'ENABLED') {
+    "${tag}: install of $id failed or left it enabled (exit $insCode; $ExpProfile $expState, tyler $tylerState; install.txt); removing it, nothing launched"
+    "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
+    HashLine 'after uninstall'
+    if ((H $tylerFile) -ne $tylerBefore) { 'TYLER PROFILE CHANGED: tyler.json does not hash as before the install (profile_hashes.txt); stop and tell the supervisor'; exit 14 }
+    exit 15
+}
+
+# 6. the run (the launcher updates itself: record its version every launch)
+$launcherExe = Join-Path $env:LOCALAPPDATA 'Programs\SwoftyLauncher\bin\swofty-launcher.exe'
+$launcherBefore = if (Test-Path $launcherExe) { (Get-Item $launcherExe).VersionInfo.ProductVersion } else { 'MISSING' }
+$shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'sandbox_shell.ps1'), '-Fixture', 'tyler-profile-20261031',
+    '-ExpProfile', $ExpProfile, '-Plan', $Plan, '-Udp', '-Addon', $id,
+    '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
+if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
+powershell @shellArgs |
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED' }
+$code = $LASTEXITCODE
+"guard exit: $code"
+
+# 7. remove the add-on (never while a game or Swofty process is up: no Swofty steps then, incident 2026-11-15)
+$tylerRestored = $true
+if (Busy) {
+    $who = (@(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) | ForEach-Object { "$($_.ProcessName) $($_.Id)" }) -join ', '
+    Set-Content (Join-Path $out 'uninstall_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "reason: running as the launch ended: $who",
+        "next: with F1 25, the launcher and swofty closed: powershell -File tools/reinstall_addon.ps1 -Id $id -Uninstall, then compare tyler.json's hash with profile_hashes.txt ('before install')",
+        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l* in verve-test)')
+    "ADD-ON LEFT INSTALLED: $id (a disabled entry in every profile); a game or Swofty process is running ($who); see uninstall_deferred.txt"
+} else {
+    "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
+    HashLine 'after uninstall'
+    $tylerAfter = H $tylerFile
+    if ($tylerAfter -eq $tylerBefore) { Add-Content $hashLog 'tyler.json: restored (hash as before the install)' -Encoding utf8; 'tyler.json: hash as before the install' }
+    else {
+        $tylerRestored = $false
+        Add-Content $hashLog "tyler.json: NOT RESTORED ($tylerBefore -> $tylerAfter)" -Encoding utf8
+        "TYLER PROFILE CHANGED: tyler.json hashed $tylerBefore before the install and $tylerAfter after the removal (profile_hashes.txt); stop and tell the supervisor"
+    }
+}
+
+# 8. per-launch logging: the add-on as the run had it, the launcher version, the capture
+$lines = @()
+$aj = Join-Path $out 'addons.json'
+$lines += if (Test-Path $aj) { "addons.json: $((Get-Content $aj -Raw) -replace '\s+', ' ')" } else { 'addons.json: MISSING' }
+$lines += if ((Test-Path $aj) -and ((Get-Content $aj -Raw) -match [regex]::Escape($id))) { "addons.json names ${id}: yes" } else { "addons.json names ${id}: NO (the run may not have had the add-on)" }
+$llog = Join-Path $out 'raw\loader.log'
+if (Test-Path $llog) {
+    $l1 = @(Get-Content $llog | Where-Object { $_ -match 'verve\.v1' })
+    $lines += "loader.log $id lines: $($l1.Count)"
+    $lines += $l1 | ForEach-Object { Scrub $_ }
+} else { $lines += 'loader.log: MISSING' }
+$lines | Set-Content (Join-Path $out 'v1addon.txt') -Encoding utf8
+"v1addon.txt: $($lines[1])"
+
+$inGame = if (Test-Path $llog) { $m = Select-String $llog -Pattern 'state: Swofty Launcher (\S+),' | Select-Object -First 1; if ($m) { $m.Matches[0].Groups[1].Value } else { 'not found' } } else { 'no loader.log' }
+$lv = @("launcher before launch: $launcherBefore", "launcher in game (loader.log): $inGame")
+if ($inGame -match '^\d' -and $inGame -ne $launcherBefore) { $lv += 'NOTE: the two differ (an update during the launch?)' }
+$prev = Join-Path $Batch "launch_$($Launch - 1)\launcher.txt"
+if (Test-Path $prev) {
+    $pv = ((Get-Content $prev | Where-Object { $_ -match '^launcher in game' }) -split ': ', 2)[1]
+    if ($pv -and $pv -ne $inGame) { $lv += "LAUNCHER CHANGED: launch $($Launch - 1) ran on $pv, this launch on $inGame" }
+}
+$lv | Set-Content (Join-Path $out 'launcher.txt') -Encoding utf8
+$lv | ForEach-Object { "launcher.txt: $_" }
+
+# the capture stays in %TEMP%\verve-udp\shell-*; keep a copy in raw\ (gitignored)
+$t0 = [TimeZoneInfo]::ConvertTime($now, $tz, [TimeZoneInfo]::Local)
+$bin = Get-ChildItem (Join-Path $env:TEMP 'verve-udp') -Directory -Filter 'shell-*' -ErrorAction SilentlyContinue |
+    Where-Object { $_.CreationTime -ge $t0.AddSeconds(-5) } | Sort-Object CreationTime -Descending | Select-Object -First 1 |
+    ForEach-Object { Join-Path $_.FullName 'udp.bin' }
+if ($bin -and (Test-Path $bin)) {
+    New-Item -ItemType Directory -Force (Join-Path $out 'raw') | Out-Null
+    Copy-Item $bin (Join-Path $out 'raw\udp.bin') -Force
+    "udp capture: raw\udp.bin ($((Get-Item (Join-Path $out 'raw\udp.bin')).Length) bytes)"
+} else { 'udp capture: none found for this launch' }
+$ur = Join-Path $out 'udp_races.txt'
+if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else { 'udp_races: none (no @udpfinish ran)' }
+if ((Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)) { "${tag}: paused during the launch; its races are invalid and rerun on RESUME" }
+
+if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
+if ($code -eq 7) { exit 7 }
+if (-not $tylerRestored) { exit 14 }
+# a pause-at the next launch wouldn't make: pause now, at the end of this one (no turn of the agent needed)
+if (-not (Test-Path $pauseFlag)) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($LaunchMinutes + 5)
+    if ($LASTEXITCODE -ne 2) { 'pause-at reached after this launch: paused' }
+}
+exit $code
