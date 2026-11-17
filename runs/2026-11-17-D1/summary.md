@@ -22,7 +22,9 @@ Pre-registered in [docs/verve_d1_d2_prereg.md](../../docs/verve_d1_d2_prereg.md)
   That's B-0012b's exploratory signal, reproduced in GP on 26566308.
 - **Build check, both launches:** 36/36 ops applied and all value-checked, 0 dropped, 0 problems; gamedb 92 = 56 + 36.
 - **Safety:** tyler.json was restored (hash as before the install) in both launches. The saves were unchanged, the
-  weather LOCKED, the session check ok, with no skip-relaunch and no display fallback.
+  weather LOCKED, the session check ok, with no skip-relaunch. The display fallback (resolution only) fired in both
+  launches and was auto-restored (corrected 2026-11-17: this line first said "no display fallback"; see
+  [docs/display_fallback.md](../../docs/display_fallback.md)).
 - **Launch 2, attempts 1-2** (02:10, 02:15) are in `invalid\` and not analysed. Both stopped in the menus: `home` timed
   out because the game raised `ServerStatus_AccessDeniedWithCustomMessage` again and again, during an **EA-side F1 25
   server outage** (EA's server-status page read "Server Outage" at 02:25 PT). The 03:23 stock route check
