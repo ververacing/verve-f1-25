@@ -1,0 +1,2 @@
+udp finish watch: all 19 AI cars done (19 finished) (exit 0); 2 earlier race uid(s) excluded
+finished uid 13336574112143647268

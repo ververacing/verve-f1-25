@@ -1,0 +1,170 @@
+﻿saves before: 179 entries; profile verve-test (0E359C69874C329C43A5A1C776587E64D296501AE151F291FDD681E3269F2EB0) +addons verve.v1-l02; active profile tyler
+udp capture pid 6428
+attempt 1 started 17:22:40 (48 s since the last game exit)
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261117-012240-1 ({"schema":1,"run":"shell-20261117-012240-1","state":"armed","pid":15716,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261117-012240-1\\saves\\remote","why":""})
+game pid 15716 (sandbox.json)
+17:24:26 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":81609}
+17:24:26 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":4335,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 15716 (test agent)
+intro played (splash after 82 s)
+17:24:47 > pad ls 15000  =>  {"seq":3,"status":"ok","ms":20610}
+17:24:47 > pad ls  =>  {"seq":4,"status":"ok","ms":265}
+17:24:51 > pad ls 2000  =>  {"seq":5,"status":"ok","ms":4000}
+17:24:52 > pad ls  =>  {"seq":6,"status":"ok","ms":250}
+17:24:57 > home  =>  {"seq":7,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4781}
+17:25:00 > @raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}  =>  {"seq":8,"status":"ok","value":{"from":"home"},"ms":469}
+17:25:06 > status  =>  {"seq":9,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":6262,"phase":"|fe_f1_world|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:25:11 > @raw {"seq":0,"cmd":"route","args":{"route":"play"},"timeout_ms":60000}  =>  {"seq":10,"status":"ok","value":{"from":"screen"},"ms":5000}
+17:25:17 > status  =>  {"seq":11,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":6937,"phase":"|f1_world_activity_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:25:18 > pad a 250  =>  {"seq":12,"status":"ok","ms":500}
+17:25:25 > pad right 250  =>  {"seq":13,"status":"ok","ms":515}
+17:25:28 > pad a 250  =>  {"seq":14,"status":"ok","ms":500}
+17:25:35 > status  =>  {"seq":15,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":7954,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:25:35 > pad right 200  =>  {"seq":16,"status":"ok","ms":406}
+17:25:36 > pad right 200  =>  {"seq":17,"status":"ok","ms":406}
+17:25:37 > pad right 200  =>  {"seq":18,"status":"ok","ms":406}
+17:25:37 > pad right 200  =>  {"seq":19,"status":"ok","ms":422}
+17:25:38 > pad right 200  =>  {"seq":20,"status":"ok","ms":406}
+17:25:39 > pad right 200  =>  {"seq":21,"status":"ok","ms":406}
+17:25:39 > pad right 200  =>  {"seq":22,"status":"ok","ms":406}
+17:25:40 > pad right 200  =>  {"seq":23,"status":"ok","ms":407}
+17:25:41 > pad right 200  =>  {"seq":24,"status":"ok","ms":406}
+17:25:41 > pad right 200  =>  {"seq":25,"status":"ok","ms":406}
+17:25:44 > pad a 250  =>  {"seq":26,"status":"ok","ms":515}
+17:25:52 > status  =>  {"seq":27,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":8894,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:25:52 > pad right 200  =>  {"seq":28,"status":"ok","ms":422}
+17:25:53 > pad right 200  =>  {"seq":29,"status":"ok","ms":407}
+17:25:54 > pad right 200  =>  {"seq":30,"status":"ok","ms":422}
+17:25:54 > pad right 200  =>  {"seq":31,"status":"ok","ms":422}
+17:25:57 > pad a 250  =>  {"seq":32,"status":"ok","ms":500}
+17:26:04 > status  =>  {"seq":33,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":9599,"phase":"|solo_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:26:05 > pad a 250  =>  {"seq":34,"status":"ok","ms":500}
+17:26:12 > status  =>  {"seq":35,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":10053,"phase":"|settings_container|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:26:13 > pad right 250  =>  {"seq":36,"status":"ok","ms":516}
+17:26:16 > pad down 250  =>  {"seq":37,"status":"ok","ms":500}
+17:26:18 > pad a 250  =>  {"seq":38,"status":"ok","ms":500}
+17:26:35 > pad right 6000  =>  {"seq":39,"status":"ok","ms":12000}
+17:26:37 > pad left 200  =>  {"seq":40,"status":"ok","ms":406}
+17:26:38 > pad left 200  =>  {"seq":41,"status":"ok","ms":407}
+17:26:39 > pad left 200  =>  {"seq":42,"status":"ok","ms":406}
+17:26:39 > pad left 200  =>  {"seq":43,"status":"ok","ms":407}
+17:26:40 > pad left 200  =>  {"seq":44,"status":"ok","ms":422}
+17:26:41 > pad left 200  =>  {"seq":45,"status":"ok","ms":406}
+17:26:41 > pad left 200  =>  {"seq":46,"status":"ok","ms":406}
+17:26:42 > pad left 200  =>  {"seq":47,"status":"ok","ms":422}
+17:26:43 > pad left 200  =>  {"seq":48,"status":"ok","ms":406}
+17:26:43 > pad left 200  =>  {"seq":49,"status":"ok","ms":407}
+17:26:46 > pad b 250  =>  {"seq":50,"status":"ok","ms":500}
+17:26:51 > pad down 250  =>  {"seq":51,"status":"ok","ms":500}
+17:26:53 > pad a 250  =>  {"seq":52,"status":"ok","ms":500}
+17:26:58 > pad down 200  =>  {"seq":53,"status":"ok","ms":406}
+17:27:00 > pad down 200  =>  {"seq":54,"status":"ok","ms":422}
+17:27:02 > pad down 200  =>  {"seq":55,"status":"ok","ms":422}
+17:27:03 > pad down 200  =>  {"seq":56,"status":"ok","ms":406}
+17:27:05 > pad down 200  =>  {"seq":57,"status":"ok","ms":406}
+17:27:08 > pad a 250  =>  {"seq":58,"status":"ok","ms":500}
+17:27:12 > pad x 250  =>  {"seq":59,"status":"ok","ms":500}
+17:27:14 > pad x 250  =>  {"seq":60,"status":"ok","ms":500}
+17:27:16 > pad x 250  =>  {"seq":61,"status":"ok","ms":500}
+17:27:17 > pad x 250  =>  {"seq":62,"status":"ok","ms":500}
+17:27:19 > pad x 250  =>  {"seq":63,"status":"ok","ms":500}
+17:27:21 > pad x 250  =>  {"seq":64,"status":"ok","ms":500}
+17:27:23 > pad x 250  =>  {"seq":65,"status":"ok","ms":500}
+17:27:24 > pad x 250  =>  {"seq":66,"status":"ok","ms":500}
+17:27:26 > pad x 250  =>  {"seq":67,"status":"ok","ms":500}
+17:27:28 > pad x 250  =>  {"seq":68,"status":"ok","ms":500}
+17:27:29 > pad x 250  =>  {"seq":69,"status":"ok","ms":500}
+17:27:31 > pad x 250  =>  {"seq":70,"status":"ok","ms":500}
+17:27:33 > pad x 250  =>  {"seq":71,"status":"ok","ms":500}
+17:27:34 > pad x 250  =>  {"seq":72,"status":"ok","ms":500}
+17:27:36 > pad x 250  =>  {"seq":73,"status":"ok","ms":500}
+17:27:38 > pad x 250  =>  {"seq":74,"status":"ok","ms":500}
+17:27:40 > pad x 250  =>  {"seq":75,"status":"ok","ms":516}
+17:27:41 > pad x 250  =>  {"seq":76,"status":"ok","ms":500}
+17:27:43 > pad x 250  =>  {"seq":77,"status":"ok","ms":500}
+17:27:47 > pad b 250  =>  {"seq":78,"status":"ok","ms":500}
+17:27:51 > pad a 250  =>  {"seq":79,"status":"ok","ms":516}
+17:27:56 > pad b 250  =>  {"seq":80,"status":"ok","ms":515}
+17:28:01 > pad up 250  =>  {"seq":81,"status":"ok","ms":500}
+17:28:03 > pad up 250  =>  {"seq":82,"status":"ok","ms":500}
+17:28:06 > pad right 250  =>  {"seq":83,"status":"ok","ms":515}
+17:28:09 > pad a 250  =>  {"seq":84,"status":"ok","ms":500}
+17:28:13 > pad right 250  =>  {"seq":85,"status":"ok","ms":500}
+17:28:17 > pad b 250  =>  {"seq":86,"status":"ok","ms":500}
+17:28:22 > pad left 250  =>  {"seq":87,"status":"ok","ms":516}
+17:28:24 > pad left 250  =>  {"seq":88,"status":"ok","ms":500}
+17:28:28 > pad a 250  =>  {"seq":89,"status":"ok","ms":500}
+17:30:42 > status  =>  {"seq":90,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":24948,"phase":"|hud|#fe9b028c|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:30:43 > pad a 250  =>  {"seq":91,"status":"ok","ms":500}
+17:30:47 > status  =>  {"seq":92,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":25244,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:30:47 > wait screen=garage_monitor_container 300  =>  {"seq":93,"status":"ok","value":{"phase":"garage_monitor_container"},"ms":0}
+17:30:56 > status  =>  {"seq":94,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":25763,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:30:57 > pad a 700  =>  {"seq":95,"status":"ok","ms":1407}
+17:31:00 > @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}  =>  {"seq":96,"status":"unavailable","error":"the player's car: the car field offsets are the KB build's and this is not that build","ms":0}
+17:31:02 > @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}  =>  {"seq":97,"status":"unavailable","error":"the player's car: the car field offsets are the KB build's and this is not that build","ms":0}
+udpfinish: race 1, watching (max 900 s, leader + 150 s; excluding 0 earlier race uid(s); ends at once on the pause flag or a game exit)
+udpfinish: race 1 exit 0 uid 720392103094415583: udp finish watch: all 19 AI cars done (19 finished) (exit 0) | finished uid 720392103094415583 
+17:37:12 > status  =>  {"seq":98,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":48258,"phase":"|hud_spectator_2|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 1: screen before '|hud_spectator_2|#ba16bc16|'
+restart 1: pad start (pause menu)
+17:37:13 > pad start  =>  {"seq":99,"status":"ok","ms":250}
+17:37:16 > status  =>  {"seq":100,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":48479,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 1: pause menu screen '|pause|#ba16bc16|'; pad a (Restart Session)
+17:37:16 > pad a  =>  {"seq":101,"status":"ok","ms":250}
+17:37:19 > status  =>  {"seq":102,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":48641,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 1: confirm dialog screen '|pause|#ba16bc16|'; pad up (Cancel -> Confirm)
+17:37:19 > pad up  =>  {"seq":103,"status":"ok","ms":250}
+restart 1: pad a (confirm)
+17:37:20 > pad a  =>  {"seq":104,"status":"ok","ms":250}
+17:37:23 > status  =>  {"seq":105,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":48879,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 1: garage after 2 s ('|garage_monitor_container|#2330fd27|'); settling 8 s, then pad a 700 (start the race)
+17:37:32 > pad a 700  =>  {"seq":106,"status":"ok","ms":1406}
+17:37:38 > status  =>  {"seq":107,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":49766,"phase":"|hud|#f00bd57e|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 1: race started (screen '|hud|#f00bd57e|')
+udpfinish: race 2, watching (max 900 s, leader + 150 s; excluding 1 earlier race uid(s); ends at once on the pause flag or a game exit)
+udpfinish: race 2 exit 0 uid 1259489673623558686: udp finish watch: all 19 AI cars done (19 finished) (exit 0); 1 earlier race uid(s) excluded | finished uid 1259489673623558686 
+17:43:48 > status  =>  {"seq":108,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":71893,"phase":"|hud|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 2: screen before '|hud|#ba16bc16|'
+restart 2: pad start (pause menu)
+17:43:48 > pad start  =>  {"seq":109,"status":"ok","ms":250}
+17:43:52 > status  =>  {"seq":110,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":72116,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 2: pause menu screen '|pause|#ba16bc16|'; pad a (Restart Session)
+17:43:52 > pad a  =>  {"seq":111,"status":"ok","ms":250}
+17:43:54 > status  =>  {"seq":112,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":72277,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 2: confirm dialog screen '|pause|#ba16bc16|'; pad up (Cancel -> Confirm)
+17:43:55 > pad up  =>  {"seq":113,"status":"ok","ms":250}
+restart 2: pad a (confirm)
+17:43:56 > pad a  =>  {"seq":114,"status":"ok","ms":250}
+17:43:59 > status  =>  {"seq":115,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":72516,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 2: garage after 2 s ('|garage_monitor_container|#2330fd27|'); settling 8 s, then pad a 700 (start the race)
+17:44:08 > pad a 700  =>  {"seq":116,"status":"ok","ms":1407}
+17:44:14 > status  =>  {"seq":117,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":73404,"phase":"|hud_spectator_2|#f00bd57e|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 2: race started (screen '|hud_spectator_2|#f00bd57e|')
+udpfinish: race 3, watching (max 900 s, leader + 150 s; excluding 2 earlier race uid(s); ends at once on the pause flag or a game exit)
+udpfinish: race 3 exit 0 uid 11800424970862224687: udp finish watch: all 19 AI cars done (19 finished) (exit 0); 2 earlier race uid(s) excluded | finished uid 11800424970862224687 
+17:50:26 > status  =>  {"seq":118,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":95677,"phase":"|hud_spectator_2|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 3: screen before '|hud_spectator_2|#ba16bc16|'
+restart 3: pad start (pause menu)
+17:50:26 > pad start  =>  {"seq":119,"status":"ok","ms":250}
+17:50:30 > status  =>  {"seq":120,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":95898,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 3: pause menu screen '|pause|#ba16bc16|'; pad a (Restart Session)
+17:50:30 > pad a  =>  {"seq":121,"status":"ok","ms":250}
+17:50:32 > status  =>  {"seq":122,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":96058,"phase":"|pause|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 3: confirm dialog screen '|pause|#ba16bc16|'; pad up (Cancel -> Confirm)
+17:50:33 > pad up  =>  {"seq":123,"status":"ok","ms":250}
+restart 3: pad a (confirm)
+17:50:34 > pad a  =>  {"seq":124,"status":"ok","ms":250}
+17:50:37 > status  =>  {"seq":125,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":96297,"phase":"|garage_monitor_container|#2330fd27|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 3: garage after 2 s ('|garage_monitor_container|#2330fd27|'); settling 8 s, then pad a 700 (start the race)
+17:50:46 > pad a 700  =>  {"seq":126,"status":"ok","ms":1407}
+17:50:52 > status  =>  {"seq":127,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":97186,"phase":"|hud|#f00bd57e|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+restart 3: race started (screen '|hud|#f00bd57e|')
+udpfinish: race 4, watching (max 900 s, leader + 150 s; excluding 3 earlier race uid(s); ends at once on the pause flag or a game exit)
+udpfinish: race 4 exit 0 uid 9973400097802265907: udp finish watch: all 19 AI cars done (19 finished) (exit 0); 3 earlier race uid(s) excluded | finished uid 9973400097802265907 
+17:57:00 > status  =>  {"seq":128,"status":"ok","value":{"v":1,"pid":15716,"run":"shell-20261117-012240-1","ticks":119211,"phase":"|hud|#ba16bc16|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+17:57:01 > quit  =>  {"seq":129,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 17:57:01
+run folder: shell-20261117-012240-1
+result: plan done
+udp recording: 635397792 bytes
+saves unchanged (179 entries)

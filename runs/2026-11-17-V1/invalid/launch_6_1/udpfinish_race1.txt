@@ -1,0 +1,2 @@
+udp finish watch: all 19 AI cars done (19 finished) (exit 0)
+finished uid 17927889466820698455

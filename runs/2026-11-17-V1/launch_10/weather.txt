@@ -1,0 +1,3 @@
+weather: LOCKED
+  0 clear: 3007 session packets
+  forecast (race samples): weather {0: 8985}, rain% {1: 620, 2: 3315, 3: 3301, 4: 1749}

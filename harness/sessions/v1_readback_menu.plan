@@ -1,0 +1,13 @@
+# V-1 readback (start rule iii): boot to the main menu with that launch's verve.v1-lNN add-on enabled, so loader.log
+# records every gamedb overwrite; then the shell quits. tools/check_applied.ps1 checks the ops against it afterwards.
+wait screen=splash 180
+pad ls 15000
+pad ls
+pad ls 2000
+pad ls
+home
+@sleep 3
+@raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}
+@sleep 5
+@expect fe_f1_world
+status

@@ -1,0 +1,2 @@
+﻿hw hardware_settings_config/graphics_card/resolution@width: 1920 -> 1024
+hw hardware_settings_config/graphics_card/resolution@height: 1080 -> 768
