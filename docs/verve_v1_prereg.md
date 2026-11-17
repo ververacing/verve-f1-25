@@ -104,7 +104,8 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
     car is controlled for.
   - Alonso alternates 1/0 by launch, with a seeded phase per factor.
   - Each factor therefore has 9 or 10 drivers at 1. Factors are drawn independently.
-  - The seed is fixed before race 1 and recorded in the batch (`seed.txt`). `assignment.csv` is written per launch.
+  - **Seed: 20261117**, fixed here before race 1 and recorded in the batch (`seed.txt`). `assignment.csv` is written per
+    launch. The readback used seed 1, so no V-1 assignment has been drawn on the game yet.
 - **Test add-on per launch:** `verve.v1-l<LL>`, `game_builds [">=26566308"]`, **235 ops** = 19 drivers × (6 traits +
   6 bundle keys) + 7 maps.
   - `tools/v1_run.ps1` installs it, enables it in verve-test for the run only (`-Addon`), and removes it afterwards.
