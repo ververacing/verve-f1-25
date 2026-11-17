@@ -1,3 +1,10 @@
+# RETIRED (supervisor, 2026-11-17). This refusal runs first, before anything else, and the script stops here.
+# The original script is kept below, verbatim, inside a here-string that is never executed (history only).
+Write-Output 'run_with_udp.ps1 is retired (supervisor, 2026-11-17): it ran `swofty test run` on the active profile and Tyler''s real saves. Use the sandbox path; see docs/verve_d1_d2_prereg.md (D2.0).'
+exit 1
+
+# --- history: the retired script (never runs) ---
+$null = @'
 <#
 Run a `swofty test` suite with the UDP capture alongside, then parse the capture (#4).
 
@@ -64,3 +71,4 @@ $parsed = Join-Path $work 'udp'
 & $Python -I "$work\udp_parse.py" $bin --out $parsed --launch-s $LaunchS
 if (Test-Path $parsed) { $dest = Join-Path $Out 'udp'; New-Item -ItemType Directory -Force $dest | Out-Null; Copy-Item "$parsed\*" $dest -Force; "parsed -> $dest" }
 exit $code
+'@
