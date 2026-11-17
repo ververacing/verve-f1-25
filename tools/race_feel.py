@@ -393,8 +393,13 @@ def race_session(sessions: dict) -> tuple[int, dict]:
     return max(pool, key=lambda kv: len(kv[1]["lap_frames"]))
 
 
-def analyse(capture: Path) -> tuple[list[dict], dict]:
-    sessions = u.parse(capture, [])
+def analyse(capture: Path, uid: int | None = None, sessions: dict | None = None) -> tuple[list[dict], dict]:
+    """uid: score that race session only (V-1: several restart-races in one capture, one uid each); default the race
+    with the most LapData frames. sessions: an already parsed udp_parse.parse result to reuse."""
+    if sessions is None:
+        sessions = u.parse(capture, [], uids={int(uid)} if uid is not None else None)
+    if uid is not None:
+        sessions = {k: v for k, v in sessions.items() if k == int(uid)}
     if not sessions:
         raise SystemExit("no sessions in the capture")
     ONSET_LOG.clear()
