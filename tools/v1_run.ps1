@@ -208,6 +208,13 @@ if ($bin -and (Test-Path $bin)) {
     Copy-Item $bin (Join-Path $out 'raw\udp.bin') -Force
     "udp capture: raw\udp.bin ($((Get-Item (Join-Path $out 'raw\udp.bin')).Length) bytes)"
 } else { 'udp capture: none found for this launch' }
+# weather (#118, --locked; validity needs weather.txt LOCKED, as b0016_run -LockedWeather wrote it). weather_check reads
+# every race session in the capture, so for a 4-race launch LOCKED means all four races stayed dry (launch 1 of V-1 was
+# checked by hand the same way: LOCKED)
+$rawBin = Join-Path $out 'raw\udp.bin'
+if (Test-Path $rawBin) {
+    & $Python -I (Join-Path $PSScriptRoot 'weather_check.py') $rawBin --out $out --locked | ForEach-Object { "weather_check: $_" }
+} else { Set-Content (Join-Path $out 'weather.txt') 'weather: no capture' -Encoding utf8; 'weather_check: no capture' }
 $ur = Join-Path $out 'udp_races.txt'
 if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else { 'udp_races: none (no @udpfinish ran)' }
 
