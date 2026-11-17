@@ -1,8 +1,12 @@
-# D4 pre-registration (DRAFT): is the racecraft rating the GP reaction lever?
+# D4 pre-registration: is the racecraft rating the GP reaction lever?
 
-Status: **DRAFT for the supervisor** (2026-11-17). Nothing is built or run. Written from repo files only (no game,
-launcher or `swofty` call); paths are repo-relative. Evidence base: [verve_drivers_plan.md](verve_drivers_plan.md)
-("After V-1", D4 outline), [verve_d1_d2_prereg.md](verve_d1_d2_prereg.md) (D1), [verve_v1_prereg.md](verve_v1_prereg.md).
+Status: **APPROVED (supervisor, 2026-11-17)**, with one ruling: the levels are **flat `evolution` curves at 0.05
+(LOW) and 0.99 (HIGH)**, the same value at every season x = 0..10 (see "Levels" below; model expectation −0.103 s; the
+PASS bar stands). The build check is key-only for the curve ops, as accepted (check 4). The seed 2026111704, the
+imbalance check, the product note and the tooling list are approved as drafted. **D4 runs ONLY after a D1 PASS.**
+Nothing is run yet. Written from repo files only (no game, launcher or `swofty` call); paths are repo-relative.
+Evidence base: [verve_drivers_plan.md](verve_drivers_plan.md) ("After V-1", D4 outline),
+[verve_d1_d2_prereg.md](verve_d1_d2_prereg.md) (D1), [verve_v1_prereg.md](verve_v1_prereg.md).
 
 **Gate.** D4 runs only if **D1 PASSES**. If D1 fails, D4 waits until the measurement chain is fixed (D1's FAIL row).
 D2 is stopped (D2.0: no sandboxed benchmark path, #174), so D4 is GP-only and doesn't depend on it.
@@ -61,25 +65,43 @@ missing line is a MISSING problem (:96-97). **It can't confirm the value written
 (`expected_ops.csv`, its selftest) and B-0001/B-0006's format, which loaded (64 overwritten,
 `runs/2026-10-30-B-0001/summary.md`:11). A value readback would need D3-style access, which isn't approved. The key
 cache (`docs/stock/v1_key_cache_26566308.csv`) holds 0 `driver_statistics` paths today, so it needs a prefill.
+**Key-only is accepted** (supervisor, 2026-11-17).
 
-### Where the spec needs a definition (for the supervisor's ruling)
-The spec can be done as written. Racecraft does feed reaction_speed, over the full 0..1. But "the rating's minimum /
-maximum" has to be defined for a curve. **Proposed:** a **flat** curve at the scale ends, on the stock axes, in
-B-0001's point format:
-- LOW: `@v2@minx:0,maxx:10,miny:0,maxy:100,0:0,0:0,1:0,1:0` (rating 0);
-- HIGH: `@v2@minx:0,maxx:10,miny:0,maxy:100,0:1,0:1,1:1,1:1` (rating 100).
+**Value readback with `swofty db get`: skipped (db get reads stock for data add-ons).** The supervisor asked for one
+`db get` on verve-test with the D4 add-on enabled, on one HIGH and one LOW holder, if cheap. It can't show a data
+add-on's ops:
+- The repo: `tools/check_applied.ps1`:8 ("`swofty db get --addon` only applies DB Editor addons, not data addons"),
+  which is why #53 (commit 5fc16c2) replaced the `db get --addon` build check (`tools/check_build.ps1`) with the
+  loader.log check. `HANDOFF.md`:176: `db get <path>` without `--addon` prints stock.
+- Swofty's public source (SwoftyLauncher, commit c01366b, read-only shallow clone, deleted after):
+  `docs/reference/cli.md`:207 and :217 ("`swofty db get` without `--addon` shows stock values");
+  `apps/cli/src/db.rs`:405-409 (`db get` takes its edits only from `--addon` through `open()`, else none) and :222-226
+  (`open()` refuses any id that isn't a DB Editor addon: "no DB Editor addon named {id}");
+  `packages/core/src/dbedit/package.rs`:20, 24, 97-99 (a DB Editor addon has the `dbedit.` id prefix and a
+  `dbedit.json` marker; `verve.d4-l<LL>` has neither); `packages/core/src/dbedit/catalog.rs`:593-596 (the values come
+  from the stock database file).
+- So enabling the add-on in verve-test changes nothing that `db get` reads (the profile isn't consulted), and
+  `db get --addon verve.d4-l<LL>` fails. A readback would print the stock curve, which proves nothing. The value rests
+  on the generator and its selftest (the flat curve parses back to the level at every x), as accepted.
 
-A flat curve gives the same value at every season x and at both x=0 points, so the open questions in (2) don't matter.
-**Alternative**, if a hard 0 might read as "unset": B-0001/B-0006's 0.05 / 0.99 (model −0.103 s instead of −0.109).
-The supervisor picks one before d4_make is built.
+## Levels (the supervisor's ruling, 2026-11-17)
+"The rating's minimum / maximum" is defined as a **flat** `evolution` curve, the same value at every season x = 0..10,
+in both datasets: **LOW 0.05, HIGH 0.99** (not 0 and 1: no special treatment of 0 or the scale ends, and it matches
+B-0001/B-0006). The exact strings are B-0001's (`harness/addons/verve.b0001/db/b0001.json`:31 and :55):
+- LOW: `@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.05,0:0.05,1:0.05,1:0.05`;
+- HIGH: `@v2@minx:0,maxx:10,miny:0,maxy:100,0:0.99,0:0.99,1:0.99,1:0.99`.
+
+The header keeps the stock axes (x seasons 0..10, y 0..100). The points are stored normalised: x 0 → 1 spans seasons
+0 → 10 and y = rating/100, as every stock curve does (they all end at x = 1, e.g. `stats_fernando_alonso.txt`:28). A
+flat curve gives the same value at every season x and at both x=0 points, so the open questions in (2) don't matter.
 
 ## Design
 - **Lever:** per launch, in each of the 9 two-AI teams (v1_make's TEAMS), a seeded coin sets one teammate's racecraft
   to HIGH and the other's to LOW, in both `default` and `2026`. Alonso (no AI teammate) stays stock and isn't scored.
   That gives 9 HIGH and 9 LOW cars, **36 ops** (18 drivers × 2 datasets), and a new draw per launch. **No other
   writes:** no rows, no other ratings, no `driver_characteristic_overrides`, no maps, no `ai_driver_config`.
-- **Seed:** fixed and recorded before D4's first launch (proposed **2026111704**; the seed string is `verve-d4|...`,
-  distinct from D1's). `assignment.csv` is written per launch.
+- **Seed:** **2026111704** (approved), fixed and recorded before D4's first launch; the seed string is
+  `verve-d4|{seed}|{launch}`, distinct from D1's. `assignment.csv` is written per launch.
 - **Size:** 2 launches × 4 races, 5 laps, Austria, on V-1's plan `harness/sessions/v1_austria_4races.plan` with the
   race-1 session check (`@sessioncheck`, line 195). That's about 70 min. The launcher is D1's (1.9.63); if it changes,
   the stock route check is rerun first.
@@ -91,16 +113,17 @@ The supervisor picks one before d4_make is built.
 - **Primary (per launch):** UDP reaction (V-1/D1: LGOT arrival to the first LapData totalDistance gain ≥ 0.3 m,
   60 Hz, relative only). Each car's mean over the launch's valid races first, then the mean over HIGH cars minus the
   mean over LOW cars.
-- **Model expectation:** **about −0.11 s**. The mean reaction is 0.35 − 0.21·k·rs with k ≈ 0.52 (F-36 implications;
-  F-39's U[0.28 − 0.24k·rs, 0.42 − 0.18k·rs]), so a 0 → 1 span gives −0.21 × 0.52 = −0.109 s. k was fitted on
-  25251167 (benchmark) and isn't re-checked on 26566308.
+- **Model expectation:** **−0.103 s**. The mean reaction is 0.35 − 0.21·k·rs with k ≈ 0.52 (F-36 implications;
+  F-39's U[0.28 − 0.24k·rs, 0.42 − 0.18k·rs]), so the ruled 0.05 → 0.99 span (0.94, through the identity
+  `racecraft_reaction_speed`) gives −0.21 × 0.52 × 0.94 = −0.103 s. k was fitted on 25251167 (benchmark) and isn't
+  re-checked on 26566308.
 - **Decision:**
   - **PASS:** the difference is ≤ −0.05 s in **both** launches.
   - **NULL:** |difference| < 0.02 s in **both** launches.
   - Otherwise **INCONCLUSIVE**.
 - **Operating characteristics** (context only, not a rule): V-1's per-launch between-car SD of reaction means is
   about 0.032 s (`runs/2026-11-17-V1/v1_check/per_driver_launch.csv`, 12 launches), so a 9-vs-9 difference has an SE
-  of about 0.015 s. At −0.11 s PASS is near-certain. At 0, a false PASS has a chance under 1 in a million, and NULL comes
+  of about 0.015 s. At −0.103 s PASS is near-certain. At 0, a false PASS has a chance under 1 in a million, and NULL comes
   out about 2 times in 3.
 - **Row imbalance (diagnostic, not scored):** the rows stay stock, so a draw can unbalance the stock row
   reaction_speed between HIGH and LOW. The worst case over all draws is 0.12
@@ -132,10 +155,10 @@ Ratings are what the career and ratings screens show (`HANDOFF.md`:83; F-26). `v
 which write statistic curves. A D4 PASS reopens both points. D4 itself runs only in verve-test, and its add-on is
 removed after each launch.
 
-## Tooling needed (listed, not built)
+## Tooling (approved as listed; built on the branch `d4-tooling`)
 - **`tools/d4_make.py`**, modelled on d1_make.py: a pure `draw(seed, launch)` (the teammate coin, Alonso stock), the
-  add-on `verve.d4-l<LL>` (36 curve ops, LOW/HIGH as ruled), `assignment.csv`, `expected_ops.csv`, `--paths` and
-  `--selftest`.
+  add-on `verve.d4-l<LL>` (36 curve ops, LOW 0.05 / HIGH 0.99 flat, as ruled), `assignment.csv`, `expected_ops.csv`,
+  `--paths` and `--selftest`.
 - **`tools/v1_run.ps1 -Make d4`**: the same install, enable, remove, hash, build and session checks; ValidateSet adds
   `d4`.
 - **Key cache:** `docs/stock/d4_paths.txt` (the 38 racecraft paths of the 19 AI drivers; Alonso's 2 for the stock
