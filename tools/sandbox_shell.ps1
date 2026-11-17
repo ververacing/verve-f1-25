@@ -123,6 +123,13 @@ $hw = Join-Path $env:USERPROFILE 'Documents\My Games\F1 25\hardwaresettings\hard
 Set-Content (Join-Path $Out 'udp_settings.txt') -Value ((Select-String $hw -Pattern '<udp ' -ErrorAction SilentlyContinue | Select-Object -First 1).Line.Trim()) -Encoding utf8   # Tyler's choice (60 Hz since 2026-11-14); recorded, never changed
 $steps = Get-Content $Plan | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') } | ForEach-Object { $_.Trim() }
 if ($steps[0] -notmatch '^wait screen=splash') { throw 'the plan must start with `wait screen=splash <s>` (skipped-intro check)' }
+# start-of-run display check (supervisor, 2026-11-17): a run that ended without its end-of-run restore (a crash or a kill)
+# can leave the game's resolution fallback in Tyler's hardware settings. Same tool, same rule (resolution only, evidence
+# copy, verified); logged to display_fallback_start.txt. Anything it refuses is logged and left as it was (no new stop).
+$ds = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_display_restore.ps1') -Out $Out -LogName 'display_fallback_start.txt' -FallbackOnly 2>&1 | ForEach-Object { "$_" })
+$dsCode = $LASTEXITCODE
+if ($ds -match 'restored \(live equals') { Log 'display check at start: a fallback was left by an earlier run (crash or kill); restored before this run'; $ds | ForEach-Object { Log "  $_" } }
+elseif ($dsCode -ne 0) { Log "display check at start: not restored (code $dsCode): $($ds -join ' | ')" }
 $before = Snapshot
 # keep the before-snapshot outside the repo (it names save files) for a deferred check (tools/deferred_saves_check.ps1)
 $outFull = (Resolve-Path $Out).Path

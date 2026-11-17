@@ -13,7 +13,10 @@ Checks, in order, and exits 1 on the first hard failure:
 - game lock and test profiles: runs tools/cleanup_test_profiles.ps1, which clears a stale `swofty-game.lock.d` when no
   F1_25 or swofty process is running and deletes leftover test-* profiles. Fails if any test-* profile is still left.
 - settings: warns if UDP is off, lists how `hardware_settings_config.xml` changed since the last pre-flight, then keeps
-  this copy as the next reference (%LOCALAPPDATA%\verve-f1-25\settings-snapshots). Changes are reported, never undone.
+  this copy as the next reference (%LOCALAPPDATA%\verve-f1-25\settings-snapshots). Changes are reported, never undone,
+  with one exception (supervisor, 2026-11-17): if the only change is the game's exact 1024x768 resolution fallback (left
+  by a run that crashed or was killed before its end-of-run restore), tools/hw_display_restore.ps1 -FallbackOnly restores
+  it and the restore is printed.
 #>
 param(
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
@@ -48,6 +51,15 @@ if (Test-Path $cur) {
     . (Join-Path $PSScriptRoot 'hw_settings.ps1')
     if (Test-Path $HwReference) {
         $chg = @(Compare-HwValues $HwReference $cur)
+        if ($chg.Count) {
+            # the one exception: the exact 1024x768 fallback alone (the tool refuses anything else and leaves it as it is)
+            $dr = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_display_restore.ps1') -FallbackOnly 2>&1 | ForEach-Object { "$_" })
+            if ($LASTEXITCODE -eq 0 -and ($dr -match 'restored \(live equals')) {
+                'settings: the 1024x768 display fallback was left by a run that did not restore it (crash or kill); restored:'
+                $dr | ForEach-Object { "  $_" }
+                $chg = @(Compare-HwValues $HwReference $cur)
+            }
+        }
         if ($chg.Count) { "settings: $($chg.Count) value(s) differ from the reference (report to the supervisor; don't restore):"; $chg | ForEach-Object { "  $_" } }
         else { 'settings: values identical to the reference' }
     } else { "settings: no reference at $HwReference; ask the supervisor before making one" }
