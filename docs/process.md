@@ -216,7 +216,11 @@ standing version**:
      channel on 1.0.145 ("log_channels.tsv is for another build"), so the RaceStarts log is gone and start measures
      come from UDP only.
 6. **Non-game work.** It's fine while Tyler plays or a PAUSE is active: network and repo only, no Swofty commands, no
-   game-folder or Steam userdata reads. If a batch is running, it's done between races.
+   game-folder or Steam userdata reads. **Amended (supervisor, 2026-11-16, during V-1):** the review doesn't hold a
+   batch. It may run in the background WHILE a launch runs, as long as it starts no Swofty command, reads nothing
+   under the game folder or Steam userdata, and doesn't touch the runner's files (the batch folder, `state\`, the
+   capture). The next launch starts as normal. The `tyler` add-on cross-check still waits for a gap with no game or
+   launcher up. The review's docs PR merges between launches.
 7. **No action from a review without the supervisor's OK:** nothing installed, updated or enabled. The `tyler` profile
    is never touched; its add-on list may be read, read-only, when allowed. Nothing is posted outside the repo, and
    neither authors nor Swofty are contacted.
