@@ -5,6 +5,12 @@
 
 ## The launch
 
+**Precondition (supervisor, 2026-11-17).** Just before the pilot, run the read-only display query
+(Win32_VideoController's current resolution, and the monitor's availability). Run the pilot only if the desktop on the
+GPU's physical output reads 1920x1080 with the monitor online. If it reads 1024x768 (`docs/display_fallback.md`), don't
+run it; wait for another gap. The pass item below stays as written. Keep the query output local, and record only the
+reading, in generic wording.
+
 One stock Austria launch: two races, no add-on, not scored. It uses the Austria discovery plan, after the usual
 pre-flight.
 
