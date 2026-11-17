@@ -98,7 +98,8 @@ $profDir = Join-Path $env:LOCALAPPDATA 'Swofty\profiles'
 $tylerFile = Join-Path $profDir 'tyler.json'
 $expFile = Join-Path $profDir "$ExpProfile.json"
 $hashLog = Join-Path $out 'profile_hashes.txt'
-function H([string] $f) { if (Test-Path $f) { (Get-FileHash $f -Algorithm SHA256).Hash } else { 'MISSING' } }
+# not 'H': PowerShell's built-in alias h (Get-History) wins over a function of that name (16 Nov readback)
+function Sha256Of([string] $f) { if (Test-Path $f) { (Get-FileHash $f -Algorithm SHA256).Hash } else { 'MISSING' } }
 function IdState([string] $f, [string] $want) {
     # 'absent', 'disabled' or 'ENABLED': the state of one id in a profile's list (nothing else is read out)
     if (-not (Test-Path $f)) { return 'no profile' }
@@ -108,7 +109,7 @@ function IdState([string] $f, [string] $want) {
     return 'disabled'
 }
 function HashLine([string] $when) {
-    $l = "{0,-16} tyler {1}  {2} {3}  ({4} in tyler: {5}; in {2}: {6})" -f $when, (H $tylerFile), $ExpProfile, (H $expFile), $id, (IdState $tylerFile $id), (IdState $expFile $id)
+    $l = "{0,-16} tyler {1}  {2} {3}  ({4} in tyler: {5}; in {2}: {6})" -f $when, (Sha256Of $tylerFile), $ExpProfile, (Sha256Of $expFile), $id, (IdState $tylerFile $id), (IdState $expFile $id)
     Add-Content $hashLog $l -Encoding utf8
     "profiles: $l"
 }
@@ -123,7 +124,7 @@ foreach ($lid in $left) {
     "${tag}: leftover $lid from an earlier launch; removing it (exit $(AddonCall @('-Id', $lid, '-Uninstall') 'leftover_uninstall.txt'))"
 }
 HashLine 'before install'
-$tylerBefore = H $tylerFile
+$tylerBefore = Sha256Of $tylerFile
 $insCode = AddonCall @('-Folder', $folder) 'install.txt'
 HashLine 'after install'
 $expState = IdState $expFile $id
@@ -134,7 +135,7 @@ if ($insCode -ne 0 -or $expState -eq 'ENABLED' -or $tylerState -eq 'ENABLED') {
     "${tag}: install of $id failed or left it enabled (exit $insCode; $ExpProfile $expState, tyler $tylerState; install.txt); removing it, nothing launched"
     "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
     HashLine 'after uninstall'
-    if ((H $tylerFile) -ne $tylerBefore) { 'TYLER PROFILE CHANGED: tyler.json does not hash as before the install (profile_hashes.txt); stop and tell the supervisor'; exit 14 }
+    if ((Sha256Of $tylerFile) -ne $tylerBefore) { 'TYLER PROFILE CHANGED: tyler.json does not hash as before the install (profile_hashes.txt); stop and tell the supervisor'; exit 14 }
     exit 15
 }
 
@@ -161,7 +162,7 @@ if (Busy) {
 } else {
     "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
     HashLine 'after uninstall'
-    $tylerAfter = H $tylerFile
+    $tylerAfter = Sha256Of $tylerFile
     if ($tylerAfter -eq $tylerBefore) { Add-Content $hashLog 'tyler.json: restored (hash as before the install)' -Encoding utf8; 'tyler.json: hash as before the install' }
     else {
         $tylerRestored = $false
