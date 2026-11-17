@@ -1,6 +1,6 @@
 # S-1 design: a screen of the per-driver `ai_driver_config` families (DRAFT)
 
-**Status: DRAFT for the supervisor. Nothing runs.** Desk work from repo files only (no game, launcher or `swofty`
+**Status: DRAFT design; the supervisor's rulings (#181) are in [verve_s1_prereg.md](verve_s1_prereg.md), which supersedes §3 here. Nothing runs.** Desk work from repo files only (no game, launcher or `swofty`
 call). Paths are repo-relative. Nothing here is pre-registered; a prereg follows only if the supervisor approves the
 design.
 
@@ -106,7 +106,7 @@ From `tools/race_feel.py`, `tools/v1_check.py` and `tools/udp_parse.py`.
 - On 26566308:
   - B-0018 had 0 in 10 races.
   - The V-1 Austria discovery had 1 in 2 (4 / 12, lap 1).
-- Read with the EA spec enums as we remember them (not checked in this repo): 5 / 4 is a warning for a small collision, and 4 / 12 is a 3 s time penalty for ignoring yellow flags.
+- Read with the EA spec enums as we remember them (**not settled by the repo**; the prereg uses no PENA codes, see [verve_s1_prereg.md](verve_s1_prereg.md) §6): 5 / 4 is a warning for a small collision, and 4 / 12 is a 3 s time penalty for ignoring yellow flags.
 - No corner-cutting PENA ever appears for the AI, and LapData's cornerCuttingWarnings and currentLapInvalid never move for AI cars (Phase 0, 0 in 510k car-frames).
 - So penalties are a guard, never a primary. Contacts carry the "clean" signal.
 
