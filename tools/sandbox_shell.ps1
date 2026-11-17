@@ -529,6 +529,18 @@ $diff = foreach ($k in @($before.Keys) + @($after.Keys) | Select-Object -Unique)
 # always written, empty when nothing changed: a missing file means the check never ran
 Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 Remove-Item (Join-Path $snapDir "$snapId.json") -ErrorAction SilentlyContinue   # the check is done (supervisor: snapshots don't pile up)
+# display fallback (supervisor, 2026-11-16, after V-1 launch 7): if the ONLY change is the hardware settings'
+# graphics_card/resolution width/height (the game's 1024x768 fallback, most likely while the display slept), restore
+# those two values from Tyler's reference (tools/hw_display_restore.ps1), verify, log, and carry on. Anything else: exit 5.
+$resOnly = @($diff).Count -gt 0 -and @($diff | Where-Object { $_ -notmatch '^hw hardware_settings_config/graphics_card/resolution@(width|height): ' }).Count -eq 0
+if ($resOnly) {
+    Log "display fallback: $(@($diff) -join '; ')"
+    $dr = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_display_restore.ps1') -Out $Out 2>&1 | ForEach-Object { "$_" })
+    $drCode = $LASTEXITCODE
+    $dr | ForEach-Object { Log $_ }
+    if ($drCode -eq 0) { Log 'display fallback restored'; $diff = $null }
+    else { Log "display fallback: the restore failed (exit $drCode); treating it as SAVES CHANGED" }
+}
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
 if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
