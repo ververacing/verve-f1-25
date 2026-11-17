@@ -154,6 +154,10 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
 - The finish comes from LapData: the leader at position 1 with resultStatus 3, and **at least 18 AI with status 3**.
 - Track 17, difficulty 100, weather LOCKED, no pause cut, and gamedb = that launch's `gamedb_expected.txt` with a clean
   build check (check_applied: every op applied, or dropped only as equal to stock).
+- **Amendment (2026-11-16, after launch 1; validity tooling only, #162):** weather is checked per launch capture; a
+  non-dry race would invalidate its whole launch. It's stricter than per race, so it can only invalidate more. If a
+  launch ever reads NOT LOCKED, the supervisor is told before it's dropped, and may ask for a per-uid check. No measure,
+  band or decision rule changes.
 - The live window runs from lights out to the first AI finish, with the plausible-finish check.
 - Any player COLL or PENA from lights out is a FAIL.
 - An invalid race is dropped and listed. The launch keeps its other valid races, and there are no reruns inside a launch.
