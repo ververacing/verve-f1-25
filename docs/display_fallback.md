@@ -16,7 +16,10 @@ the two values back and verifies, before SAFE TO PLAY. Validity isn't affected: 
 - **Display query 1** (read-only, supervisor-approved, 2026-11-17 08:11 PT, nothing running): the Windows desktop on the
   GPU's physical output was itself at 1024x768, and that monitor read "off line". A virtual display adapter from a
   remote-desktop tool was also present, at its own resolution. So the game simply boots at the desktop's resolution.
-- **Best guess, UNVERIFIED until display query 2:** when the physical monitor goes off line (off or asleep), Windows
+- **Display query 2** (2026-11-17 09:13 PT, nothing running) read the same: the desktop on the physical output was still
+  at 1024x768 and the monitor still off line. It doesn't separate the guess from other causes, because the monitor never
+  came back online between the queries.
+- **Best guess, still UNVERIFIED:** when the physical monitor goes off line (off or asleep), Windows
   drops that output to 1024x768, and the game follows the desktop. It began between 19:52 and 20:29 PT on 2026-11-16.
 
 **Rulings (supervisor, 2026-11-17).** It's harmless: tests at 1024x768 are fine. There's no fix to the fallback, the
