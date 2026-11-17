@@ -28,7 +28,10 @@ screen). The bands come from the COMMITTED bands file docs/stock/s1_bands.json (
 missing or malformed. Secondaries (estimate, SE, p; never a decision) as the prereg's table, plus gain_t1, gain_lap1,
 laptime_sd_s and penalties (PENA per car, any code) for every factor.
 Validity per race: aionly_check per uid and the build check (v1_check), plus per launch: invalid.txt (the session
-check), check_applied's op count, the saves guard (SAVES CHANGED) and tyler.json (CHANGED / NOT RESTORED).
+check), check_applied's op count and tyler.json (CHANGED / NOT RESTORED). A tripped saves guard (SAVES CHANGED in
+transcript.txt) is a NOTE, not an invalidation (the supervisor's ruling on #182, as V-1's launch 7 stood): it is a
+safety stop in the runner (v1_run exits 5 and the batch halts), printed per launch and recorded in summary.json, and
+the launch's races stay in the analysis (and in --baseline). The smoke's rule 4 still names the saves guard.
 STALLS (reported, not invalidating): an AI car with < 1 m of LapData totalDistance gain in any 30 s window while not
 in the pit lane (pitStatus 0), from lights out to its own or the leader's finish, whichever is earlier; an AI car whose
 final LapData resultStatus isn't 3 (finished) also counts. More than one stalled race in a launch prints STOP (the
@@ -293,18 +296,24 @@ def build_problems(ld: Path, n_ops: int) -> list[str]:
 
 def launch_guard_problems(ld: Path, n_ops: int) -> list[str]:
     """Per-launch validity beyond v1_check's (prereg section 2): the session check's mark, the build check's op count,
-    the saves guard, tyler.json."""
+    tyler.json. The saves guard is NOT here: it is a note (saves_note), not a validity rule."""
     probs = []
     inv = ld / "invalid.txt"
     if inv.exists():
         probs.append(f"INVALID: the launch is marked invalid.txt ({(cc.text_of(inv).strip().splitlines() or ['?'])[0]})")
     probs += [f"INVALID: {p}" for p in build_problems(ld, n_ops)]
-    if "SAVES CHANGED" in cc.text_of(ld / "transcript.txt"):
-        probs.append("INVALID: saves: SAVES CHANGED (transcript.txt)")
     ph = cc.text_of(ld / "profile_hashes.txt")
     if re.search(r"tyler\.json: (NOT RESTORED|CHANGED)", ph):
         probs.append("INVALID: tyler.json changed (profile_hashes.txt)")
     return probs
+
+
+def saves_note(n: int, ld: Path) -> str | None:
+    """The supervisor's ruling on #182: a tripped saves guard is a safety stop, not a validity rule."""
+    if "SAVES CHANGED" in cc.text_of(ld / "transcript.txt"):
+        return (f"NOTE: saves guard tripped (SAVES CHANGED) in launch {n}: a safety stop, not a validity rule; reviewed "
+                f"by the supervisor (its races stay in the analysis)")
+    return None
 
 
 def tyler_ok(ld: Path) -> bool:
@@ -585,6 +594,7 @@ def run(batch: Path, gamedb: int | None, seed_arg: str | None, perms: int, allow
     stall_lines, stop = stall_summary(launch_data)
     odd = {n: len(L["races"]) for n, L in launch_data.items() if len(L["races"]) != RACES_PER_LAUNCH}
     untyler = [n for n, ld in complete.items() if not tyler_ok(ld)]
+    snotes = {n: x for n, ld in complete.items() if (x := saves_note(n, ld))}
     head = [f"S-1 check {batch}: seed {seed}, {len(complete)} launches, {len(valid)}/{len(races)} races valid, "
             f"{perms} permutations with the launch as the block ({res['perm_runtime_s']} s; parsing {parse_s:.0f} s)",
             f"  bands: {bands['path']} " + ", ".join(f"{m} +/-{bands['bands'][m]:g}" for m in BAND_MEASURES)]
@@ -592,6 +602,7 @@ def run(batch: Path, gamedb: int | None, seed_arg: str | None, perms: int, allow
              f"{'; '.join(r['reasons'])}" for r in dropped]
     if odd:
         head.append(f"  launches without {RACES_PER_LAUNCH} races: {odd}")
+    head += list(snotes.values())
     if untyler:
         head.append(f"  note: tyler.json has no 'restored' line in profile_hashes.txt for launch(es) {untyler}")
     if steps != sm.no_steps():
@@ -608,6 +619,7 @@ def run(batch: Path, gamedb: int | None, seed_arg: str | None, perms: int, allow
           "sensitivity": {"races_set_aside": n_sens, "factors": sens["factors"], "scored": False},
           "stalls": [{"launch": r["launch"], "race": r["race"], "uid": r["uid"], "stalls": r["stalls"]}
                      for r in races if r.get("stalls")], "stop_launches": stop,
+          "saves_notes": {str(n): x for n, x in snotes.items()},
           "dropped": [{"launch": r["launch"], "race": r["race"], "uid": r["uid"], "verdict": r["verdict"],
                        "reasons": r["reasons"]} for r in dropped], "report": lines}
     write_outputs(out, launch_data, assigns, js)
@@ -643,6 +655,9 @@ def run_baseline(batch: Path, gamedb: int | None, quiet: bool = False) -> int:
         L = vc.process_launch(n, ld, gamedb, TRACK, out, log=say, hook=race_hook)
         mark_launch(L, launch_guard_problems(ld, 0))
         launch_data[n] = L
+    snotes = {n: x for n, ld in launches.items() if (x := saves_note(n, ld))}
+    for x in snotes.values():
+        say(x)
     st = baseline_stats(launch_data)
     stall_lines, stop = stall_summary(launch_data)
     for ln in stall_lines:
@@ -669,7 +684,7 @@ def run_baseline(batch: Path, gamedb: int | None, quiet: bool = False) -> int:
           "races": [{"launch": r["launch"], "race": r["race"], "uid": r["uid"], "valid": r["valid"],
                      "verdict": r["verdict"], "coll_total": r.get("coll_total"), "stalls": r.get("stalls")}
                     for L in launch_data.values() for r in L["races"]],
-          "stop_launches": stop}
+          "stop_launches": stop, "saves_notes": {str(n): x for n, x in snotes.items()}}
     dest = batch / "s1_bands_proposed.json"
     dest.write_text(json.dumps(js, indent=1) + "\n", encoding="utf-8")
     say(f"  M_p {fnum(st['M_p'], 4)} (n {st['n_passes_made']}), M_h {fnum(st['M_h'], 2)} s (n {st['n_held_behind_s']}), "
@@ -1206,6 +1221,23 @@ def selftest() -> int:
             rc == 0 and js["scored"] and js["races_valid"] == 64 and len(prc) == 64 * 19
             and all(js["factors"][f]["decision"] for f in FACTORS) and txt.count("SENSITIVITY") == 6
             and "STOP: launch 1" in txt and js["sensitivity"]["races_set_aside"] == 64, f"rc {rc}")
+        tr5 = batch / "launch_5" / "transcript.txt"
+        keep5 = tr5.read_text(encoding="utf-8")
+        tr5.write_text(keep5.replace("saves unchanged (179 entries)", "SAVES CHANGED: stop the batch"), encoding="utf-8")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rcn = run(batch, None, None, 100, False)
+        jsn = json.loads((batch / "s1_check" / "summary.json").read_text(encoding="utf-8"))
+        note = ("NOTE: saves guard tripped (SAVES CHANGED) in launch 5: a safety stop, not a validity rule; reviewed by "
+                "the supervisor")
+        chk("a SAVES CHANGED launch is KEPT (64/64 races valid, launch 5's 4 included) with the NOTE printed and in "
+            "summary.json (the supervisor's ruling on #182)",
+            rcn == 0 and jsn["races_valid"] == 64 and note in buf.getvalue() and note in jsn["saves_notes"]["5"]
+            and not launch_guard_problems(batch / "launch_5", n_ops_of(batch / "launch_5"))
+            and sum(1 for r0 in csv.DictReader((batch / "s1_check" / "per_race.csv").open(encoding="utf-8"))
+                    if r0["launch"] == "5" and r0["valid"] == "1") == 4 * 19,
+            next((ln for ln in buf.getvalue().splitlines() if ln.startswith("NOTE")), "no NOTE line")[:90])
+        tr5.write_text(keep5, encoding="utf-8")
         part = tmpd / "partial"
         for n in (1, 2):
             shutil.copytree(batch / f"launch_{n}", part / f"launch_{n}")
