@@ -1,0 +1,3 @@
+﻿== 2026-11-17T06:09:37 reinstall_addon.ps1 -Id verve.c1-l01 -Uninstall (exit 0)
+removed verve.c1-l01
+uninstalled verve.c1-l01

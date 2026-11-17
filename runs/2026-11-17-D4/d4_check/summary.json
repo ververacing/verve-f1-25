@@ -1,0 +1,183 @@
+{
+ "batch": "runs\\2026-11-17-D4",
+ "launches": [
+  1,
+  2
+ ],
+ "races_total": 8,
+ "races_valid": 8,
+ "track": "17",
+ "gamedb": null,
+ "high": {
+  "1": [
+   "oscar_piastri",
+   "lewis_hamilton",
+   "yuki_tsunoda",
+   "george_russell",
+   "pierre_gasly",
+   "oliver_bearman",
+   "isack_hadjar",
+   "carlos_sainz-jr",
+   "nico_hulkenberg"
+  ],
+  "2": [
+   "oscar_piastri",
+   "lewis_hamilton",
+   "max_verstappen",
+   "andrea-kimi_antonelli",
+   "pierre_gasly",
+   "oliver_bearman",
+   "liam_lawson",
+   "alex_albon",
+   "nico_hulkenberg"
+  ]
+ },
+ "low": {
+  "1": [
+   "lando_norris",
+   "charles_leclerc",
+   "max_verstappen",
+   "andrea-kimi_antonelli",
+   "franco_colapinto",
+   "esteban_ocon",
+   "liam_lawson",
+   "alex_albon",
+   "gabriel_bortoleto"
+  ],
+  "2": [
+   "lando_norris",
+   "charles_leclerc",
+   "yuki_tsunoda",
+   "george_russell",
+   "franco_colapinto",
+   "esteban_ocon",
+   "isack_hadjar",
+   "carlos_sainz-jr",
+   "gabriel_bortoleto"
+  ]
+ },
+ "dropped": [],
+ "constants": {
+  "MOVE_M": 0.3,
+  "PASS_S": -0.05,
+  "NULL_S": 0.02,
+  "ROW_SLOPE": -0.109,
+  "N_LAUNCHES": 2,
+  "LEVELS": {
+   "high": "0.99",
+   "low": "0.05"
+  }
+ },
+ "verdict": "NULL",
+ "why": "|HIGH - LOW| < 0.02 s in both launches",
+ "pass_s": -0.05,
+ "null_s": 0.02,
+ "per_launch": {
+  "1": {
+   "primary": {
+    "measure": "reaction_s",
+    "races_valid": 4,
+    "races_total": 4,
+    "n_high": 9,
+    "n_low": 9,
+    "high_mean": 0.4756825963656108,
+    "low_mean": 0.46259523762596977,
+    "diff": 0.013087358739641008
+   },
+   "secondary": {
+    "passes_made": {
+     "measure": "passes_made",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": 0.4444444444444444,
+     "low_mean": 0.4722222222222222,
+     "diff": -0.02777777777777779
+    },
+    "passes_suffered": {
+     "measure": "passes_suffered",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": 0.5,
+     "low_mean": 0.3888888888888889,
+     "diff": 0.1111111111111111
+    },
+    "gain_lap1": {
+     "measure": "gain_lap1",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": -0.2777777777777778,
+     "low_mean": 0.3055555555555556,
+     "diff": -0.5833333333333334
+    }
+   },
+   "imbalance": {
+    "high_row_rs": 0.7955555555555556,
+    "low_row_rs": 0.7844444444444445,
+    "diff_row_rs": 0.011111111111111072,
+    "rows_win_s": -0.0012111111111111068
+   }
+  },
+  "2": {
+   "primary": {
+    "measure": "reaction_s",
+    "races_valid": 4,
+    "races_total": 4,
+    "n_high": 9,
+    "n_low": 9,
+    "high_mean": 0.4732685022883945,
+    "low_mean": 0.4561157160335117,
+    "diff": 0.017152786254882812
+   },
+   "secondary": {
+    "passes_made": {
+     "measure": "passes_made",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": 0.5,
+     "low_mean": 0.3611111111111111,
+     "diff": 0.1388888888888889
+    },
+    "passes_suffered": {
+     "measure": "passes_suffered",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": 0.4722222222222222,
+     "low_mean": 0.3611111111111111,
+     "diff": 0.1111111111111111
+    },
+    "gain_lap1": {
+     "measure": "gain_lap1",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_high": 9,
+     "n_low": 9,
+     "high_mean": 0.16666666666666666,
+     "low_mean": -0.25,
+     "diff": 0.41666666666666663
+    }
+   },
+   "imbalance": {
+    "high_row_rs": 0.7777777777777778,
+    "low_row_rs": 0.8022222222222222,
+    "diff_row_rs": -0.02444444444444438,
+    "rows_win_s": 0.0026644444444444376
+   }
+  }
+ },
+ "ignored_launches": [],
+ "secondary_mean_over_launches": {
+  "passes_made": 0.05555555555555555,
+  "passes_suffered": 0.1111111111111111,
+  "gain_lap1": -0.08333333333333337
+ }
+}

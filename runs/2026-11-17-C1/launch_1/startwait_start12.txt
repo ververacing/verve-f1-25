@@ -1,0 +1,2 @@
+udp start wait: lights out (LGOT) of race uid 9262800101207698457, capture past LGOT + 20 s (exit 0); 11 earlier race uid(s) excluded
+started uid 9262800101207698457

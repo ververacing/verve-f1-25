@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "verve.c1-l01",
+  "name": "Verve test C1 launch 01 (race_start calibration)",
+  "version": "0.0.1",
+  "author": "TC Verve",
+  "description": "Test-only addon for C-1 (docs/verve_c1_prereg.md), seed 2026111705, launch 1: all four ai_driver_config.race_start reaction bounds = one level per pinned driver (0.20 on 5, 0.35 on 4, 0.65 on 5 drivers; the seeded rotation, assignment.csv); 5 drivers incl. Alonso stay stock. 56 ops. Not for play.",
+  "license": "MIT",
+  "category": "ai",
+  "kind": [
+    "database"
+  ],
+  "compat": {
+    "game": "f1_25",
+    "game_builds": [
+      ">=26566308"
+    ],
+    "launcher": ">=1.9.34"
+  },
+  "requires": [
+    {
+      "id": "swofty.core",
+      "version": ">=0.2.13"
+    }
+  ],
+  "saves": {
+    "affects": false
+  },
+  "operations": {
+    "database": [
+      "db/c1.json"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+﻿start 1 2026-11-17T05:42:01 exit 0 uid 5092187218470270808 | udp start wait: lights out (LGOT) of race uid 5092187218470270808, capture past LGOT + 20 s (exit 0) | started uid 5092187218470270808
+start 2 2026-11-17T05:42:49 exit 0 uid 17118336613692456930 | udp start wait: lights out (LGOT) of race uid 17118336613692456930, capture past LGOT + 20 s (exit 0); 1 earlier race uid(s) excluded | started uid 17118336613692456930
+start 3 2026-11-17T05:43:36 exit 0 uid 1343656139630064514 | udp start wait: lights out (LGOT) of race uid 1343656139630064514, capture past LGOT + 20 s (exit 0); 2 earlier race uid(s) excluded | started uid 1343656139630064514
+start 4 2026-11-17T05:44:23 exit 0 uid 14710917351788189642 | udp start wait: lights out (LGOT) of race uid 14710917351788189642, capture past LGOT + 20 s (exit 0); 3 earlier race uid(s) excluded | started uid 14710917351788189642

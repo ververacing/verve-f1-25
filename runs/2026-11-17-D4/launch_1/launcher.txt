@@ -1,0 +1,2 @@
+﻿launcher before launch: 1.9.63
+launcher in game (loader.log): 1.9.63

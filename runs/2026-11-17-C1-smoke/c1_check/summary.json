@@ -1,0 +1,115 @@
+{
+ "batch": "%USERPROFILE%\\Documents\\verve-f1-25\\runs\\2026-11-17-C1-smoke",
+ "mode": "smoke",
+ "verdict": "SMOKE PASS",
+ "criteria": [
+  {
+   "name": "1. a new uid each start",
+   "ok": true,
+   "detail": "4 starts, 4 distinct uids; udp_starts.txt: 4 line(s), 4 exit 0"
+  },
+  {
+   "name": "2. the same grid in every start (LapData gridPosition)",
+   "ok": true,
+   "detail": "1 distinct grid(s)"
+  },
+  {
+   "name": "3. the player re-parked each start (driverStatus 0, not moving)",
+   "ok": true,
+   "detail": "parked in 4/4 starts; loader 'GARAGE: car 19 sent' lines: 2 (reported)"
+  },
+  {
+   "name": "4. start-only check: all starts PASS",
+   "ok": true,
+   "detail": "4/4 PASS"
+  },
+  {
+   "name": "5. a clean end with no finish needed",
+   "ok": true,
+   "detail": "plan done yes, quit sent yes, saves guard yes, cleanup.txt yes, post_run_check.txt yes, no @udpfinish yes"
+  }
+ ],
+ "starts": [
+  {
+   "launch": 1,
+   "start": 1,
+   "uid": "5092187218470270808",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 2,
+   "uid": "17118336613692456930",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 3,
+   "uid": "1343656139630064514",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.02,
+   "player_dstatus": {
+    "0": 1197
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  },
+  {
+   "launch": 1,
+   "start": 4,
+   "uid": "14710917351788189642",
+   "verdict": "PASS",
+   "reasons": [],
+   "max_gap_s": 0.03,
+   "player_dstatus": {
+    "0": 1196
+   },
+   "player_gain_m": 0.0,
+   "player_events": {
+    "COLL": [],
+    "PENA": []
+   },
+   "listed": 1
+  }
+ ],
+ "launch_problems": [],
+ "session_check": {
+  "1": {
+   "path": "live",
+   "note": "session ok uid 5092187218470270808: difficulty 100 track 17 weather 0"
+  }
+ },
+ "constants": {
+  "CUTOFF_S": 20.0,
+  "GAP_S": 5.0,
+  "MOVE_M": 0.3,
+  "SMOKE_STARTS": 4
+ }
+}

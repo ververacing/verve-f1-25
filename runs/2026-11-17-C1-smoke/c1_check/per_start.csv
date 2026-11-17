@@ -1,0 +1,5 @@
+launch,start,uid,verdict,reasons,finish_checks,max_gap_s,player_dstatus,player_gain_m,fastest_stock_reaction_s
+1,1,5092187218470270808,PASS,,not applicable (start-only),0.02,"{""0"": 1197}",0.0,0.3833
+1,2,17118336613692456930,PASS,,not applicable (start-only),0.03,"{""0"": 1197}",0.0,0.4017
+1,3,1343656139630064514,PASS,,not applicable (start-only),0.02,"{""0"": 1197}",0.0,0.3338
+1,4,14710917351788189642,PASS,,not applicable (start-only),0.03,"{""0"": 1196}",0.0,0.351
