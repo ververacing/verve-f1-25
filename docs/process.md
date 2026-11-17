@@ -207,7 +207,14 @@ standing version**:
 4. **Sundays:** a weekly roll-up in `docs/community/weekly/` with the top 5 learnings and what we changed.
 5. **URGENT** is anything that affects a running batch: an update to an add-on in verve-test or to the launcher, or a
    change in game-build support. The highest-priority watch item is a Swofty fix for `ai_drives_player` / the live_car
-   offsets on 26566308.
+   offsets on 26566308. Also on the watch list (supervisor, 2026-11-16), each reported as soon as it appears:
+   - **dromodf.skip-cutscenes**: a release that supports F1 25 1.0.145. 1.9.4, enabled in Tyler's profile, crashes
+     1.0.145, and the catalog has nothing newer.
+   - **jonno.smarter-ai-strategies**: a manifest whose `game_builds` covers 26566308. 1.3.2 still declares
+     `["=25251167"]`, despite its "Works on EA's latest F1 25 update" changelog.
+   - **Swofty's game-log channels**: a `log_channels.tsv` for 26566308. Without it the loader opens no game log
+     channel on 1.0.145 ("log_channels.tsv is for another build"), so the RaceStarts log is gone and start measures
+     come from UDP only.
 6. **Non-game work.** It's fine while Tyler plays or a PAUSE is active: network and repo only, no Swofty commands, no
    game-folder or Steam userdata reads. If a batch is running, it's done between races.
 7. **No action from a review without the supervisor's OK:** nothing installed, updated or enabled. The `tyler` profile
