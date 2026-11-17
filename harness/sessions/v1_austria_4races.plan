@@ -189,6 +189,10 @@ pad a 700
 @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
 @sleep 2
 @raw {"seq":0,"cmd":"ai_drives_player","args":{"on":true},"timeout_ms":30000}
+# V-1 guard (supervisor, 2026-11-17): at race 1's lights out the Session packet must read AI difficulty 100, track 17
+# (Austria) and weather 0, else the launch ends at once (invalid) and tools/v1_run.ps1 reruns it once. Race 1 only:
+# the restarts keep the settings.
+@sessioncheck 100 17 0
 # AI-only (spectator garage start, #134): the player car is parked in the garage and never finishes, so there is no
 # results screen. Quit when every AI car is done by UDP LapData, at most the leader's finish + 150 s (#134 ruling 4).
 @udpfinish 900 150
