@@ -158,6 +158,14 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
   non-dry race would invalidate its whole launch. It's stricter than per race, so it can only invalidate more. If a
   launch ever reads NOT LOCKED, the supervisor is told before it's dropped, and may ask for a per-uid check. No measure,
   band or decision rule changes.
+- **Amendment (2026-11-16, after launch 5, before any effect is seen; supervisor):** launcher or core change
+  mid-batch. The launcher is frozen at 1.9.59 until V-1 is scored. If it changes anyway (v1_run's launcher.txt says
+  LAUNCHER CHANGED, or the core version moves):
+  - stop before the next launch and tell the supervisor;
+  - unless the boot path breaks, the batch continues on the new version with the same seed and launch numbers, and the
+    primary analysis uses every valid launch;
+  - a sensitivity re-run on the launches before the change is reported beside it, not scored;
+  - if the new core breaks boot or gamedb, the launches already done stand, and the supervisor rules on the rest.
 - The live window runs from lights out to the first AI finish, with the plausible-finish check.
 - Any player COLL or PENA from lights out is a FAIL.
 - An invalid race is dropped and listed. The launch keeps its other valid races, and there are no reruns inside a launch.
