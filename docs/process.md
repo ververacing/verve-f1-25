@@ -254,6 +254,14 @@ standing version**:
 
 ## Rule amendments
 
+- **Launcher freeze during V-1** (supervisor, 2026-11-16, after the daily review found launcher 1.9.60 released and
+  1.9.61 with swofty.core 0.2.14 ready):
+  - No launcher update until V-1 is scored; Tyler's standing update OK is suspended until then.
+  - The reason: an update mid-batch changes swofty.core (1.9.61 adds a default-on `startup_intro` and turns on Live
+    State for 26566308).
+  - V-1 runs on 1.9.59. If it changes anyway, the prereg v3 amendment for a mid-batch launcher change applies.
+  - When 1.9.61 is released, that day's review reads its notes, and one launch checks our route on it before any batch
+    uses it.
 - **#118, the dry-weather lock** (`tools/weather_check.py --locked`):
   - **Original (15 Nov):** weather byte 0 in every race Session packet, and every race forecast sample at weather 0
     and rain% 0.

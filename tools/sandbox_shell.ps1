@@ -24,7 +24,17 @@ Plan file, one step per line ('#' comments):
                                  The race uids already ended in this run (finished or timed out) are passed as
                                  --exclude-uids, so after a @restart it waits for the new race; each is logged to
                                  <Out>/udp_races.txt
-    @restart [<garage s>]        restart the race while spectating (V-1 Phase 0, 2026-11-16): `pad start` (pause menu,
+    @sessioncheck <difficulty> <track> <weather> [<max s>]
+                                 (needs -Udp) V-1 guard (supervisor, 2026-11-17): the newest race session's Session
+                                 packet at lights out (tools/udp_session_check.py; the race uids already ended are
+                                 excluded) must read this AI difficulty, track id and weather; no race session within
+                                 <max s> (default 90) is exit 2. Writes <Out>/session_check.txt (verdict line, exit).
+                                 Only a mismatch (exit 6) stops the plan, as `sessioncheck: invalid: ...`: the normal
+                                 quit, guard and cleanup run, and tools/v1_run.ps1 reruns the launch once. Exit 2/3/4
+                                 (unverified) is logged (`session check UNVERIFIED: ...`) and the plan carries on (the
+                                 post-race aionly_check still validates each race); 5 (pause flag, game exit) is the
+                                 usual stop
+    @restart [<garage s>]       restart the race while spectating (V-1 Phase 0, 2026-11-16): `pad start` (pause menu,
                                  Restart Session on top), `pad a` (confirm dialog, defaults to Cancel), `pad up`,
                                  `pad a` (confirm); wait for garage_monitor_container (default 60 s, else the plan
                                  stops), 8 s settle, `pad a 700` (start the race). If the screen is still the garage 5 s
@@ -377,6 +387,45 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
                 $why = if (($watch -join ' ') -match 'game exited') { $script:gameGone = $true; 'game exited' } else { 'pause flag' }
                 Log "udpfinish: race $script:raceNo stopped at once ($why); stopping the plan"; $script:stop = "udpfinish: $why"
             }
+            return
+        }
+        if ($s -match '^@sessioncheck (\d+) (-?\d+) (\d+)(?: (\d+))?$') {
+            # V-1 guard (supervisor's ruling, 2026-11-17; launch 6 ran at difficulty 99, found 35 min later): at race 1's
+            # lights out, the live capture's Session packet must read this difficulty, track and weather. A mismatch ends
+            # the launch at once through the normal quit/guard/cleanup path below; tools/v1_run.ps1 reruns it once.
+            $wantD = $Matches[1]; $wantT = $Matches[2]; $wantW = $Matches[3]; $cMax = if ($Matches[4]) { $Matches[4] } else { '90' }
+            $cTxt = Join-Path $Out 'session_check.txt'
+            if (-not $Udp -or -not $udpBin) {
+                Set-Content $cTxt -Encoding utf8 -Value @('unverified: no -Udp capture to check', 'exit -')
+                Log 'session check UNVERIFIED: no -Udp capture to check; carrying on with the plan'; return
+            }
+            $cArgs = @('-I', (Join-Path $PSScriptRoot 'udp_session_check.py'), '--bin', $udpBin, '--difficulty', $wantD, '--track', $wantT,
+                       '--weather', $wantW, '--max-s', $cMax, '--stop-file', $pauseFlagPath)
+            if ($script:gamePid) { $cArgs += @('--game-pid', "$script:gamePid") }
+            if ($script:doneUids.Count) { $cArgs += @('--exclude-uids', ($script:doneUids -join ',')) }
+            Log "sessioncheck: want difficulty $wantD track $wantT weather $wantW at lights out (max $cMax s; excluding $($script:doneUids.Count) earlier race uid(s); ends at once on the pause flag or a game exit)"
+            # its own process, recorded in ours.csv (role 'udp session check', never a pause stop scope), as the watcher
+            $cp = Start-Process -FilePath $Python -ArgumentList ($cArgs | ForEach-Object { '"' + $_ + '"' }) -NoNewWindow -PassThru `
+                -RedirectStandardOutput $cTxt -RedirectStandardError "$cTxt.err"
+            $null = $cp.Handle   # PS 5.1: keep the handle, or ExitCode is empty after WaitForExit
+            Ours-AddId $cp.Id 'udp session check' | Out-Null
+            $cp.WaitForExit()
+            $cCode = $cp.ExitCode
+            $cOut = @(@(Get-Content $cTxt -ErrorAction SilentlyContinue) + @(Get-Content "$cTxt.err" -ErrorAction SilentlyContinue) | Where-Object { $_ } | ForEach-Object { "$_" })
+            $verdict = if ($cOut.Count) { $cOut[0] } else { '(no output)' }
+            if ($cCode -ne 0 -and $cCode -ne 5 -and $cCode -ne 6) { $verdict = "unverified: $verdict" }
+            # first line the verdict (session ok / invalid: / unverified: / stopped:), last line the exit code (read by v1_run)
+            Set-Content $cTxt -Encoding utf8 -Value (@($verdict) + @($cOut | Select-Object -Skip 1) + @("exit $cCode"))
+            Log "sessioncheck: exit $cCode`: $($cOut -join ' | ')"
+            if ($cCode -eq 0) { return }
+            if ($cCode -eq 6) { Log "SESSION CHECK FAILED: $verdict; ending the launch (quit, guard, cleanup)"; $script:stop = "sessioncheck: $verdict"; return }
+            if ($cCode -eq 5) {
+                $why = if (($cOut -join ' ') -match 'game exited') { $script:gameGone = $true; 'game exited' } else { 'pause flag' }
+                Log "sessioncheck: stopped at once ($why); stopping the plan"; $script:stop = "sessioncheck: $why"; return
+            }
+            # unverified (exit 2/3/4) never stops the launch (supervisor, review of #167): only a confirmed wrong value
+            # does. The post-race aionly_check still validates difficulty, track and weather per race.
+            Log "session check UNVERIFIED: $($verdict -replace '^unverified: ', '') (exit $cCode); carrying on with the plan"
             return
         }
         if ($s -match '^@restart(?: (\d+))?$') {

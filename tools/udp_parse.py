@@ -43,6 +43,9 @@ SESSION_TYPES = {0: "unknown", 1: "P1", 2: "P2", 3: "P3", 4: "short_practice", 5
                  8: "short_quali", 9: "one_shot_quali", 10: "sprint_shootout_1", 11: "sprint_shootout_2",
                  12: "sprint_shootout_3", 13: "short_sprint_shootout", 14: "one_shot_sprint_shootout", 15: "race",
                  16: "race_2", 17: "race_3", 18: "time_trial"}
+# Session packet body offsets read here (and by tools/udp_session_check.py: one source of truth): weather u8,
+# totalLaps u8, trackLength u16, sessionType u8, trackId i8, and the AI difficulty (u8 at 640, see parse())
+S_WEATHER, S_TOTAL_LAPS, S_TRACK_LENGTH, S_TYPE, S_TRACK, S_AI_DIFFICULTY = 0, 3, 4, 6, 7, 640
 
 # LapData car entry: 57 bytes. Offsets of the fields read here.
 LAP = struct.Struct("<IIHBHBHBHBfffBBBBBBBBBBBBBBBHHBfB")
@@ -145,11 +148,11 @@ def parse(path: Path, launch_offsets: list[float], uids: set[int] | None = None)
         n_cars = s["cars"] = lay["cars"]
         body = p[HEADER.size:]
         if pid == 1 and len(body) >= 9:
-            s["laps"], s["type"], s["track"] = body[3], body[6], struct.unpack_from("<b", body, 7)[0]
-            s["track_length"] = struct.unpack_from("<H", body, 4)[0]
+            s["laps"], s["type"], s["track"] = body[S_TOTAL_LAPS], body[S_TYPE], struct.unpack_from("<b", body, S_TRACK)[0]
+            s["track_length"] = struct.unpack_from("<H", body, S_TRACK_LENGTH)[0]
             # the AI difficulty: checked against the menu's 19 on three recordings, 2026-11-03. The first packets read 0
-            if len(body) > 640 and body[640]:
-                s["ai_difficulty"] = body[640]
+            if len(body) > S_AI_DIFFICULTY and body[S_AI_DIFFICULTY]:
+                s["ai_difficulty"] = body[S_AI_DIFFICULTY]
         elif pid == 2:
             need = n_cars * LAP.size + 2
             if len(body) != need:
