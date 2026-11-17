@@ -520,8 +520,9 @@ def launch_gamedb(ld: Path, gamedb: int | None) -> tuple[int | None, list[str]]:
     return gamedb, probs
 
 
-def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, log=print) -> dict:
-    """Every race of one launch: validity and, for the valid ones, the measures per roster driver."""
+def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, log=print, hook=None) -> dict:
+    """Every race of one launch: validity and, for the valid ones, the measures per roster driver. hook (tools/s1_check.py):
+    called as hook(race, session, car map, race_feel rows or None) for every race, before it is logged."""
     cap = ld / "raw" / "udp.bin"
     gamedb, build_probs = launch_gamedb(ld, gamedb)
     scan = scan_capture(cap)
@@ -541,6 +542,7 @@ def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, 
             verdict, reasons = "INVALID", reasons + build_probs
         race = {"launch": n, "race": k, "uid": str(uid), "verdict": verdict, "valid": verdict == "PASS",
                 "reasons": reasons, "drivers": {}, "info": {}}
+        rows_rf = None
         if race["valid"]:
             st = start_measures(d, ai, s.get("grid_order", "spec"))
             rows_rf, _ = rf.analyse(cap, uid=uid, sessions=sessions)
@@ -553,6 +555,8 @@ def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, 
                 v["gain_lap1"] = g - v["_l1_pos"] if g and v.get("_l1_pos") else None
                 v["car"] = c
                 race["drivers"][drv] = v
+        if hook is not None:
+            hook(race, s, cmap, rows_rf)
         log(f"  launch {n} race {k} uid {uid}: {verdict}" + (f" ({'; '.join(reasons)})" if reasons else ""))
         races.append(race)
     return {"launch": n, "races": races, "grids": [r["drivers"] and tuple(sorted((v["grid"], dv) for dv, v in
@@ -562,11 +566,13 @@ def process_launch(n: int, ld: Path, gamedb: int | None, track: str, out: Path, 
 
 # ==================================================================================================== the analysis
 
-def launch_tables(launch_data: dict[int, dict]) -> dict:
+def launch_tables(launch_data: dict[int, dict], measures: dict | None = None) -> dict:
     """{measure: {launch: {driver: (launch mean, centred value or None)}}} after grid-side residualisation of the
-    start measures. launch_data[L] = {"races": [{"valid", "drivers": {driver: {measure: value, "side"}}}]}."""
+    start measures. launch_data[L] = {"races": [{"valid", "drivers": {driver: {measure: value, "side"}}}]}.
+    measures: default MEASURES (tools/s1_check.py passes its own)."""
+    measures = MEASURES if measures is None else measures
     side_mean = {}
-    for m, (_, start, _) in MEASURES.items():
+    for m, (_, start, _) in measures.items():
         if start:
             by = defaultdict(list)
             for L in launch_data.values():
@@ -577,7 +583,7 @@ def launch_tables(launch_data: dict[int, dict]) -> dict:
                                 by[v["side"]].append(v[m])
             side_mean[m] = {k: statistics.fmean(x) for k, x in by.items()}
     out = {}
-    for m, (_, start, _) in MEASURES.items():
+    for m, (_, start, _) in measures.items():
         means = {}
         for n, L in launch_data.items():
             vals = defaultdict(list)

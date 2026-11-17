@@ -8,6 +8,9 @@ Usage:
     powershell -File tools/v1_run.ps1 -Make d4 -Launch <n> -Batch runs/<date>-D4 -Seed <int> [-Plan <plan>]
     powershell -File tools/v1_run.ps1 -Make c1 -Launch <n> -Batch runs/<date>-C1 -Seed <int> [-Plan <plan>]
     powershell -File tools/v1_run.ps1 -StockSmoke -Launch 1 -Batch runs/<date>-C1-smoke [-Plan <plan>]
+    powershell -File tools/v1_run.ps1 -Make s1 -Launch <n> -Batch runs/<date>-S1 -Seed 2026111706 [-Levels <levels.json>]
+    powershell -File tools/v1_run.ps1 -Make s1 -Smoke -Launch 1 -Batch runs/<date>-S1-smoke -Seed 2026111707 [-Levels <levels.json>]
+    powershell -File tools/v1_run.ps1 -StockSmoke -Launch <1|2> -Batch runs/<date>-S1-baseline -Plan harness\sessions\v1_austria_4races.plan -LaunchMinutes 80
     (-IsRetry is set only by v1_run itself, on its one rerun after a failed session check; see 10.)
 
 -Make v1 (the default) is V-1. -Make d1 is D1 (docs/verve_d1_d2_prereg.md): step 2 calls tools/d1_make.py instead, the
@@ -16,6 +19,15 @@ add-on is gen\verve.d1-L<LL> with the id verve.d1-l<LL>, and every other step is
 are ignored for d1 and d4 (they write no maps; a note says so). Below, verve.v1-* reads verve.d1-* / verve.d4-* for them.
 -Make c1 is C-1 (docs/verve_c1_prereg.md), the same with tools/c1_make.py, gen\verve.c1-L<LL> and verve.c1-l<LL>; its plan
 defaults to harness\sessions\c1_austria_20starts.plan (20 start-only starts, `@startwait`) and -LaunchMinutes to 40.
+-Make s1 is S-1 (docs/verve_s1_prereg.md), the same with tools/s1_make.py, gen\verve.s1-L<LL> and verve.s1-l<LL> (the V-1
+4-race plan and 80 minutes by default). -Levels <file> passes `--levels <file>` to s1_make (the stepped levels after a
+failed smoke; recorded in gen\levels.json and arm.txt); -Smoke passes `--smoke` (the extremes validity smoke: s1_make
+refuses any seed but 2026111707 and any launch but 1; the plan defaults to harness\sessions\s1_smoke_2races.plan and
+-LaunchMinutes to 45; checked by tools/s1_check.py --smoke). Both are ignored, with a note, for any other -Make.
+The S-1 STOCK BASELINE is -StockSmoke with an explicit `-Plan harness\sessions\v1_austria_4races.plan -LaunchMinutes 80`:
+an explicit -Plan and -LaunchMinutes are always taken as given (C-1's 4-start plan and 16 minutes are only the defaults
+when they're left out), and everything else is the stock smoke below (no add-on, the build check 56 + 0; checked by
+tools/s1_check.py --baseline). Its udp_starts line just reads "none (no @startwait ran)": the V-1 plan has none.
 -StockSmoke is C-1's stock smoke test: the plan (default harness\sessions\c1_smoke_4starts.plan; -LaunchMinutes 16)
 runs with NO add-on: steps 2, 5 and 7 (make, install, uninstall) are skipped, -Seed and -Make aren't needed (ignored),
 and every other step runs as below: the refusals, the leftover removal, the profile hashes (trivially unchanged), the
@@ -74,16 +86,18 @@ param(
     [string] $Python = 'python',
     [int] $SkippedIntroS = 40,
     [switch] $IsRetry,   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
-    [ValidateSet('v1', 'd1', 'd4', 'c1')] [string] $Make = 'v1',   # which generator: v1_make.py (V-1), d1_make.py (D1), d4_make.py (D4) or c1_make.py (C-1)
-    [switch] $StockSmoke   # C-1's stock smoke test: the plan with NO add-on (no make, no install); every other check runs
+    [ValidateSet('v1', 'd1', 'd4', 'c1', 's1')] [string] $Make = 'v1',   # which generator: v1_make.py (V-1), d1_make.py (D1), d4_make.py (D4), c1_make.py (C-1) or s1_make.py (S-1)
+    [switch] $StockSmoke,   # C-1's stock smoke test: the plan with NO add-on (no make, no install); every other check runs
+    [string] $Levels = '',   # -Make s1 only: s1_make --levels <file> (the stepped levels after a failed smoke)
+    [switch] $Smoke   # -Make s1 only: s1_make --smoke (S-1's extremes validity smoke, seed 2026111707, launch 1)
 )
 $ErrorActionPreference = 'Stop'
 if (-not $StockSmoke -and -not $PSBoundParameters.ContainsKey('Seed')) { throw '-Seed is required (except with -StockSmoke)' }
 if (-not $Plan) {
-    $Plan = if ($StockSmoke) { 'harness\sessions\c1_smoke_4starts.plan' } elseif ($Make -eq 'c1') { 'harness\sessions\c1_austria_20starts.plan' } else { 'harness\sessions\v1_austria_4races.plan' }
+    $Plan = if ($StockSmoke) { 'harness\sessions\c1_smoke_4starts.plan' } elseif ($Make -eq 'c1') { 'harness\sessions\c1_austria_20starts.plan' } elseif ($Make -eq 's1' -and $Smoke) { 'harness\sessions\s1_smoke_2races.plan' } else { 'harness\sessions\v1_austria_4races.plan' }
 }
 if (-not $PSBoundParameters.ContainsKey('LaunchMinutes')) {
-    if ($StockSmoke) { $LaunchMinutes = 16 } elseif ($Make -eq 'c1') { $LaunchMinutes = 40 }
+    if ($StockSmoke) { $LaunchMinutes = 16 } elseif ($Make -eq 'c1') { $LaunchMinutes = 40 } elseif ($Make -eq 's1' -and $Smoke) { $LaunchMinutes = 45 }
 }
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
 $now = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
@@ -136,6 +150,14 @@ if ($Make -eq 'v1') {
     $mk += @('--amp', "$Amp")
     if ($NoUncapped) { $mk += '--no-uncapped' }
 } elseif (-not $IsRetry -and ($PSBoundParameters.ContainsKey('Amp') -or $NoUncapped)) { "${tag}: note: -Amp/-NoUncapped are ignored for -Make $Make ($($Make.ToUpper()) writes no maps)" }
+$s1Note = ''
+if ($Make -eq 's1') {
+    if ($Levels) {
+        if (-not (Test-Path $Levels)) { "${tag}: no levels file $Levels; nothing installed or launched"; exit 15 }
+        $mk += @('--levels', (Resolve-Path $Levels).Path); $s1Note += ", levels $Levels"
+    }
+    if ($Smoke) { $mk += '--smoke'; $s1Note += ', extremes smoke' }
+} elseif (-not $IsRetry -and ($Levels -or $Smoke)) { "${tag}: note: -Levels/-Smoke are ignored for -Make $Make (S-1 only)" }
 $ErrorActionPreference = 'Continue'
 & $Python @mk *> (Join-Path $out "${Make}_make.txt")
 $mkCode = $LASTEXITCODE
@@ -144,7 +166,7 @@ $folder = Join-Path $gen "verve.$Make-L$ll"
 if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: ${Make}_make failed (exit $mkCode, ${Make}_make.txt); nothing installed or launched"; exit 15 }
 $id = (Get-Content (Join-Path $folder 'swofty.json') -Raw | ConvertFrom-Json).id
 if ($id -ne "verve.$Make-l$ll") { "${tag}: the generated add-on id is '$id', not verve.$Make-l$ll; nothing installed or launched"; exit 15 }
-$armText = if ($Make -ne 'v1') { "$($Make.ToUpper()) seed $Seed launch $Launch, add-on $id, $Plan$retryNote" } else { "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote" }
+$armText = if ($Make -ne 'v1') { "$($Make.ToUpper()) seed $Seed launch $Launch, add-on $id$s1Note, $Plan$retryNote" } else { "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote" }
 Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value $armText
 "${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan$retryNote"
 }
@@ -170,11 +192,11 @@ function HashLine([string] $when) {
     "profiles: $l"
 }
 if ($id -and (IdState $tylerFile $id) -eq 'ENABLED') { "${tag}: tyler lists $id ENABLED; never removed from Tyler's setup, so not installing"; exit 15 }
-# a verve.v1-l*, verve.d1-l*, verve.d4-l* or verve.c1-l* add-on that an earlier launch left installed (its uninstall
+# a verve.v1-l*, verve.d1-l*, verve.d4-l*, verve.c1-l* or verve.s1-l* add-on that an earlier launch left installed (its uninstall
 # deferred or failed): ours, remove it first (any kind, whatever -Make this launch uses; -StockSmoke too)
 $left = @()
 if (Test-Path $expFile) {
-    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.(v1|d1|d4|c1)-l\d+$' })
+    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.(v1|d1|d4|c1|s1)-l\d+$' })
 }
 foreach ($lid in $left) {
     if ((IdState $tylerFile $lid) -eq 'ENABLED') { "${tag}: leftover $lid is ENABLED in tyler; not touching it; not launching"; exit 15 }
@@ -245,7 +267,7 @@ if (-not $id) {
     $who = (@(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) | ForEach-Object { "$($_.ProcessName) $($_.Id)" }) -join ', '
     Set-Content (Join-Path $out 'uninstall_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "reason: running as the launch ended: $who",
         "next: with F1 25, the launcher and swofty closed: powershell -File tools/reinstall_addon.ps1 -Id $id -Uninstall, then compare tyler.json's hash with profile_hashes.txt ('before install')",
-        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l*, verve.d1-l*, verve.d4-l* or verve.c1-l* in verve-test)')
+        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l*, verve.d1-l*, verve.d4-l*, verve.c1-l* or verve.s1-l* in verve-test)')
     "ADD-ON LEFT INSTALLED: $id (a disabled entry in every profile); a game or Swofty process is running ($who); see uninstall_deferred.txt"
 } else {
     "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
@@ -267,7 +289,7 @@ $smokeAddon = $false   # -StockSmoke: a verve test add-on in the run's addons.js
 if ($id) {
     $lines += if ((Test-Path $aj) -and ((Get-Content $aj -Raw) -match [regex]::Escape($id))) { "addons.json names ${id}: yes" } else { "addons.json names ${id}: NO (the run may not have had the add-on)" }
 } else {
-    $smokeAddon = (Test-Path $aj) -and ((Get-Content $aj -Raw) -match 'verve\.(v1|d1|d4|c1)-l\d+')
+    $smokeAddon = (Test-Path $aj) -and ((Get-Content $aj -Raw) -match 'verve\.(v1|d1|d4|c1|s1)-l\d+')
     $lines += if (-not (Test-Path $aj)) { 'addons.json names a verve test add-on: unknown (no addons.json)' } elseif ($smokeAddon) { 'addons.json names a verve test add-on: YES (the stock smoke must have none)' } else { 'addons.json names a verve test add-on: no (stock smoke, as expected)' }
 }
 $llog = Join-Path $out 'raw\loader.log'
@@ -318,7 +340,8 @@ if (Test-Path $us) { Get-Content $us | ForEach-Object { "udp_starts: $_" } } els
 # equal-to-stock writes the build drops varies (2 of 4 at seed 1 launch 1), so each launch gets its own expected
 # gamedb count (gamedb_expected.txt, read by v1_check). Offline: every path is in the 26566308 key cache, no swofty
 # (D1's 76 race_start paths once check_applied -PrefillOnly docs/stock/d1_paths.txt has filled it; D4's 38 racecraft
-# curves once docs/stock/d4_paths.txt has: those are key-checked only, a curve's value isn't logged).
+# curves once docs/stock/d4_paths.txt has: those are key-checked only, a curve's value isn't logged; S-1's 114 paths once
+# docs/stock/s1_paths.txt has, its two curves key-checked only).
 $buildOk = $true
 if (-not $id) {
     # -StockSmoke: no add-on, so no ops; the build check is the baseline count and no verve test add-on in the run
@@ -358,6 +381,8 @@ if ($scFailed) {
         '-SkippedIntroS', "$SkippedIntroS", '-IsRetry', '-Make', $Make)
     if ($NoUncapped) { $re += '-NoUncapped' }
     if ($StockSmoke) { $re += '-StockSmoke' }
+    if ($Levels) { $re += @('-Levels', $Levels) }
+    if ($Smoke) { $re += '-Smoke' }
     & powershell @re
     exit $LASTEXITCODE
 }
