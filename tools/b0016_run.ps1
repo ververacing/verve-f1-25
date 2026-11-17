@@ -75,7 +75,7 @@ if ($LowGraphics) { $shellArgs += '-LowGraphics' }   # only when set: the shell 
 $hwBackCode = 0
 try {
 powershell @shellArgs |
-    ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored' }
+    ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored|display fallback acted after a swap-back' }
 $code = $LASTEXITCODE
 } finally {
     # safety net for every exit (the shell killed or crashed before its own swap-back): only this race's swap (tagged

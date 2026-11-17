@@ -172,7 +172,7 @@ if ($LowGraphics) { $shellArgs += '-LowGraphics' }   # only when set: the shell 
 $hwBackCode = 0
 try {
 powershell @shellArgs |
-    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored' }
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored|display fallback acted after a swap-back' }
 $code = $LASTEXITCODE
 } finally {
     # safety net for every exit (the shell killed or crashed before its own swap-back): only this launch's swap

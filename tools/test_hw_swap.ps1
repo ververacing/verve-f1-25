@@ -314,6 +314,68 @@ Check 'game exit write: the swap-back after the game exited gives Tyler''s refer
 # and nothing comes after it: the game's exit write came BEFORE the restore, so the restore is the last write
 Check 'game exit write: the game''s write was not left behind (the restore came after it)' (-not (HwSameBytes ([IO.File]::ReadAllBytes($c.Live)) $gameBytes))
 
+
+# ---- 8c. the swap and the display fallback (#168, tools/hw_display_restore.ps1) on one run, in the shell's order ----
+$dr = Join-Path $tools 'hw_display_restore.ps1'
+$drLabel = if (Test-Path $dr) { 'hw_display_restore.ps1' } else { 'a stub of hw_display_restore.ps1 (not in this tree yet)' }
+function Display-Step($c, [string] $runDir) {
+    # the guard's display-fallback step as sandbox_shell runs it: only for a hardware diff (Tyler's values before the
+    # launch vs after) of resolution width/height alone
+    $diff = @(Compare-HwValues $c.Ref $c.Live)
+    $resOnly = $diff.Count -gt 0 -and -not @($diff | Where-Object { $_ -notmatch '^hw hardware_settings_config/graphics_card/resolution@(width|height): ' }).Count
+    if (-not $resOnly) { return @{ Ran = $false; Code = 0; Out = @("not entered ($($diff.Count) change(s))") } }
+    if (Test-Path $dr) {
+        $o = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $dr -Out $runDir -File $c.Live -Reference $c.Ref -SnapDir (Join-Path $c.Dir 'evidence') -NoProcessCheck 2>&1 | ForEach-Object { "$_" })
+        return @{ Ran = $true; Code = $LASTEXITCODE; Out = $o }
+    }
+    # the stub: width and height back from the reference by an in-place edit, and its display_fallback.txt
+    $rv = Get-HwValues $c.Ref; $txt = [IO.File]::ReadAllText($c.Live)
+    foreach ($a in 'width', 'height') { $txt = [regex]::Replace($txt, "(<resolution\b[^>]*\b$a="")[^""]*", "`${1}$($rv["hw hardware_settings_config/graphics_card/resolution@$a"])") }
+    [IO.File]::WriteAllText($c.Live, $txt, $enc)
+    Set-Content (Join-Path $runDir 'display_fallback.txt') -Encoding utf8 -Value 'display fallback restored (live equals the reference by value)'
+    @{ Ran = $true; Code = 0; Out = @('display fallback restored (stub)') }
+}
+# (1) the game quits with its 1024x768 fallback in its own layout; the swap-back alone restores, the fallback finds nothing
+$c = New-Case 'swap-and-fallback'
+Put $c.Live (Make-Xml $base 'a'); Put $c.Ref (Make-Xml $base 'b')
+$orig = Sha $c.Live
+$run = Join-Path $c.Dir 'run'; New-Item -ItemType Directory -Force $run | Out-Null
+Swap $c @('-In', '-Tag', $run) | Out-Null
+$st = State $c
+$g = Game-Layout $c.Live
+$g = [regex]::Replace($g, '(<resolution\b[^>]*\bwidth=")[^"]*', '${1}1024'); $g = [regex]::Replace($g, '(<resolution\b[^>]*\bheight=")[^"]*', '${1}768')
+Put $c.Live $g
+$fb = @(Compare-HwValues $st.preset $c.Live)
+Check 'swap + fallback: the game''s exit write is the preset with a 1024x768 fallback, in its own layout' ($fb.Count -eq 2 -and ($fb -join ' ') -match "resolution@width: '1280' -> '1024'" -and (Sha $c.Live) -ne $st.presetSha)
+$r = Swap $c @('-Back', '-Tag', $run)
+$d1 = Display-Step $c $run
+$a1 = Swap $c @('-AfterGuard', '-Tag', $run)
+Check "swap + fallback: the swap-back alone gives Tyler's reference by value AND his SHA-256; the display step ($drLabel) finds nothing to do" ($r.Code -eq 0 -and -not @(Compare-HwValues $c.Ref $c.Live).Count -and (Sha $c.Live) -eq $orig -and -not $d1.Ran -and -not (Test-Path (Join-Path $run 'display_fallback.txt'))) "back $($r.Code); display: $($d1.Out -join ' / ')"
+if (Test-Path $dr) {
+    $o = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $dr -File $c.Live -Reference $c.Ref -SnapDir (Join-Path $c.Dir 'evidence') -NoProcessCheck 2>&1 | ForEach-Object { "$_" })
+    Check 'swap + fallback: hw_display_restore.ps1 itself, run anyway, says nothing to do and writes nothing' ($LASTEXITCODE -eq 0 -and "$o" -match 'nothing to do' -and (Sha $c.Live) -eq $orig) "$o"
+}
+Check 'swap + fallback: no "display fallback acted after a swap-back" line when only the swap-back acted' ($a1.Code -eq 0 -and -not ($a1.Out | Where-Object { $_ -match 'display fallback acted after a swap-back' }))
+# (2) both act: something writes 1024x768 again after the swap-back (simulated), so the fallback edits too
+$c = New-Case 'both-act'
+Put $c.Live (Make-Xml $base 'a'); Put $c.Ref (Make-Xml $base 'a')
+$run = Join-Path $c.Dir 'run'; New-Item -ItemType Directory -Force $run | Out-Null
+Swap $c @('-In', '-Tag', $run) | Out-Null
+Swap $c @('-Back', '-Tag', $run) | Out-Null
+$t2 = [IO.File]::ReadAllText($c.Live)
+$t2 = [regex]::Replace($t2, '(<resolution\b[^>]*\bwidth=")[^"]*', '${1}1024'); $t2 = [regex]::Replace($t2, '(<resolution\b[^>]*\bheight=")[^"]*', '${1}768')
+[IO.File]::WriteAllText($c.Live, $t2, $enc)
+$d2 = Display-Step $c $run
+$a2 = Swap $c @('-AfterGuard', '-Tag', $run)
+Check "both act: the display step ($drLabel) restores width/height after the swap-back" ($d2.Ran -and $d2.Code -eq 0 -and -not @(Compare-HwValues $c.Ref $c.Live).Count) "$($d2.Out -join ' / ')"
+Check 'both act: hw_swap -AfterGuard logs its own line "display fallback acted after a swap-back" (output and hw_swap.log)' (@($a2.Out | Where-Object { $_ -match '^display fallback acted after a swap-back: ' }).Count -eq 1 -and (Get-Content $c.Log -Raw) -match 'display fallback acted after a swap-back') "$($a2.Out -join ' / ')"
+$a3 = Swap $c @('-AfterGuard', '-Tag', 'another-run')
+Check "both act: -AfterGuard for another run's tag stays silent" (-not ($a3.Out | Where-Object { $_ }))
+# the shell's order: swap-back (finally) -> after-snapshot -> display fallback (when #168 is in) -> -AfterGuard
+$sh = Get-Content (Join-Path $tools 'sandbox_shell.ps1') -Raw
+$iBack = $sh.IndexOf('$hwSwap -Back'); $iAfter = $sh.IndexOf('$after = Snapshot'); $iGuard = $sh.IndexOf('$hwSwap -AfterGuard'); $iRes = $sh.IndexOf('hw_display_restore.ps1')
+Check 'sandbox_shell: swap-back, then the after-snapshot, then the display fallback (if present), then -AfterGuard' ($iBack -gt 0 -and $iBack -lt $iAfter -and $iAfter -lt $iGuard -and ($iRes -lt 0 -or ($iAfter -lt $iRes -and $iRes -lt $iGuard))) "back $iBack, after $iAfter, fallback $iRes, afterguard $iGuard"
+
 # ---- 9. an interrupted run: an exception between in and back still restores (the runners' try/finally) ----
 $c = New-Case 'interrupted'
 Put $c.Live (Make-Xml $base 'a'); Put $c.Ref (Make-Xml $base 'a')
@@ -342,7 +404,7 @@ foreach ($name in 'v1_run.ps1', 'b0016_run.ps1', 'sandbox_shell.ps1') {
         Where-Object { $_.Finally -and $_.Finally.Extent.Text -match 'hw_swap\.ps1''?\)? -Back|\$hwSwap -Back' -and $_.Body.Extent.Text -match $inner })
     Check "${name}: the launch sits in a try whose finally runs hw_swap -Back" ($tries.Count -eq 1)
     # every hw_swap call sits inside an `if ($LowGraphics)` (off by default: a [switch] with no default value)
-    $calls = @($ast.FindAll({ param($n) $n -is [Management.Automation.Language.CommandAst] -and $n.Extent.Text -match 'hw_swap\.ps1|\$hwSwap' -and $n.Extent.Text -match '-(In|Back)\b' }, $true))
+    $calls = @($ast.FindAll({ param($n) $n -is [Management.Automation.Language.CommandAst] -and $n.Extent.Text -match 'hw_swap\.ps1|\$hwSwap' -and $n.Extent.Text -match '-(In|Back|AfterGuard)\b' }, $true))
     $unguarded = @($calls | Where-Object {
         $q = $_.Parent; $g = $false
         while ($q) { if ($q -is [Management.Automation.Language.IfStatementAst] -and $q.Clauses[0].Item1.Extent.Text -match '^\$LowGraphics$') { $g = $true; break }; $q = $q.Parent }

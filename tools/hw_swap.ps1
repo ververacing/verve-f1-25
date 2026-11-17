@@ -19,6 +19,9 @@ Usage:
     powershell -File tools/hw_swap.ps1 -PauseGate
         tools/safe_to_play.ps1: -Back, printing one line only on failure: "WAIT: URGENT: message the supervisor now: <reason>".
     powershell -File tools/hw_swap.ps1 -Status
+    powershell -File tools/hw_swap.ps1 -AfterGuard -Tag <run folder>
+        The shell, after its saves guard: one line 'display fallback acted after a swap-back' if this run's swap-back
+        restored Tyler's file AND the display fallback (<run>\display_fallback.txt) also edited it; else silent.
     powershell -File tools/hw_swap.ps1 -Preview -Source <copy.xml> [-OutFile <preset.xml>]
         The preset of a COPY, with the edit log; nothing live is read or written.
 
@@ -41,6 +44,7 @@ param(
     [switch] $PauseGate,
     [switch] $Status,
     [switch] $Preview,
+    [switch] $AfterGuard,
     [string] $Tag = '',
     [string] $Log = '',
     [string] $Live = '',
@@ -386,6 +390,18 @@ function Invoke-HwMain {
             "WAIT: URGENT: message the supervisor now: Tyler's hardware settings are NOT restored (the low-graphics test preset is still live; hw_swap exit ${r}: $(($last -replace '^\S+ ', '').Trim()))"
             return 1
         }
+        if ($AfterGuard) {
+            # the shell, after its saves guard: did this run's swap-back AND the display fallback (tools/hw_display_restore.ps1,
+            # which writes <run>\display_fallback.txt) both act on Tyler's file? Normally the swap-back alone restores it
+            # and the fallback finds nothing to do; both acting is logged as its own line for the supervisor
+            $st = Read-HwState
+            if (-not $st -or -not $Tag -or $st.tag -ne $Tag -or $st.active -or $st.restoredWhy -ne 'swap-back') { return 0 }
+            $df = Join-Path $Tag 'display_fallback.txt'
+            if ((Test-Path -LiteralPath $df) -and ((Get-Content -LiteralPath $df -Raw) -match 'display fallback restored')) {
+                HwSay "display fallback acted after a swap-back: the swap-back restored Tyler's file (sha $($st.backupSha.Substring(0, 12))), then the display fallback also set resolution width/height back (display_fallback.txt); report both to the supervisor"
+            }
+            return 0
+        }
         if ($Status) {
             $st = Read-HwState
             if (-not $st) { 'no swap on record'; return 0 }
@@ -408,7 +424,7 @@ function Invoke-HwMain {
     }
 }
 
-if ($In -or $Back -or $Recover -or $PauseGate -or $Status -or $Preview) {
+if ($In -or $Back -or $Recover -or $PauseGate -or $Status -or $Preview -or $AfterGuard) {
     try { $code = Invoke-HwMain } catch {
         HwSay "ERROR: $($_.Exception.Message)"
         if ($PauseGate) { "WAIT: URGENT: message the supervisor now: Tyler's hardware settings could not be checked or restored (hw_swap error: $($_.Exception.Message))"; exit 1 }

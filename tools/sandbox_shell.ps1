@@ -606,6 +606,12 @@ Set-Content (Join-Path $Out 'saves_diff.txt') -Value @($diff) -Encoding utf8
 Remove-Item (Join-Path $snapDir "$snapId.json") -ErrorAction SilentlyContinue   # the check is done (supervisor: snapshots don't pile up)
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
+# -LowGraphics: the swap-back (above, before the after-snapshot) normally restores Tyler's file alone, so a display
+# fallback only ever sees a non-swap diff; if both acted on this run, hw_swap logs it as its own line
+if ($LowGraphics) {
+    $hwo = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $hwSwap -AfterGuard -Tag $Out -Log (Join-Path $Out 'hw_swap.txt'))
+    $hwo | ForEach-Object { Log "hw_swap: $_" }
+}
 if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
 if ($result -ne 'plan done') { exit 6 }
 exit 0
