@@ -17,10 +17,12 @@ Checks, in order, and exits 1 on the first hard failure:
 #>
 param(
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $Build = '26566308'   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
+    [string] $Build = '26566308',   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
+    [string] $Profile = 'verve-test'   # doctor names it, never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
-$doc = & $Swofty doctor
+$doc = & $Swofty --profile $Profile doctor
 $doc
 $bid = ($doc | Where-Object { $_ -match '^build id\s+(\S+)' } | ForEach-Object { $Matches[1] })
 if ($bid -ne $Build) { "PREFLIGHT FAIL: build $bid, pinned $Build. Stop and tell the supervisor."; exit 1 }

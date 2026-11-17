@@ -149,8 +149,8 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
     `db get` under the ACTIVE profile, which was Tyler's. Those were read-only stock lookups and changed nothing.
   - `addons install/remove` (all profiles, by design), `profile list/delete` (test-* cleanup) and `restore` have no
     profile.
-  - The per-launch `doctor` calls (`preflight.ps1`, `post_run_check.ps1`, `sandbox_run.ps1`) get `--profile` after
-    V-1, so the harness doesn't change mid-batch.
+  - The per-launch `doctor` calls (`preflight.ps1`, `post_run_check.ps1`, `sandbox_run.ps1`) now name
+    `--profile verve-test` too: each has `-Profile` (default `verve-test`, refuses anything not `verve-*`).
 - **`swofty addons install` writes the new id into every profile,** Tyler's included (as a disabled entry). Install only
   when a batch needs it, and say so in the batch's PR.
 - **Standing OK for Swofty add-ons** (Tyler, relayed by the supervisor, 2026-11-16: "yes you are always allowed to
