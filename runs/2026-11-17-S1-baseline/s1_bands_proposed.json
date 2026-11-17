@@ -1,0 +1,107 @@
+{
+ "what": "S-1 null bands (docs/verve_s1_prereg.md section 3), PROPOSED from the stock baseline; the bands amendment PR commits this as docs/stock/s1_bands.json",
+ "proposed": true,
+ "batch": "runs\\2026-11-17-S1-baseline",
+ "rule": "contacts max(0.15, 0.25 M_c); exit_all_kph 2.0 (always the floor); passes_made 0.25 M_p; held_behind_s max(25, 0.25 M_h); 3 significant figures; over the valid races and the 19 AI cars",
+ "bands": {
+  "contacts": 0.161,
+  "exit_all_kph": 2.0,
+  "passes_made": 0.163,
+  "held_behind_s": 43.2
+ },
+ "stats": {
+  "M_p": 0.651,
+  "M_h": 173.0,
+  "M_c": 0.645,
+  "exit_mean": 0.165,
+  "C_race": 6.12,
+  "races_valid": 8,
+  "races_total": 8,
+  "n_driver_races": {
+   "passes_made": 152,
+   "held_behind_s": 152,
+   "contacts": 152,
+   "exit_all_kph": 152
+  }
+ },
+ "exit_rule_info": {
+  "0.25 x |mean|": 0.0413,
+  "applied": 2.0
+ },
+ "races": [
+  {
+   "launch": 1,
+   "race": 1,
+   "uid": "3493713800540815882",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 8,
+   "stalls": []
+  },
+  {
+   "launch": 1,
+   "race": 2,
+   "uid": "15617603853736912579",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 4,
+   "stalls": []
+  },
+  {
+   "launch": 1,
+   "race": 3,
+   "uid": "2065312171039930672",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 4,
+   "stalls": []
+  },
+  {
+   "launch": 1,
+   "race": 4,
+   "uid": "684586595248195700",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 7,
+   "stalls": []
+  },
+  {
+   "launch": 2,
+   "race": 1,
+   "uid": "6581940759464011118",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 7,
+   "stalls": []
+  },
+  {
+   "launch": 2,
+   "race": 2,
+   "uid": "7891276528702764258",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 6,
+   "stalls": []
+  },
+  {
+   "launch": 2,
+   "race": 3,
+   "uid": "113415103385887022",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 6,
+   "stalls": []
+  },
+  {
+   "launch": 2,
+   "race": 4,
+   "uid": "15140415966224091665",
+   "valid": true,
+   "verdict": "PASS",
+   "coll_total": 7,
+   "stalls": []
+  }
+ ],
+ "stop_launches": [],
+ "saves_notes": {}
+}

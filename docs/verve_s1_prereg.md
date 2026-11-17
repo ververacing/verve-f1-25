@@ -127,6 +127,32 @@ own measure code (`s1_check --baseline`, which is v1_check's measures).
 The amendment PR writes M_p, M_h, M_c, C_race and the four bands, rounded to 3 significant figures, into this file and into
 `s1_check`'s NULL_BAND. It's merged before the smoke.
 
+**Amendment: the bands (from the stock baseline `runs/2026-11-17-S1-baseline`, 8/8 races valid).** Computed by
+`s1_check --baseline` with the rule above, unchanged; no S-1 race has been seen. `s1_check` reads the bands from the committed
+`docs/stock/s1_bands.json` (its `load_bands`; there is no separate NULL_BAND constant), so that file is the second copy.
+
+| Statistic | Value (3 s.f.) | V-1-based expectation |
+|---|---|---|
+| M_p (passes_made per driver-race, n 152) | 0.651 | 0.98 |
+| M_h (held_behind_s, n 152) | 173 s | 142.7 s |
+| M_c (contacts, n 152) | 0.645 | 0.583 |
+| exit_all_kph mean (n 152) | 0.165 | about 0 |
+| C_race (COLL events per race) | 6.12 | |
+
+| Primary | Band (half-width on the FE slope) | Rule that set it |
+|---|---|---|
+| contacts (YIELD) | **0.161** | 0.25 × M_c (above the 0.15 floor) |
+| exit_all_kph (EXIT_ERR) | **2.0 km/h** | the floor (0.25 × \|0.165\| = 0.041) |
+| passes_made (OVERLAP, COMMIT) | **0.163** | 0.25 × M_p (no floor) |
+| held_behind_s (BLK_SPEED, BLK_THREAT) | **43.2 s** | 0.25 × M_h (above the 25 s floor) |
+
+Context, not a rule: with §5's V-1-scaled SE(FE), the chance of DEAD under a true zero becomes passes_made ≈0.31 (was ≈0.9:
+the lower M_p narrows its band), contacts ≈0.75 (was ≈0.64), held_behind_s and exit_all_kph ≈1.0 (unchanged).
+
+The lower stock pass rate (0.651 vs V-1's 0.98 under ×3 maps) lowers the chance of a DEAD call for OVERLAP/COMMIT to about
+0.31; INCONCLUSIVE there is expected and reads as not-a-lever-for-now. (Supervisor: #185 approved as written, no band
+changes, 2026-11-17.)
+
 ## 4. Extremes validity smoke (validity only, never analysed for effects)
 
 **Run.** One launch, the first 2 races of the V-1 plan, with seed 2026111707:
