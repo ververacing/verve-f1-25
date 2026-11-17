@@ -28,8 +28,9 @@ Steps, all logged in <Batch>\launch_<n>\:
    (supervisor, 2026-11-17: does difficulty 99 only follow a skip-relaunch?).
 9. The build check (check_applied).
 10. The session check (supervisor's ruling, 2026-11-17; the plan's `@sessioncheck 100 17 0` at race 1's lights out,
-   <launch>\session_check.txt): if it says `invalid:` or `unverified:`, the launch is marked <launch>\invalid.txt
-   ("invalid: difficulty N (session check)"). After the uninstall, the tyler.json hash check and the build check above
+   <launch>\session_check.txt): if it says `invalid:` (a confirmed wrong value), the launch is marked
+   <launch>\invalid.txt ("invalid: difficulty N (session check)"). `unverified:` (checker exit 2/3/4) only prints and
+   writes "session check UNVERIFIED: <reason>" to boot.txt: no mark, no rerun (aionly_check still validates). After the uninstall, the tyler.json hash check and the build check above
    have run for that attempt (and only if none of them stops the batch), v1_run reruns the same launch ONCE with
    -IsRetry (same -Launch/-Batch/-Seed/-Plan/-Amp/-NoUncapped); the rerun moves this attempt to invalid\ and its exit
    is v1_run's exit. If the rerun's session check fails too: exit 19.
@@ -172,14 +173,17 @@ $scFile = Join-Path $out 'session_check.txt'
 $scFailed = $false; $scWhy = ''
 $scLine = if (Test-Path $scFile) { [string](Get-Content $scFile -TotalCount 1) } else { 'none (no session_check.txt: the plan never reached @sessioncheck)' }
 "session check: $scLine"
+$scNote = ''
 if ($scLine -match '^(invalid: .+?)(?: \(uid \d+\))?$') { $scFailed = $true; $scWhy = "$($Matches[1]) (session check)" }
-elseif ($scLine -match '^unverified: (.*)$') { $scFailed = $true; $scWhy = "invalid: unverified (session check: $($Matches[1]))" }
+# unverified (checker exit 2/3/4): noted only, no mark and no rerun (supervisor, review of #167); aionly_check still
+# validates each race's difficulty, track and weather
+elseif ($scLine -match '^unverified: (.*)$') { $scNote = "session check UNVERIFIED: $($Matches[1])"; $scNote }
 if ($scFailed) { Set-Content (Join-Path $out 'invalid.txt') -Encoding utf8 -Value $scWhy; "${tag}: $scWhy; marked invalid (invalid.txt)" }
 # boot: how many skip-relaunches this launch's boot took (the shell's `intro skipped` lines), beside the session check
 $tr = Join-Path $out 'transcript.txt'
 $bootLines = @(if (Test-Path $tr) { Get-Content $tr | Where-Object { $_ -match '^(attempt \d+ started|intro (skipped|played))' } })
 $boot = if (Test-Path $tr) { "boot: skip-relaunches $(@($bootLines | Where-Object { $_ -match '^intro skipped' }).Count)" } else { 'boot: unknown (no transcript.txt)' }
-Set-Content (Join-Path $out 'boot.txt') -Encoding utf8 -Value (@($boot) + @($bootLines | ForEach-Object { "  $(Scrub $_)" }) + @("session check: $scLine"))
+Set-Content (Join-Path $out 'boot.txt') -Encoding utf8 -Value (@($boot) + @($bootLines | ForEach-Object { "  $(Scrub $_)" }) + @("session check: $scLine") + @($scNote | Where-Object { $_ }))
 $boot
 
 # 7. remove the add-on (never while a game or Swofty process is up: no Swofty steps then, incident 2026-11-15)

@@ -29,9 +29,11 @@ Plan file, one step per line ('#' comments):
                                  packet at lights out (tools/udp_session_check.py; the race uids already ended are
                                  excluded) must read this AI difficulty, track id and weather; no race session within
                                  <max s> (default 90) is exit 2. Writes <Out>/session_check.txt (verdict line, exit).
-                                 A mismatch (exit 6) stops the plan as `sessioncheck: invalid: ...`; exit 2/3/4 as
-                                 `sessioncheck: unverified`; 5 (pause flag, game exit) as the usual stop. A stop runs
-                                 the normal quit, guard and cleanup; tools/v1_run.ps1 then reruns the launch once
+                                 Only a mismatch (exit 6) stops the plan, as `sessioncheck: invalid: ...`: the normal
+                                 quit, guard and cleanup run, and tools/v1_run.ps1 reruns the launch once. Exit 2/3/4
+                                 (unverified) is logged (`session check UNVERIFIED: ...`) and the plan carries on (the
+                                 post-race aionly_check still validates each race); 5 (pause flag, game exit) is the
+                                 usual stop
     @restart [<garage s>]       restart the race while spectating (V-1 Phase 0, 2026-11-16): `pad start` (pause menu,
                                  Restart Session on top), `pad a` (confirm dialog, defaults to Cancel), `pad up`,
                                  `pad a` (confirm); wait for garage_monitor_container (default 60 s, else the plan
@@ -379,7 +381,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             $cTxt = Join-Path $Out 'session_check.txt'
             if (-not $Udp -or -not $udpBin) {
                 Set-Content $cTxt -Encoding utf8 -Value @('unverified: no -Udp capture to check', 'exit -')
-                Log 'sessioncheck: no -Udp capture to check; stopping the plan'; $script:stop = 'sessioncheck: unverified (no -Udp)'; return
+                Log 'session check UNVERIFIED: no -Udp capture to check; carrying on with the plan'; return
             }
             $cArgs = @('-I', (Join-Path $PSScriptRoot 'udp_session_check.py'), '--bin', $udpBin, '--difficulty', $wantD, '--track', $wantT,
                        '--weather', $wantW, '--max-s', $cMax, '--stop-file', $pauseFlagPath)
@@ -405,8 +407,9 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
                 $why = if (($cOut -join ' ') -match 'game exited') { $script:gameGone = $true; 'game exited' } else { 'pause flag' }
                 Log "sessioncheck: stopped at once ($why); stopping the plan"; $script:stop = "sessioncheck: $why"; return
             }
-            Log "SESSION CHECK UNVERIFIED (exit $cCode): $verdict; ending the launch (quit, guard, cleanup)"
-            $script:stop = "sessioncheck: unverified (exit $cCode)"
+            # unverified (exit 2/3/4) never stops the launch (supervisor, review of #167): only a confirmed wrong value
+            # does. The post-race aionly_check still validates difficulty, track and weather per race.
+            Log "session check UNVERIFIED: $($verdict -replace '^unverified: ', '') (exit $cCode); carrying on with the plan"
             return
         }
         if ($s -match '^@restart(?: (\d+))?$') {
