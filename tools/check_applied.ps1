@@ -3,6 +3,7 @@ Deterministic build check (#53): the game, as it loaded, must hold exactly what 
 
 Usage:
     powershell -File tools/check_applied.ps1 -Loader runs/<id>/raw/batches/1/loader.log -Folder harness/addons/verve.b0011
+    powershell -File tools/check_applied.ps1 -PrefillOnly docs/stock/d1_paths.txt -KeyCache docs/stock/v1_key_cache_26566308.csv
 
 `swofty db get --addon` only applies DB Editor addons, not data addons, so the check reads the game's own record of
 the build instead: each start's loader.log has one `[assets] gamedb: overwrote 0x<key> (..., tag T type): OLD -> NEW`
@@ -12,20 +13,54 @@ the stock value; the op must then have an overwrite line whose new value equals 
 strings, which the log shows as `label fnv32 0x...`, by FNV-1a 32 of the op's text). An op with no line is allowed
 only when its value equals stock (the build dropped it). Prints the count every start must show: 52 baseline + the
 ops found. Exit 0 = every op accounted for; 1 = a mismatch or a missing write (build broken: stop the batch).
+
+-PrefillOnly <paths file> (one select.field path per line; blank and # lines skipped) only fills -KeyCache: each path
+not cached yet gets one read-only `swofty db get --profile <Profile>` and is added. No loader.log, no add-on, no check.
+Run it with nothing running (no game, launcher or swofty). Exit 0 = every path cached; 1 = a path had no key or hash.
+Selftest: tools/test_check_applied.ps1 (a stub -Swofty, offline).
 #>
 param(
-    [Parameter(Mandatory)] [string] $Loader,
-    [Parameter(Mandatory)] [string] $Folder,
+    [string] $Loader,   # required unless -PrefillOnly
+    [string] $Folder,   # required unless -PrefillOnly
     [int] $Baseline = 52,
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
     # every db get names our test profile: never the active one, which is Tyler's (V-1 readback, 16 Nov)
     [string] $Profile = 'verve-test',
     # path,hash,stock cache (V-1: every launch writes the same 235 paths, only the values change): a cached path needs
     # no swofty call, so a launch's check runs offline in seconds; misses are looked up and added
-    [string] $KeyCache = ''
+    [string] $KeyCache = '',
+    # a paths file: fill -KeyCache with these paths (db get for the missing ones), then exit; no loader check
+    [string] $PrefillOnly = ''
 )
 if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
+# one read-only db get: @{ row = path,hash,stock } or @{ why = 'NO KEY' / 'NO HASH' }
+function LookUp([string] $path) {
+    $out = & $Swofty db get --profile $Profile $path
+    if ($LASTEXITCODE -ne 0) { return @{ why = 'NO KEY' } }
+    if (-not (($out | Select-Object -First 1) -match '\((0x[0-9a-f]{16}), type \d+\)')) { return @{ why = 'NO HASH' } }
+    $hash = $Matches[1]
+    $stock = ($out | Where-Object { $_ -match '^\s*value: ' } | Select-Object -First 1) -replace '^\s*value: ', ''
+    @{ row = [pscustomobject]@{ path = $path; hash = $hash; stock = $stock } }
+}
+if ($PrefillOnly) {
+    if (-not $KeyCache) { throw '-PrefillOnly needs -KeyCache (the cache file to fill)' }
+    if (-not (Test-Path $PrefillOnly)) { throw "no paths file $PrefillOnly" }
+    $cache = [ordered]@{}
+    if (Test-Path $KeyCache) { foreach ($r in Import-Csv $KeyCache) { $cache[$r.path] = $r } }
+    $paths = @(Get-Content $PrefillOnly | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith('#') })
+    $added = 0; $had = 0; $bad = 0
+    foreach ($p in $paths) {
+        if ($cache.Contains($p)) { $had++; continue }
+        $r = LookUp $p
+        if ($r.why) { $bad++; "$($r.why) $p"; continue }
+        $cache[$p] = $r.row; $added++
+    }
+    if ($added) { $cache.Values | Sort-Object path | Export-Csv $KeyCache -NoTypeInformation -Encoding UTF8 }
+    "prefill: $($paths.Count) path(s) in ${PrefillOnly}: $had already cached, $added looked up and added, $bad problem(s) ($($cache.Count) in $KeyCache)"
+    exit $(if ($bad) { 1 } else { 0 })
+}
+if (-not $Loader -or -not $Folder) { throw 'pass -Loader and -Folder (or -PrefillOnly <paths file> -KeyCache <csv>)' }
 $inv = [Globalization.CultureInfo]::InvariantCulture
 function Fnv1a([string] $s) { $h = [uint32]2166136261; foreach ($b in [Text.Encoding]::UTF8.GetBytes($s)) { $h = [uint32](([uint64]($h -bxor $b) * 16777619) % 4294967296) }; '0x{0:x8}' -f $h }
 function SameValue([string] $logged, [string] $value) {
@@ -50,12 +85,9 @@ foreach ($o in $ops) {
         $hash = $cache[$path].hash; $stock = $cache[$path].stock
     } else {
         $misses++
-        $out = & $Swofty db get --profile $Profile $path
-        if ($LASTEXITCODE -ne 0) { $bad++; "NO KEY $path"; continue }
-        if (-not (($out | Select-Object -First 1) -match '\((0x[0-9a-f]{16}), type \d+\)')) { $bad++; "NO HASH $path"; continue }
-        $hash = $Matches[1]
-        $stock = ($out | Where-Object { $_ -match '^\s*value: ' } | Select-Object -First 1) -replace '^\s*value: ', ''
-        $cache[$path] = [pscustomobject]@{ path = $path; hash = $hash; stock = $stock }
+        $r = LookUp $path
+        if ($r.why) { $bad++; "$($r.why) $path"; continue }
+        $cache[$path] = $r.row; $hash = $r.row.hash; $stock = $r.row.stock
     }
     if ($over.ContainsKey($hash)) {
         $found++
