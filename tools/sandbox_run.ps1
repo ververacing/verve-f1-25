@@ -43,8 +43,10 @@ param(
     [int] $ConfirmS = 120,
     [int] $IntroTries = 3,
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $SteamApp = ''   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
+    [string] $SteamApp = '',   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
+    [string] $Profile = 'verve-test'   # doctor names it, never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
 if (-not $SteamApp) { $SteamApp = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') }
 
@@ -97,7 +99,7 @@ $sessions = "$env:LOCALAPPDATA\Swofty\sessions"
 $raw = Join-Path (Resolve-Path $Out).Path 'raw'
 # The live loader.log is in the game folder. sessions\<id>\loader.log is a copy made when the game ends, so it can't
 # confirm anything during a run (seen on 1.8.4: its creation time is the game's exit).
-$gameDir = & $Swofty doctor | Where-Object { $_ -match '^game dir\s+(.+)$' } | ForEach-Object { $Matches[1].Trim() } | Select-Object -First 1
+$gameDir = & $Swofty --profile $Profile doctor | Where-Object { $_ -match '^game dir\s+(.+)$' } | ForEach-Object { $Matches[1].Trim() } | Select-Object -First 1
 $liveLog = if ($gameDir) { Join-Path $gameDir 'swofty\loader.log' } else { $null }
 function FreshLiveLog([datetime] $since) {
     if ($liveLog -and (Test-Path $liveLog) -and (Get-Item $liveLog).LastWriteTime -ge $since.AddSeconds(-5)) { return $liveLog }
