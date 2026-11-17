@@ -40,7 +40,7 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
 ## D2: benchmark replication of B-0008 on 26566308
 
 - **D2.0, a feasibility probe first** (1 start, stock, no add-on, not scored). B-0008's tests waited on the
-  `RaceStarts: Reaction Time…` log line, which is gone on 26566308 (F-47 era: no `log_channels.tsv`). The probe runs
+  `RaceStarts: Reaction Time…` log line, which is gone on 26566308 (Swofty ships no `log_channels.tsv` for this build). The probe runs
   B-0008's env (`swofty test`, `kind: benchmark`, Austria, 3 laps, 20 cars, clear, fresh) with the UDP capture on.
   It records:
   - whether the benchmark boots and ends on 26566308;
