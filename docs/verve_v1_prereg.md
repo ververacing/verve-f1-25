@@ -1,6 +1,6 @@
 # V-1 pre-registration (v3): are the driver levers alive? A factorial screen
 
-Status: **v3 for the supervisor's approval** (2026-11-16). It replaces the v2 draft (#147). It applies the supervisor's
+Status: **v3 for the supervisor's approval** (2026-11-16): every value is filled, and the readback passes. It replaces the v2 draft (#147). It applies the supervisor's
 rulings on #147 (A-H), on #148 (bundles, maps, the throttle_exit_fallibility exception), on Phase 0 (size, UDP start
 measures, conditional starts session, launch-blocked permutation) and on #155 (mistakes direction, control floor fallback,
 corner pace, decision labels, pass null bands). v1_check (#155) is approved; its null simulation gives a false-positive
@@ -8,7 +8,7 @@ rate of 4.83% (95% CI 4.26-5.48) over 4,800 null tests. Scope: Verve Drivers (do
 [verve_drivers_plan.md](verve_drivers_plan.md).
 
 The **[discovery]** values below come from the Austria discovery launch (16:00-16:06, `runs/2026-11-16-V1-austria-disc`;
-2 stock races, both valid). The **[readback]** values come from the v1_make readback, before race 1. **The 26566308 stock re-dump (#156) changed nothing** that V-1 uses. The 7 live maps
+2 stock races, both valid). The readback result is below (`runs/2026-11-16-V1-readback`). **The 26566308 stock re-dump (#156) changed nothing** that V-1 uses. The 7 live maps
 (all 66 lines), the six characteristics on the 20 f1_2025 seats and the 6 bundle keys on all 21 rows are identical to
 25251167, so the tables below stand. **Season:** the 2025 and 2026 grids share the driver rows, so the product keeps
 the season option, with 2026 as the default.
@@ -16,6 +16,23 @@ the season option, with 2026 as the default.
 **V-1 START RULE** (supervisor): V-1 starts once (i) this v3 is approved, (ii) `@restart` is merged (#153), and (iii) the
 v1_make readback passes on 26566308: the package select works, the 235 ops are applied and the gamedb count matches.
 v1_check (#155) can follow during the batch, and the supervisor reviews it before any verdict. **No interim looks.**
+
+## Readback (start rule iii): PASS
+- **The run:** `tools/v1_run.ps1`, seed 1, launch 1, with the menu-only plan `harness/sessions/v1_readback_menu.plan`
+  and the add-on `verve.v1-l01` enabled.
+- **check_applied** on its loader.log: 235 ops, **233 applied**:
+  - 214 value-checked, including all 7 `vehicle_package_10` map ops, so the package select works, and
+    throttle_exit_fallibility at 1.5;
+  - 19 overlap_percentage curves written at the right key (the log doesn't show curve values).
+- **2 dropped** as equal to stock (reaction_speed), and **0 problems**.
+- **gamedb:** 289 overwritten = 56 (the route's stock baseline on 26566308) + 233.
+- **Profiles:** the install added a disabled entry to tyler.json and verve-test.json; after the removal both hash
+  exactly as before the install. The saves are unchanged.
+- **The gamedb count is per launch.** The build drops only some equal-to-stock writes (2 of the 4 here), so each
+  launch's expected count comes from its own build check:
+  - v1_run runs check_applied after every launch, offline through the 26566308 key cache (#159), and writes
+    `gamedb_expected.txt`. v1_check reads it per launch.
+  - A failed build check stops the batch (exit 16) and invalidates the launch.
 
 ## Question
 On game build 26566308 (F1 25 Steam 1.0.145.2472), on the spectator garage route (F-46), do the eight per-driver
@@ -134,7 +151,8 @@ realistic values are V-2. If the traits are dead even amplified, the row-to-map 
 
 ## Validity per race (tools/aionly_check.py, per race uid)
 - The finish comes from LapData: the leader at position 1 with resultStatus 3, and **at least 18 AI with status 3**.
-- Track 17, difficulty 100, weather LOCKED, gamedb as read back, and no pause cut.
+- Track 17, difficulty 100, weather LOCKED, no pause cut, and gamedb = that launch's `gamedb_expected.txt` with a clean
+  build check (check_applied: every op applied, or dropped only as equal to stock).
 - The live window runs from lights out to the first AI finish, with the plausible-finish check.
 - Any player COLL or PENA from lights out is a FAIL.
 - An invalid race is dropped and listed. The launch keeps its other valid races, and there are no reruns inside a launch.
