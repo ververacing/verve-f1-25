@@ -374,9 +374,16 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
             Log "restart $script:restartNo`: screen before '$(Screen)'"
             Log "restart $script:restartNo`: pad start (pause menu)"
             Send 'pad start' | Out-Null; Start-Sleep -Seconds 3
-            Log "restart $script:restartNo`: pause menu screen '$(Screen)'; pad a (Restart Session)"
+            # @expect hardening (supervisor): only press A on the pause stack. The Austria discovery (16:00, 26566308)
+            # showed the pause menu and the Restart confirm dialog share one screen string, '|pause|#ba16bc16|', so the
+            # dialog itself can't be told apart; a screen off the pause stack (a results or other dialog) stops the plan.
+            $scr = Screen
+            if ($scr -notmatch '^\|pause\|') { Log "RESTART FAILED: restart $script:restartNo, not the pause menu after pad start (screen '$scr'); stopping the plan"; $script:stop = "restart $script:restartNo`: no pause menu"; return }
+            Log "restart $script:restartNo`: pause menu screen '$scr'; pad a (Restart Session)"
             Send 'pad a' | Out-Null; Start-Sleep -Seconds 2
-            Log "restart $script:restartNo`: confirm dialog screen '$(Screen)'; pad up (Cancel -> Confirm)"
+            $scr = Screen
+            if ($scr -notmatch '^\|pause\|') { Log "RESTART FAILED: restart $script:restartNo, not the pause stack before confirming (screen '$scr'); stopping the plan"; $script:stop = "restart $script:restartNo`: no confirm on the pause stack"; return }
+            Log "restart $script:restartNo`: confirm dialog screen '$scr'; pad up (Cancel -> Confirm)"
             Send 'pad up' | Out-Null; Start-Sleep -Seconds 1
             Log "restart $script:restartNo`: pad a (confirm)"
             Send 'pad a' | Out-Null
