@@ -1,0 +1,3 @@
+﻿key cache: all 235 paths cached (no swofty call)
+ops 235: 234 applied (215 value-checked, 19 curves written at the right key but their value isn't logged), 1 dropped as equal to stock (driver_characteristics.reaction_speed 1), 0 problem(s)
+loader total 290 overwritten; expected 56 + 234 = 290

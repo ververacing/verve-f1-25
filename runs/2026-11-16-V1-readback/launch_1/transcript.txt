@@ -1,0 +1,23 @@
+﻿saves before: 179 entries; profile verve-test (63C02A54A1D2B25116F965E6A4BA44B3739A3A42EBE20FA7D3F1CCBC6050FA33) +addons verve.v1-l01; active profile tyler
+udp capture pid 27332
+attempt 1 started 16:21:52 (910 s since the last game exit)
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261117-002152-1 ({"schema":1,"run":"shell-20261117-002152-1","state":"armed","pid":11772,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261117-002152-1\\saves\\remote","why":""})
+game pid 11772 (sandbox.json)
+16:23:36 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":80641}
+16:23:36 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":11772,"run":"shell-20261117-002152-1","ticks":4358,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 11772 (test agent)
+intro played (splash after 81 s)
+16:23:57 > pad ls 15000  =>  {"seq":3,"status":"ok","ms":20641}
+16:23:58 > pad ls  =>  {"seq":4,"status":"ok","ms":250}
+16:24:02 > pad ls 2000  =>  {"seq":5,"status":"ok","ms":4000}
+16:24:02 > pad ls  =>  {"seq":6,"status":"ok","ms":250}
+16:24:07 > home  =>  {"seq":7,"status":"ok","value":{"home":true,"notice_presses":1},"ms":4766}
+16:24:11 > @raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}  =>  {"seq":8,"status":"ok","value":{"from":"home"},"ms":469}
+16:24:16 > status  =>  {"seq":9,"status":"ok","value":{"v":1,"pid":11772,"run":"shell-20261117-002152-1","ticks":6289,"phase":"|fe_f1_world|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+16:24:17 > status  =>  {"seq":10,"status":"ok","value":{"v":1,"pid":11772,"run":"shell-20261117-002152-1","ticks":6308,"phase":"|fe_f1_world|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+16:24:17 > quit  =>  {"seq":11,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 16:24:17
+run folder: shell-20261117-002152-1
+result: plan done
+udp recording: 605 bytes
+saves unchanged (179 entries)

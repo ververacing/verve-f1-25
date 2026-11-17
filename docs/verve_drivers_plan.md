@@ -230,3 +230,44 @@ criterion. Order follows Verve's dependence on each lever.
     override curves (only the two converter anchors were re-checked).
 13. **Run alongside community add-ons:** kizi.ai-driver-behaviour writes overlapping `ai_driver_config` keys on
     every row. No batch has run Verve together with any community add-on, so "works alongside" is untested.
+
+## After V-1 (supervisor, 2026-11-17)
+
+**V-1 result (F-48, #169):** in GP on 26566308 (the spectator route), the six `driver_characteristics` overrides at 0/1
+with ×3 maps showed no measurable effect. Whether the overrides reach the per-car AI record is untested. D1 (a GP
+positive control) and D2 (a benchmark replication of B-0008) are pre-registered in
+[verve_d1_d2_prereg.md](verve_d1_d2_prereg.md).
+
+**Takeaways from the desk research** ([community/racecraft_research_2026-11-17.md](community/racecraft_research_2026-11-17.md), #171):
+- **Racecraft per-vehicle aggression** (`ai::VehicleConfig.racecraft.{overtake,defend}_aggression`) exists on paper
+  only ("ships later"), and would be per VEHICLE anyway, shared by teammates. **Dropped.**
+- **`cars::live` is OFF on 26566308.** Live per-car layers aren't an option on this build, which blocks any native,
+  live approach.
+- **The D3 native probe of the per-car AI record is NOT approved:** high risk, layouts proven for the KB build only.
+  Revisit only if D1/D2 leave H1 vs H2 open.
+- **The AI driver profile is built at session enter, from the entrant's row, after the DB edits apply.** So "our ops
+  arrive too late" is ruled out.
+- **Three unproven candidates for a GP-only loss of the override:**
+  - (a) the in-race driver variation record outranks the override (on in Race, off in Time Trial);
+  - (b) `driver_statistics.driver_characteristic_overrides` maps the racecraft/awareness ratings onto the traits;
+  - (c) game-mode fields (`benchmark`, `timetrial`, `driver_%s_override`).
+
+### D4 outline: a factorial on the ratings (NOT pre-registered; drafted so it's ready)
+
+The supervisor asks for D4 only if D1/D2 point at lead (b): GP derives the traits from the per-driver ratings. Then the
+ratings ARE the personality lever. They're per driver and per season dataset, which fits Tyler's season ask.
+- **Lever:** the per-driver `driver_statistics` ratings that the `driver_characteristic_overrides` rows map from: the
+  racecraft and awareness ratings (and the others in that table), in BOTH datasets (`default` and `2026`).
+  - The exact rating → trait pairs come from `driver_characteristic_overrides`; the re-dump on 26566308 (#156) found
+    it unchanged.
+- **Design:** V-1's factorial frame (a seeded teammate split, a new draw per launch, Austria spectator route, 4 races
+  per launch, a launch-blocked permutation test), with ratings at a low and a high anchor instead of traits at 0/1.
+  The anchors are set from the override curves so the mapped trait spans most of its range.
+- **Primary measures:** reaction via UDP (V-1's definition) for the rating mapped to reaction_speed. For the others,
+  V-1's measures for the trait each one maps to.
+- **Prior evidence to weigh:** B-0006 (benchmark, 25251167) found the STATS (racecraft rating) slope on reaction at
+  **+0.068 s per unit** (SE 0.029), positive and against the row's −0.109. So in benchmark, the rating didn't act like
+  the trait. GP may differ (lead (b) is about GP).
+- **Size and bands:** set from V-1's variance (per-car SD and launch-level SE), and pre-registered before any run.
+- **Product fit:** writing ratings changes what the career/ratings screens show. The build design must say whether
+  Verve accepts that, or writes ratings only in race sessions.

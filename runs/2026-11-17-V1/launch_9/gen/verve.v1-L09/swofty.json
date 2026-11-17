@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "verve.v1-l09",
+  "name": "Verve test V-1 launch 09 (factorial screen)",
+  "version": "0.0.1",
+  "author": "TC Verve",
+  "description": "Test-only addon for V-1 (docs/verve_v1_prereg.md), seed 20261117, launch 9: six row traits and the DEFEND/ATTACK ai_driver_config bundles at 0/1 per driver (assignment.csv), plus the parameter maps amplified 3x. 235 ops. Not for play.",
+  "license": "MIT",
+  "category": "ai",
+  "kind": [
+    "database"
+  ],
+  "compat": {
+    "game": "f1_25",
+    "game_builds": [
+      ">=26566308"
+    ],
+    "launcher": ">=1.9.34"
+  },
+  "requires": [
+    {
+      "id": "swofty.core",
+      "version": ">=0.2.13"
+    }
+  ],
+  "saves": {
+    "affects": false
+  },
+  "operations": {
+    "database": [
+      "db/v1.json"
+    ]
+  }
+}

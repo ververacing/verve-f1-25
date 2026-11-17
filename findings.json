@@ -657,6 +657,19 @@
       "implications": "A crash report at quit is not by itself a failed race; validity stays with tools/aionly_check.py and the saves guard. Crash reports stay local: Swofty uploads only when someone clicks Send Logs to Developers on the crash screen or runs `swofty logs send` (Swofty docs, using/send-logs). We never use either.",
       "related_questions": [],
       "status": "verified (systemic on 26566308)"
+    },
+    {
+      "id": "F-48",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "V-1: in GP on 26566308 (spectator route), the six driver_characteristics overrides at 0/1 with ×3 maps showed no measurable effect; whether the overrides reach the per-car AI record is untested.",
+      "confidence": "pre-registered factorial screen (prereg v3, #160): 12 launches x 4 races, 48/48 valid, launch-blocked permutation test (10,000 redraws); reaction_speed, mistakes, control (floor fallback: corner-exit pace), speed_in and speed_out DEAD within their null bands; aggression, DEFEND and ATTACK INCONCLUSIVE (underpowered). Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-17-V1 (README, v1_check/report.txt, summary.json)",
+        "reaction_speed: FE slope -0.0061 s (SE 0.0038) vs about -0.11 s per unit in B-0006/B-0008 on 25251167 (benchmark)"
+      ],
+      "implications": "Two explanations remain: (H1) the overrides reach the AI but don't matter in GP on 26566308; (H2) they never reach the per-car AI record on this route/build. D1 (a positive control with the per-driver ai_driver_config race-start reaction bounds), D2 (a benchmark replication of B-0006) and D3 (a readback of the effective per-car values) separate them. Nobody writes 'the row route is dead' before that.",
+      "related_questions": [],
+      "status": "verified as scored (V-1); the mechanism is open"
     }
   ]
 }

@@ -254,6 +254,23 @@ standing version**:
 
 ## Rule amendments
 
+- **Display fallback restore** (supervisor, 2026-11-16, after V-1 launch 7 stopped on SAVES CHANGED):
+  - Launch 7 ended with Tyler's hardware settings at 1024x768 instead of 1920x1080 (graphics_card/resolution width and
+    height only). The file matched the reference before the launch, and the game changed it during our test session,
+    most likely while the display slept. So restoring it undoes our side effect, not a choice of Tyler's: a narrow
+    exception to "Tyler decides".
+  - **21:1x PT, 16 Nov:** the 1024x768 file was saved as evidence (`settings-snapshots\…display-fallback-20261116-2103.xml`)
+    and only the two values were set back to 1920x1080. It was verified by value against the reference: 0 changes.
+  - **From then on:** after each launch, if the ONLY hardware-settings change is resolution@width/@height,
+    `tools/hw_display_restore.ps1` restores those two values from the reference, verifies, and logs "display fallback
+    restored", and the run carries on. It's reported in the launch status. Any other key change still stops the batch
+    (exit 5). Two or more fallbacks in one night are reported to the supervisor, since they point to the display
+    sleeping. Windows power and display settings are Tyler's: never touched.
+  - Launch 7 itself stands, subject to the per-uid aionly_check: the saves guard is a safety stop, not a race-validity
+    rule.
+- **Launcher freeze LIFTED 2026-11-17** (supervisor, once V-1 was scored): the standing update OK applies again. The
+  next update is followed by one stock Austria route check (boot, the startup_intro default, gamedb, the session check,
+  @restart) before any scored run.
 - **Launcher freeze during V-1** (supervisor, 2026-11-16, after the daily review found launcher 1.9.60 released and
   1.9.61 with swofty.core 0.2.14 ready):
   - No launcher update until V-1 is scored; Tyler's standing update OK is suspended until then.

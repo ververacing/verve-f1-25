@@ -4,7 +4,12 @@ with it switched on, remove it. One call per launch, so control comes back betwe
 
 Usage:
     powershell -File tools/v1_run.ps1 -Launch <n> -Batch runs/<date>-V-1 -Seed <int> [-Plan <plan>] [-Amp 3] [-NoUncapped]
+    powershell -File tools/v1_run.ps1 -Make d1 -Launch <n> -Batch runs/<date>-D1 -Seed <int> [-Plan <plan>]
     (-IsRetry is set only by v1_run itself, on its one rerun after a failed session check; see 10.)
+
+-Make v1 (the default) is V-1. -Make d1 is D1 (docs/verve_d1_d2_prereg.md): step 2 calls tools/d1_make.py instead, the
+add-on is gen\verve.d1-L<LL> with the id verve.d1-l<LL>, and every other step is the same. -Amp and -NoUncapped are
+ignored for d1 (it writes no maps; a note says so). Below, verve.v1-* reads verve.d1-* for d1.
 
 Steps, all logged in <Batch>\launch_<n>\:
 1. Refusals as tools/b0016_run.ps1: a PAUSE or a due pause-at (exit 12), a game or launcher running that it didn't
@@ -59,7 +64,8 @@ param(
     [string] $Python = 'python',
     [int] $SkippedIntroS = 40,
     [switch] $LowGraphics,  # opt-in, off by default: the low-graphics test preset for this launch (tools/hw_swap.ps1)
-    [switch] $IsRetry   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
+    [switch] $IsRetry,   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
+    [ValidateSet('v1', 'd1')] [string] $Make = 'v1'   # which generator: v1_make.py (V-1) or d1_make.py (D1)
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -101,18 +107,22 @@ function AddonCall([string[]] $a, [string] $log) {
 # 2. the launch's add-on and assignment
 $gen = Join-Path $out 'gen'
 $ll = '{0:D2}' -f $Launch
-$mk = @('-I', (Join-Path $PSScriptRoot 'v1_make.py'), '--seed', "$Seed", '--launch', "$Launch", '--out', $gen, '--amp', "$Amp")
-if ($NoUncapped) { $mk += '--no-uncapped' }
+$mk = @('-I', (Join-Path $PSScriptRoot "${Make}_make.py"), '--seed', "$Seed", '--launch', "$Launch", '--out', $gen)
+if ($Make -eq 'v1') {
+    $mk += @('--amp', "$Amp")
+    if ($NoUncapped) { $mk += '--no-uncapped' }
+} elseif (-not $IsRetry -and ($PSBoundParameters.ContainsKey('Amp') -or $NoUncapped)) { "${tag}: note: -Amp/-NoUncapped are ignored for -Make d1 (D1 writes no maps)" }
 $ErrorActionPreference = 'Continue'
-& $Python @mk *> (Join-Path $out 'v1_make.txt')
+& $Python @mk *> (Join-Path $out "${Make}_make.txt")
 $mkCode = $LASTEXITCODE
 $ErrorActionPreference = 'Stop'
-$folder = Join-Path $gen "verve.v1-L$ll"
-if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: v1_make failed (exit $mkCode, v1_make.txt); nothing installed or launched"; exit 15 }
+$folder = Join-Path $gen "verve.$Make-L$ll"
+if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: ${Make}_make failed (exit $mkCode, ${Make}_make.txt); nothing installed or launched"; exit 15 }
 $id = (Get-Content (Join-Path $folder 'swofty.json') -Raw | ConvertFrom-Json).id
-if ($id -ne "verve.v1-l$ll") { "${tag}: the generated add-on id is '$id', not verve.v1-l$ll; nothing installed or launched"; exit 15 }
+if ($id -ne "verve.$Make-l$ll") { "${tag}: the generated add-on id is '$id', not verve.$Make-l$ll; nothing installed or launched"; exit 15 }
 $retryNote = if ($IsRetry) { ' (rerun after a failed session check)' } else { '' }
-Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote"
+$armText = if ($Make -eq 'd1') { "D1 seed $Seed launch $Launch, add-on $id, $Plan$retryNote" } else { "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote" }
+Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value $armText
 "${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan$retryNote"
 
 # 3./4. profile hashes, leftovers, install
@@ -136,10 +146,11 @@ function HashLine([string] $when) {
     "profiles: $l"
 }
 if ((IdState $tylerFile $id) -eq 'ENABLED') { "${tag}: tyler lists $id ENABLED; never removed from Tyler's setup, so not installing"; exit 15 }
-# a verve.v1-l* add-on that an earlier launch left installed (its uninstall deferred or failed): ours, remove it first
+# a verve.v1-l* or verve.d1-l* add-on that an earlier launch left installed (its uninstall deferred or failed): ours,
+# remove it first (either kind, whatever -Make this launch uses)
 $left = @()
 if (Test-Path $expFile) {
-    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.v1-l\d+$' })
+    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.(v1|d1)-l\d+$' })
 }
 foreach ($lid in $left) {
     if ((IdState $tylerFile $lid) -eq 'ENABLED') { "${tag}: leftover $lid is ENABLED in tyler; not touching it; not launching"; exit 15 }
@@ -210,7 +221,7 @@ if (Busy) {
     $who = (@(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) | ForEach-Object { "$($_.ProcessName) $($_.Id)" }) -join ', '
     Set-Content (Join-Path $out 'uninstall_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "reason: running as the launch ended: $who",
         "next: with F1 25, the launcher and swofty closed: powershell -File tools/reinstall_addon.ps1 -Id $id -Uninstall, then compare tyler.json's hash with profile_hashes.txt ('before install')",
-        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l* in verve-test)')
+        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l* or verve.d1-l* in verve-test)')
     "ADD-ON LEFT INSTALLED: $id (a disabled entry in every profile); a game or Swofty process is running ($who); see uninstall_deferred.txt"
 } else {
     "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
@@ -231,12 +242,12 @@ $lines += if (Test-Path $aj) { "addons.json: $((Get-Content $aj -Raw) -replace '
 $lines += if ((Test-Path $aj) -and ((Get-Content $aj -Raw) -match [regex]::Escape($id))) { "addons.json names ${id}: yes" } else { "addons.json names ${id}: NO (the run may not have had the add-on)" }
 $llog = Join-Path $out 'raw\loader.log'
 if (Test-Path $llog) {
-    $l1 = @(Get-Content $llog | Where-Object { $_ -match 'verve\.v1' })
+    $l1 = @(Get-Content $llog | Where-Object { $_ -match "verve\.$Make" })
     $lines += "loader.log $id lines: $($l1.Count)"
     $lines += $l1 | ForEach-Object { Scrub $_ }
 } else { $lines += 'loader.log: MISSING' }
-$lines | Set-Content (Join-Path $out 'v1addon.txt') -Encoding utf8
-"v1addon.txt: $($lines[1])"
+$lines | Set-Content (Join-Path $out "${Make}addon.txt") -Encoding utf8
+"${Make}addon.txt: $($lines[1])"
 
 $inGame = if (Test-Path $llog) { $m = Select-String $llog -Pattern 'state: Swofty Launcher (\S+),' | Select-Object -First 1; if ($m) { $m.Matches[0].Groups[1].Value } else { 'not found' } } else { 'no loader.log' }
 $lv = @("launcher before launch: $launcherBefore", "launcher in game (loader.log): $inGame")
@@ -271,7 +282,8 @@ if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else
 
 # 9. the build check per launch (V-1 readback, 16 Nov): the game must hold every op this launch's add-on wrote. Which
 # equal-to-stock writes the build drops varies (2 of 4 at seed 1 launch 1), so each launch gets its own expected
-# gamedb count (gamedb_expected.txt, read by v1_check). Offline: every path is in the 26566308 key cache, no swofty.
+# gamedb count (gamedb_expected.txt, read by v1_check). Offline: every path is in the 26566308 key cache, no swofty
+# (D1's 76 race_start paths once check_applied -PrefillOnly docs/stock/d1_paths.txt has filled it).
 $buildOk = $true
 if (Test-Path $llog) {
     $keyCache = Join-Path (Split-Path $PSScriptRoot -Parent) 'docs\stock\v1_key_cache_26566308.csv'
@@ -297,7 +309,7 @@ if ($scFailed) {
     "${tag}: rerunning the launch once ($scWhy)"
     $re = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, '-Launch', "$Launch", '-Batch', $Batch, '-Seed', "$Seed",
         '-Plan', $Plan, '-Amp', "$Amp", '-LaunchMinutes', "$LaunchMinutes", '-ExpProfile', $ExpProfile, '-Python', $Python,
-        '-SkippedIntroS', "$SkippedIntroS", '-IsRetry')
+        '-SkippedIntroS', "$SkippedIntroS", '-IsRetry', '-Make', $Make)
     if ($NoUncapped) { $re += '-NoUncapped' }
     if ($LowGraphics) { $re += '-LowGraphics' }   # the rerun keeps the low-graphics preset (its own swap-in and swap-back)
     & powershell @re

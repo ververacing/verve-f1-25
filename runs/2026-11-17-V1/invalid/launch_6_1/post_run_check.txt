@@ -1,0 +1,2 @@
+﻿post-run: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
+post-run: CLEAN (drift lines 0, doctor's open journals 0 [], journal files 0, version.dll absent)
