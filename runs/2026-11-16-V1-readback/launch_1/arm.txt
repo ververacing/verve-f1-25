@@ -1,0 +1,1 @@
+﻿V-1 seed 1 launch 1, add-on verve.v1-l01 (amp 3), %USERPROFILE%\Documents\verve-f1-25\harness\sessions\v1_readback_menu.plan

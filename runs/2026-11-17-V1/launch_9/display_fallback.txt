@@ -1,0 +1,3 @@
+﻿display fallback: live differs only in resolution@width 1920 -> 1024, resolution@height 1080 -> 768
+display fallback: evidence copy hardware_settings_config.display-fallback-20261116-230106.xml
+display fallback restored (live equals the reference by value)

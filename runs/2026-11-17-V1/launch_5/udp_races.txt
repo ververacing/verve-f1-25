@@ -1,0 +1,4 @@
+﻿race 1 2026-11-16T19:24:09 exit 0 uid 8535303777280820439 | udp finish watch: all 19 AI cars done (19 finished) (exit 0) | finished uid 8535303777280820439
+race 2 2026-11-16T19:30:45 exit 0 uid 13437199419863766382 | udp finish watch: all 19 AI cars done (19 finished) (exit 0); 1 earlier race uid(s) excluded | finished uid 13437199419863766382
+race 3 2026-11-16T19:37:23 exit 0 uid 14367228596723293871 | udp finish watch: all 19 AI cars done (19 finished) (exit 0); 2 earlier race uid(s) excluded | finished uid 14367228596723293871
+race 4 2026-11-16T19:44:34 exit 0 uid 8413426222144121757 | udp finish watch: all 19 AI cars done (19 finished) (exit 0); 3 earlier race uid(s) excluded | finished uid 8413426222144121757

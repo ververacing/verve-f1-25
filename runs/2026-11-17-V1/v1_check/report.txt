@@ -1,0 +1,71 @@
+  launch 1 race 1 uid 3654053672728747390: PASS
+  launch 1 race 2 uid 10879861164408209297: PASS
+  launch 1 race 3 uid 494331368905533702: PASS
+  launch 1 race 4 uid 8835465053868795258: PASS
+  launch 2 race 1 uid 720392103094415583: PASS
+  launch 2 race 2 uid 1259489673623558686: PASS
+  launch 2 race 3 uid 11800424970862224687: PASS
+  launch 2 race 4 uid 9973400097802265907: PASS
+  launch 3 race 1 uid 1450426476025506234: PASS
+  launch 3 race 2 uid 13842180031955155154: PASS
+  launch 3 race 3 uid 9532842656136849001: PASS
+  launch 3 race 4 uid 17917567032712777643: PASS
+  launch 4 race 1 uid 11280339558284622460: PASS
+  launch 4 race 2 uid 9423658724370316905: PASS
+  launch 4 race 3 uid 15447795494490870025: PASS
+  launch 4 race 4 uid 2334462781041926319: PASS
+  launch 5 race 1 uid 8535303777280820439: PASS
+  launch 5 race 2 uid 13437199419863766382: PASS
+  launch 5 race 3 uid 14367228596723293871: PASS
+  launch 5 race 4 uid 8413426222144121757: PASS
+  launch 6 race 1 uid 208447410089941828: PASS
+  launch 6 race 2 uid 14584441626090472868: PASS
+  launch 6 race 3 uid 13410886837714407489: PASS
+  launch 6 race 4 uid 16441640076446507873: PASS
+  launch 7 race 1 uid 13966433290332553329: PASS
+  launch 7 race 2 uid 3712929636258950053: PASS
+  launch 7 race 3 uid 13336574112143647268: PASS
+  launch 7 race 4 uid 4008586369505658500: PASS
+  launch 8 race 1 uid 15414279959307268674: PASS
+  launch 8 race 2 uid 11720687260723856818: PASS
+  launch 8 race 3 uid 1383424563827099760: PASS
+  launch 8 race 4 uid 4133226495275255749: PASS
+  launch 9 race 1 uid 17850283079764143859: PASS
+  launch 9 race 2 uid 9062669374081997351: PASS
+  launch 9 race 3 uid 3514932411685949849: PASS
+  launch 9 race 4 uid 15590414826760293656: PASS
+  launch 10 race 1 uid 6547540441699860695: PASS
+  launch 10 race 2 uid 14517442145975427024: PASS
+  launch 10 race 3 uid 4755820327428870070: PASS
+  launch 10 race 4 uid 7757041212191637624: PASS
+  launch 11 race 1 uid 3791051637377112184: PASS
+  launch 11 race 2 uid 5450179331487883933: PASS
+  launch 11 race 3 uid 13607558818375164190: PASS
+  launch 11 race 4 uid 9307445015856978003: PASS
+  launch 12 race 1 uid 5033981731546500561: PASS
+  launch 12 race 2 uid 768106000261265753: PASS
+  launch 12 race 3 uid 5896399265781320093: PASS
+  launch 12 race 4 uid 7247594848476041658: PASS
+V-1 check runs\2026-11-17-V1: seed 20261117, 12 launches, 48/48 races valid, 10000 permutations with the launch as the block (21.46 s; parsing 317 s)
+factor         primary           pred  estimate       SE       p  FE slope   SE(FE)  null band (FE slope)                      decision
+reaction_speed reaction_s           -   -0.0059   0.0035  0.0940   -0.0061   0.0038  +/-0.02 s from the prereg                 DEAD
+mistakes       launch_m             +   -0.0648   0.1048  0.5518   -0.0685   0.1123  +/-0.50 m prereg v3 (about half the 1.08 m start-to-start SD of one driver)DEAD
+aggression     passes_made          +   -0.0007   0.0711  0.9942    0.0008   0.0771  +/-0.10 /race prereg v3: 25% of the stock 0.41/driver-raceINCONCLUSIVE
+control        exit_all_kph         +    0.0100   0.2381  0.9679    0.0198   0.2577  +/-2.00 km/h from the prereg              DEAD
+speed_in       entry_all_kph        +    0.0094   0.3070  0.9734    0.0211   0.3315  +/-2.00 km/h from the prereg              DEAD
+speed_out      exit_all_kph         +   -0.0891   0.2410  0.7106   -0.0844   0.2614  +/-2.00 km/h from the prereg              DEAD
+DEFEND         passes_suffered      -    0.1558   0.1089  0.1528    0.1635   0.1180  +/-0.10 /race prereg v3: 25% of the stock 0.41/driver-raceINCONCLUSIVE
+ATTACK         passes_made          +    0.0465   0.0724  0.5245    0.0487   0.0785  +/-0.10 /race prereg v3: 25% of the stock 0.41/driver-raceINCONCLUSIVE
+aggression vs ATTACK, both on passes_made: aggression -0.001 (FE 0.001, p 0.9942) INCONCLUSIVE; ATTACK 0.046 (FE 0.049, p 0.5245) INCONCLUSIVE
+control floor rule: 3 off-track + spin events in the batch (threshold 10) -> control primary exit_all_kph (FALLBACK)
+secondaries (no decision): estimate / SE / p
+  reaction_speed speed_1s_kph 0.039/0.114/0.731; launch_m -0.186/0.106/0.078; gain_t1 -0.049/0.057/0.389; gain_lap1 0.001/0.112/0.995; laptime_sd_s 0.016/0.030/0.604; contacts -0.025/0.053/0.637
+  mistakes       speed_1s_kph -0.038/0.115/0.737; reaction_s -0.001/0.004/0.786; gain_t1 0.030/0.056/0.599; gain_lap1 0.041/0.110/0.706; laptime_sd_s -0.017/0.030/0.572; contacts -0.016/0.054/0.761
+  aggression     passes_suffered 0.041/0.107/0.707; gain_t1 -0.044/0.056/0.426; gain_lap1 -0.047/0.110/0.674; laptime_sd_s 0.003/0.030/0.933; contacts 0.056/0.053/0.298
+  control        offtracks_spins -0.008/0.005/0.044; offtracks -0.005/0.003/0.071; spins -0.003/0.002/0.109; gain_t1 -0.030/0.056/0.599; gain_lap1 -0.168/0.111/0.129; laptime_sd_s 0.035/0.030/0.233; contacts -0.009/0.054/0.883
+  speed_in       entry_kph 0.209/0.554/0.711; gain_t1 -0.012/0.056/0.834; gain_lap1 0.013/0.110/0.909; laptime_sd_s 0.021/0.030/0.491; contacts -0.007/0.054/0.898
+  speed_out      exit_kph 0.080/0.424/0.856; gain_t1 0.022/0.057/0.700; gain_lap1 0.024/0.111/0.822; laptime_sd_s -0.059/0.030/0.053; contacts -0.009/0.054/0.873
+  DEFEND         held_behind_s -6.520/7.636/0.397; passes_made -0.013/0.072/0.858; gain_t1 -0.040/0.056/0.471; gain_lap1 -0.135/0.111/0.226; laptime_sd_s 0.014/0.030/0.635; contacts -0.055/0.054/0.318
+  ATTACK         passes_suffered 0.160/0.108/0.138; gain_t1 -0.008/0.056/0.883; gain_lap1 0.208/0.111/0.058; laptime_sd_s -0.016/0.030/0.596; contacts 0.174/0.055/0.002
+fixed in prereg v3: T1_M 345 m (Austria T1); launch_m null band +/-0.5 m; control = off-tracks (surfaceType, >= 2 unpaved wheels) + spins (slip >= 60 deg); the statistic is attenuated about (L-1)/L vs the FE slope (summary.json)
+wrote runs\2026-11-17-V1\v1_check\summary.json, per_race.csv, per_driver_launch.csv

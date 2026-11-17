@@ -1,0 +1,3 @@
+﻿addons.json: { "verve.v1-l04": "0.0.1" }
+addons.json names verve.v1-l04: yes
+loader.log verve.v1-l04 lines: 0

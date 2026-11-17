@@ -1,0 +1,2 @@
+﻿ops 235: 233 applied (214 value-checked, 19 curves written at the right key but their value isn't logged), 2 dropped as equal to stock (driver_characteristics.reaction_speed 2), 0 problem(s)
+loader total 289 overwritten; expected 56 + 233 = 289

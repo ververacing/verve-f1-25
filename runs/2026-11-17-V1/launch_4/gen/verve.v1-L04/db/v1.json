@@ -1,0 +1,1415 @@
+{
+  "schema_version": 1,
+  "ops": [
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oscar_piastri]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lando_norris]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=charles_leclerc]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=lewis_hamilton]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=max_verstappen]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=yuki_tsunoda]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=george_russell]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=andrea-kimi_antonelli]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=fernando_alonso]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=pierre_gasly]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=franco_colapinto]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=esteban_ocon]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=oliver_bearman]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=liam_lawson]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=isack_hadjar]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=alex_albon]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=carlos_sainz-jr]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.mistakes",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.aggression",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.control",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.speed_in",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "driver_characteristics.speed_out",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "0.7"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "0.6"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.9,0:0.9,1:0.9,1:0.9"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=nico_hulkenberg]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "2"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.reaction_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.mistakes",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.aggression",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.control",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.speed_in",
+      "value": "0.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "driver_characteristics.speed_out",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.blocking.max_blocking_distance",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.blocking.max_blocking_distance_at_race_start",
+      "value": "5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.blocking.fraction_of_follow_speed_at_race_start",
+      "value": "1.0"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.overtake.overlap_percentage",
+      "value": "@v2@minx:0,maxx:1,miny:0,maxy:1,0:0.05,0:0.05,1:0.05,1:0.05"
+    },
+    {
+      "op": "set",
+      "select": "entrants.drivers.driver[_metadata_=gabriel_bortoleto]",
+      "field": "ai_driver_config.alongside.yield_overtake_rate",
+      "value": "0.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.alongside_space_factor.high_difficulty_low_characteristic_mapping",
+      "value": "1.45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.braking_distance_factor.high_difficulty_low_characteristic_mapping",
+      "value": "1.45"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.corner_curvature_factor.high_difficulty_low_characteristic_mapping",
+      "value": "0.76"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.follow_speed_factor.high_difficulty_low_characteristic_mapping",
+      "value": "1.15"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.throttle_confidence.high_difficulty_low_characteristic_mapping",
+      "value": "0.88"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.throttle_exit_fallibility.high_difficulty_low_characteristic_mapping",
+      "value": "1.5"
+    },
+    {
+      "op": "set",
+      "select": "entrants.vehicles.vehicle_packages.vehicle_package_10",
+      "field": "ai_vehicle_package_config.driver_parameter_maps.throttle_on_time.high_difficulty_low_characteristic_mapping",
+      "value": "1.8"
+    }
+  ]
+}
