@@ -28,10 +28,11 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
   36 ops applied), weather LOCKED and the saves guard.
 - **Primary (per launch):** the mean UDP reaction of the pinned cars minus that of the stock cars, over the launch's
   valid races (a car's mean over its races, then the mean over cars).
-- **PASS:** the difference is **≥ 0.12 s in both launches** (the supervisor's threshold). That's conservative: 0.65 s
-  against B-0006's stock-field draws of about 0.20-0.36 s predicts about +0.3 s.
-- **FAIL:** < 0.12 s in either launch. Then the measurement chain or the per-driver `ai_driver_config` path is broken on
-  this build or route, and every V-1 null is moot until it's understood.
+- **PASS:** the difference is **≥ 0.12 s in both launches** (the supervisor's threshold). That's conservative: pinning
+  to 0.65 s against a stock draw of about 0.28-0.42 s should give about +0.25-0.35 s.
+- **FAIL:** < 0.12 s in either launch (two readings in the outcome table below).
+- **Secondaries, not scored** (B-0012b's exploratory signal): speed at 1 s after lights out, and positions gained to T1
+  (`T1_M` 345 m), for the pinned cars against the stock cars.
 - **Tooling to build (for review, before D1 runs):** `tools/d1_make.py` (the seeded teammate draw plus the add-on
   `verve.d1-l<LL>`, 36 ops), and a `-Make` switch on `tools/v1_run.ps1` to use it instead of v1_make (same install,
   enable, remove, hash, build and session checks). The check_applied key cache gets the 76 race_start paths, from
@@ -64,7 +65,7 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
 |---|---|---|
 | PASS | REPLICATES | The rows reach the AI in benchmark, and the chain works in GP: the trait path is **mode-dependent** (H2 for GP). Next: D3, to see where GP loses the override. |
 | PASS | NULL | `ai_driver_config` reaches the AI in GP, but the trait row is dead in both modes on 26566308: a build change (H1-like for this build). Next: D3, plus the per-seat racecraft levers (desk research). |
-| FAIL | any | The chain or the `ai_driver_config` path is broken on this build or route. Fix the measure or route first; the V-1 nulls are moot. |
+| FAIL | any | Two readings: (a) the measurement chain is broken (the UDP reaction measure or the route), or (b) per-driver `ai_driver_config` rows aren't read in GP on this build. **First step after a FAIL:** a stock-vs-stock check of the UDP reaction measure (no add-on; the two random halves of the field must read about 0 apart), plus the build check's applied-op readback (all 36 ops applied at the right keys). Until it's understood, the V-1 nulls are moot. |
 | PASS | probe fails | D1 alone stands; the benchmark route is unavailable on 26566308. D3 decides. |
 
 No interim looks. Each run is reported when it's done, and nothing is called a result before the supervisor's review.
