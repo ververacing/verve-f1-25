@@ -48,6 +48,11 @@ RESUME with `pause.ps1 -Clear` afterwards.
 - GPU and CPU load, only if a counter is cheap to read without installing anything (for example
   `Get-Counter '\GPU Engine(*)\Utilization Percentage'` and `'\Processor(_Total)\% Processor Time'`, sampled during
   race 1). Otherwise leave them out.
+- **Same boot size only (supervisor, 2026-11-17).** A perf comparison may only use launches that booted at the same
+  swapchain size, read from each launch's `raw/loader.log` first `CreateSwapChainForHwnd (WxH)` line. The Austria
+  discovery launch booted at 1920x1080. Every launch since 2026-11-16 at about 20:29 PT has booted at the desktop's
+  1024x768 (`docs/display_fallback.md`). Record the pilot's boot size, and pick a comparison launch with the same one.
+  If none exists, leave (d) out.
 
 **The 10 `unverified` keys.** Record the real value form of each, read-only, from the preset the game re-serialised
 (the edit log in `hw_swap.txt` shows the starting forms):
