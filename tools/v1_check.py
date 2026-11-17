@@ -90,7 +90,7 @@ MOVE_M = 0.3            # totalDistance gain over the pre-LGOT value that counts
 MOVE_WINDOW_S = 6.0     # LapData frames read after LGOT for the start measures
 LAUNCH_S = 2.0          # launch_m: distance covered in this long after the car's own first movement
 SPEED_AT_S = 1.0        # speed_1s_kph: CarTelemetry speed this long after LGOT
-T1_M = 300.0            # PROVISIONAL: Austria's T1 lap distance for positions gained to T1 (prereg must fix it)
+T1_M = 345.0            # prereg v3: Austria's first braking zone (brake onset at 345-348 m in both discovery races, 16 Nov)
 
 # ---------------------------------------------------------------------------------------------------- race measures
 OFF_SURFACES = {3, 4, 5, 6, 7, 8}   # CarTelemetry surfaceType: rock, gravel, mud, sand, grass, water (unpaved)
@@ -138,7 +138,7 @@ PRIMARY = {
 # primary measure -> (null band half-width, source). "prereg" = the v2 table; "PROVISIONAL" = to fix before race 1.
 NULL_BAND = {
     "reaction_s": (0.02, "from the prereg"),
-    "launch_m": (0.5, "PROVISIONAL (not in the prereg)"),
+    "launch_m": (0.5, "prereg v3 (about half the 1.08 m start-to-start SD of one driver)"),
     # prereg v3 (supervisor, #155 review): 25% of the stock per-driver-per-race mean at Austria. B-0016 arm A, dry:
     # 55 net held passes on laps 2+ in 7 races = 7.9 per race = 0.41 per driver per race -> +/-0.10. Re-fixed only if
     # the discovery's stock rate is under 4 or over 16 per race.
@@ -737,7 +737,7 @@ def report(res: dict, head: list[str], partial: bool) -> list[str]:
     for f, r in res["factors"].items():
         lines.append(f"  {f:<15}" + "; ".join(f"{m} {fnum(x['estimate'], 3)}/{fnum(x['se'], 3)}/{fnum(x['p'], 3)}"
                                              for m, x in r["secondary"].items()))
-    lines.append(f"provisional: T1_M {T1_M:g} m (Austria T1); launch_m null band +/-{NULL_BAND['launch_m'][0]} m; "
+    lines.append(f"fixed in prereg v3: T1_M {T1_M:g} m (Austria T1); launch_m null band +/-{NULL_BAND['launch_m'][0]} m; "
                  f"control = off-tracks (surfaceType, >= {OFF_WHEELS} unpaved wheels) + spins (slip >= "
                  f"{SPIN_SLIP_DEG:g} deg); the statistic is attenuated about (L-1)/L vs the FE slope (summary.json)")
     return [f"{PARTIAL} | {ln}" for ln in lines] if partial else lines
