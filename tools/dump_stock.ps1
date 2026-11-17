@@ -13,14 +13,16 @@ param(
     [Parameter(Mandatory)] [string] $Out,
     [int] $MaxDepth = 8,
     [int] $MaxNodes = 5000,
-    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe"
+    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
+    [string] $Profile = 'verve-test'   # never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
 $script:nodes = 0
 $sb = New-Object System.Text.StringBuilder
 
 function Get-Level([string] $p) {
-    $lines = & $Swofty db get $p
+    $lines = & $Swofty db get --profile $Profile $p
     if ($LASTEXITCODE -ne 0) { return $null }
     $resolved = $lines[0].Trim()
     $items = foreach ($l in $lines | Select-Object -Skip 1) {
