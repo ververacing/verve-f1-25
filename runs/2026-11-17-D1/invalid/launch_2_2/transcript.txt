@@ -1,0 +1,28 @@
+﻿saves before: 179 entries; profile verve-test (DDDF6A0F754A87ADFA7935C77990F7BED04A9B803C4C30D6098A22BF196BDE0F) +addons verve.d1-l02; active profile tyler
+udp capture pid 23860
+attempt 1 started 02:15:02 (38 s since the last game exit)
+sandbox: %USERPROFILE%\AppData\Local\Swofty\test-runs\shell-20261117-101502-1 ({"schema":1,"run":"shell-20261117-101502-1","state":"armed","pid":31712,"remote":"%USERPROFILE%\\AppData\\Local\\Swofty\\test-runs\\shell-20261117-101502-1\\saves\\remote","why":""})
+game pid 31712 (sandbox.json)
+02:16:43 > wait screen=splash 180  =>  {"seq":1,"status":"ok","value":{"phase":"splash"},"ms":75641}
+02:16:43 > status  =>  {"seq":2,"status":"ok","value":{"v":1,"pid":31712,"run":"shell-20261117-101502-1","ticks":4096,"phase":"|splash|StateIntro|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+game pid 31712 (test agent)
+intro played (splash after 76 s)
+02:17:04 > pad ls 15000  =>  {"seq":3,"status":"ok","ms":20610}
+02:17:04 > pad ls  =>  {"seq":4,"status":"ok","ms":250}
+02:17:09 > pad ls 2000  =>  {"seq":5,"status":"ok","ms":4000}
+02:17:09 > pad ls  =>  {"seq":6,"status":"ok","ms":250}
+02:18:09 > home  =>  {"seq":7,"status":"timeout","error":"home: not within 60 s (no home view model: the front end's transition screen; 29 press(es) of the virtual pad's a for the notice)","ms":60000}
+02:19:13 > @raw {"seq":0,"cmd":"route","args":{"route":"f1_world"},"timeout_ms":60000}  =>  {"seq":8,"status":"timeout","error":"route f1_world: not within 60 s (no home view model: the front end's transition screen; 28 press(es) of the virtual pad's a for the notice)","ms":60000}
+02:19:18 > status  =>  {"seq":9,"status":"ok","value":{"v":1,"pid":31712,"run":"shell-20261117-101502-1","ticks":12849,"phase":"|frontend_transition|#5f9ae18b|","sandbox":"armed","bindings":{"route":"ok","pad":"ok","ai_drives_player":"ok","car":"the car field offsets are the KB build's and this is not that build","title":"StateIntro's state layout (+0xcd0, +0xef3, +0xef4) is the KB build's and this is not that build","resume":"the resume screens' card layout is the KB build's and this is not that build","advance":"Team HQ's advance view model layout is the KB build's and this is not that build"},"tests":[]},"ms":0}
+EXPECT FAILED: screen '|frontend_transition|#5f9ae18b|' !~ fe_f1_world; stopping the plan
+02:19:18 > quit  =>  {"seq":10,"status":"ok","value":{"windows":1},"ms":0}
+stdin closed (EOF) at 02:19:18
+run folder: shell-20261117-101502-1
+result: stopped at expect fe_f1_world
+udp recording: 6655 bytes
+display fallback: hw hardware_settings_config/graphics_card/resolution@width: 1920 -> 1024; hw hardware_settings_config/graphics_card/resolution@height: 1080 -> 768
+display fallback: live differs only in resolution@width 1920 -> 1024, resolution@height 1080 -> 768
+display fallback: evidence copy hardware_settings_config.display-fallback-20261117-021937.xml
+display fallback restored (live equals the reference by value)
+display fallback restored
+saves unchanged (179 entries)

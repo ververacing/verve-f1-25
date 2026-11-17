@@ -670,6 +670,19 @@
       "implications": "Two explanations remain: (H1) the overrides reach the AI but don't matter in GP on 26566308; (H2) they never reach the per-car AI record on this route/build. D1 (a positive control with the per-driver ai_driver_config race-start reaction bounds), D2 (a benchmark replication of B-0006) and D3 (a readback of the effective per-car values) separate them. Nobody writes 'the row route is dead' before that.",
       "related_questions": [],
       "status": "verified as scored (V-1); the mechanism is open"
+    },
+    {
+      "id": "F-49",
+      "game_build": "26566308 (F1 25 Steam 1.0.145.2472)",
+      "claim": "D1: in GP on 26566308, per-driver ai_driver_config race_start reaction bounds reach the AI (pinned 0.65 → +0.46 s UDP reaction vs stock, both launches); the measurement chain works; V-1's trait null is specific to the driver_characteristics path.",
+      "confidence": "pre-registered positive control (docs/verve_d1_d2_prereg.md, #170): 2 launches x 4 races, 8/8 valid, PASS bar >= 0.12 s in both launches; pinned - stock +0.467 / +0.453 s; 36/36 ops value-checked; the pinned cars read an identical 0.936 s in both launches (deterministic draw). Wording by the supervisor.",
+      "evidence": [
+        "runs/2026-11-17-D1 (summary.md, d1_check/summary.json, per_car_launch.csv)",
+        "secondaries (not scored): speed at 1 s -8.18 / -7.60 km/h, gain to T1 -1.85 / -1.64 places for the pinned cars"
+      ],
+      "implications": "race_start rows are a CONFIRMED per-driver start lever in GP on 26566308. The V-1 null for reaction_speed narrows to the driver_characteristics path (D2 is stopped: the benchmark can't be sandboxed). D4 tests the ratings route; C-1 calibrates game-time reaction to UDP reaction and launch distance.",
+      "related_questions": [],
+      "status": "verified (D1)"
     }
   ]
 }
