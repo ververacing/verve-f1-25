@@ -57,6 +57,10 @@ try {
         & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_hw_settings.ps1 *> $null
         if ($LASTEXITCODE -ne 0) { $fails += 'test_hw_settings' } else { '  ok test_hw_settings' }
     }
+    if (Test-Path 'tools/test_hw_swap.ps1') {   # pure: synthetic files in %TEMP% only, never the live hardware settings
+        & powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_hw_swap.ps1 *> $null
+        if ($LASTEXITCODE -ne 0) { $fails += 'test_hw_swap' } else { '  ok test_hw_swap' }
+    }
     # PID ownership and the foreign-dummy check (incident 2026-11-15); b0015/b0016 scorers when present
     # the live part (dummy F1_25/swofty processes): testing runs 24 hours a day since 2026-11-16 (no windows), but the
     # dummies never run while paused (#107 review), nor while any F1_25 or launcher process is up (a real race, or

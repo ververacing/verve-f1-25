@@ -13,6 +13,8 @@ Refusals: a PAUSE (or a due pause-at) (exit 12), a game or launcher running that
 profiles left over (exit 10), a missing plan (exit 13); 5 if saves changed. Testing runs 24 hours a day since
 2026-11-16, so there's no window or wrap-up refusal (exit 8) any more. Rerunning a race moves the earlier attempt to
 <Batch>\invalid\.
+-LowGraphics (opt-in, OFF by default): as tools/v1_run.ps1 (the shell swaps the low-graphics test preset in and back,
+this runner's finally repeats the swap-back); exit 17 = swap refused, 18 = Tyler's hardware settings not restored.
 #>
 param(
     [Parameter(Mandatory)] [int] $Race,
@@ -24,7 +26,8 @@ param(
     [string] $Plan = 'harness\sessions\gp_menu_full_skip.plan',   # #118: the dry-locked plan for B-0016b / B-0018
     [switch] $StockOnly,       # B-0018 (#120): every race is stock (arm A), no addon
     [switch] $LockedWeather,   # #118: weather.txt from weather_check --locked (the checkers then require LOCKED)
-    [int] $SkippedIntroS = 40  # passed to sandbox_shell; 0 = never treat a fast splash as a skipped intro (diagnostics only)
+    [int] $SkippedIntroS = 40, # passed to sandbox_shell; 0 = never treat a fast splash as a skipped intro (diagnostics only)
+    [switch] $LowGraphics      # opt-in, off by default: the low-graphics test preset for this race (tools/hw_swap.ps1)
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -68,9 +71,22 @@ $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $
 if ($armB) { $shellArgs += @('-Addon', 'swofty.lap1-ai') }   # only when set: an empty -Addon through -File fails
 if ($SidestepDryRun) { $shellArgs += '-SidestepDryRun' }
 if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
+if ($LowGraphics) { $shellArgs += '-LowGraphics' }   # only when set: the shell swaps the preset in and back itself
+$hwBackCode = 0
+try {
 powershell @shellArgs |
-    ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording' }
+    ForEach-Object { $_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%' } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored' }
 $code = $LASTEXITCODE
+} finally {
+    # safety net for every exit (the shell killed or crashed before its own swap-back): only this race's swap (tagged
+    # with its folder), and a no-op once the shell has restored Tyler's file
+    if ($LowGraphics) {
+        $outFull = (Resolve-Path $out).Path
+        $hb = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_swap.ps1') -Back -Tag $outFull -Log (Join-Path $outFull 'hw_swap.txt'))
+        $hwBackCode = $LASTEXITCODE
+        $hb | ForEach-Object { "hw_swap: $($_ -replace [regex]::Escape($env:USERPROFILE), '%USERPROFILE%')" }
+    }
+}
 "guard exit: $code"
 
 # #101 per-race logging: lap1-ai's version and its loader.log lines
@@ -125,6 +141,8 @@ elseif ($bin -and (Test-Path $bin)) {
     $ErrorActionPreference = 'Stop'
 } else { 'race_feel: no UDP capture found for this race' }
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
+if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: Tyler''s hardware settings were NOT restored (hw_swap.txt); stop the batch and message the supervisor'; exit 18 }
+if ($LowGraphics -and $hwBackCode -eq 3) { "race ${Race}: hardware settings swap-back deferred (F1 25 still running); pause or pre-flight restores Tyler's file" }
 # a pause-at the next race wouldn't make: pause now, at the end of this race (no turn of the agent needed)
 if (-not (Test-Path $pauseFlag)) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'pause.ps1') -IfDue -NextMinutes ($RaceMinutes + 5)

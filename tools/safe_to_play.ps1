@@ -10,6 +10,8 @@ SAFE TO PLAY only once all of these have FINISHED:
 1. Nothing of ours is running: no runner or sandbox script (b00xx_run, sandbox_shell, sandbox_run, run_with_udp,
    preflight, post_run_check, cleanup, deferred check) and no process recorded in a recent runs/**/ours.csv.
 2. No F1 25 or Swofty process is up (if Tyler's own game or launcher is up, he is already in; the checks wait).
+2b. If a low-graphics swap is active (tools/hw_swap.ps1 state), Tyler's hardware_settings_config.xml is restored
+   byte-identical and verified; a failure is "WAIT: ... URGENT: message the supervisor now". No swap: a no-op.
 3. post_run_check.ps1 exits 0 (CLEAN), cleanup_test_profiles.ps1 exits 0, deferred_saves_check.ps1 has nothing
    pending. These run only after 1 and 2 pass, so this script never runs a swofty command while a game or launcher is up.
 #>
@@ -35,6 +37,16 @@ if ($ours.Count) { Verdict "WAIT: cleanup running (ours still up: $(($ours | For
 # 2. any game or Swofty process now is someone else's
 $up = @($snap | Where-Object { $_.Name -match '^F1_25' -or $_.Name -match '^swofty' })
 if ($up.Count) { Verdict "WAIT: F1 25 or the Swofty Launcher is open (not ours: $(($up | ForEach-Object { "$($_.Name) $($_.Id)" }) -join ', ')); the post-run checks run once it has closed" 1 }
+# 2b. Tyler's hardware settings (tools/hw_swap.ps1): if a low-graphics swap is active, his file is restored and its hash
+# verified here, before the saves checks and before any SAFE TO PLAY; a failure is WAIT plus URGENT. No swap active:
+# nothing is read or written (the opt-in rule)
+$hwg = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_swap.ps1') -PauseGate)
+$hwCode = $LASTEXITCODE
+if ($hwCode -ne 0) {
+    $hwLine = "$($hwg | Select-Object -Last 1)"
+    if ($hwLine -notmatch '^WAIT: .*URGENT') { $hwLine = "WAIT: Tyler's hardware settings could not be checked (hw_swap exit $hwCode $hwLine). URGENT: message the supervisor now" }
+    Verdict $hwLine 1
+}
 # 3. the checks themselves
 $pc = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'post_run_check.ps1')
 if ($LASTEXITCODE -ne 0) { Verdict "WAIT: post-run check not clean (exit $LASTEXITCODE): $($pc | Select-Object -Last 1)" 1 }

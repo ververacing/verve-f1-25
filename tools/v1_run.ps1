@@ -29,6 +29,10 @@ Exit codes as b0016_run.ps1: the guard's exit (0 plan done, 6 plan stopped, 7 UR
 build check failed (check_applied: the game didn't hold this launch's ops; stop the batch). gamedb_expected.txt is that
 launch's expected overwrite count for v1_check.
 Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
+-LowGraphics (opt-in, OFF by default; nothing changes without it): the shell swaps in the low-graphics test preset
+(tools/hw_swap.ps1 -In, after its saves snapshot) and Tyler's hardware_settings_config.xml back, byte-identical, when
+its launch ends; this runner's finally repeats the swap-back as a safety net (a no-op once restored). Exit 17 = the
+swap was refused (nothing launched); 18 = Tyler's hardware settings could not be restored (URGENT, stop the batch).
 #>
 param(
     [Parameter(Mandatory)] [int] $Launch,
@@ -40,7 +44,8 @@ param(
     [int] $LaunchMinutes = 80,   # for pause-at: the menu (~9 min) + 4 races at the plan's @udpfinish cap, worst case
     [string] $ExpProfile = 'verve-test',
     [string] $Python = 'python',
-    [int] $SkippedIntroS = 40
+    [int] $SkippedIntroS = 40,
+    [switch] $LowGraphics   # opt-in, off by default: the low-graphics test preset for this launch (tools/hw_swap.ps1)
 )
 $ErrorActionPreference = 'Stop'
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
@@ -148,9 +153,21 @@ $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $
     '-ExpProfile', $ExpProfile, '-Plan', $Plan, '-Udp', '-Addon', $id,
     '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
 if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
+if ($LowGraphics) { $shellArgs += '-LowGraphics' }   # only when set: the shell swaps the preset in and back itself
+$hwBackCode = 0
+try {
 powershell @shellArgs |
-    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED' }
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored' }
 $code = $LASTEXITCODE
+} finally {
+    # safety net for every exit (the shell killed or crashed before its own swap-back): only this launch's swap
+    # (tagged with its folder), and a no-op once the shell has restored Tyler's file
+    if ($LowGraphics) {
+        $hb = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_swap.ps1') -Back -Tag $out -Log (Join-Path $out 'hw_swap.txt'))
+        $hwBackCode = $LASTEXITCODE
+        $hb | ForEach-Object { "hw_swap: $(Scrub $_)" }
+    }
+}
 "guard exit: $code"
 
 # 7. remove the add-on (never while a game or Swofty process is up: no Swofty steps then, incident 2026-11-15)
@@ -236,6 +253,8 @@ if ((Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)) { "
 
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
 if ($code -eq 7) { exit 7 }
+if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: Tyler''s hardware settings were NOT restored (hw_swap.txt); stop the batch and message the supervisor'; exit 18 }
+if ($LowGraphics -and $hwBackCode -eq 3) { "${tag}: hardware settings swap-back deferred (F1 25 still running); pause or pre-flight restores Tyler's file" }
 if (-not $tylerRestored) { exit 14 }
 if (-not $buildOk) { exit 16 }
 # a pause-at the next launch wouldn't make: pause now, at the end of this one (no turn of the agent needed)

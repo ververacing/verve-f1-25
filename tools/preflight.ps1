@@ -5,6 +5,8 @@ Usage:
     powershell -File tools/preflight.ps1
 
 Checks, in order, and exits 1 on the first hard failure:
+- hardware settings recovery (only when tools/hw_swap.ps1's state says a low-graphics swap is still active, e.g. after
+  a crash): the test preset live = Tyler's file restored byte-identical and logged; any other state = fail, report.
 - build: `swofty doctor` must report build id -Build (everything is pinned to it); a patch means stop and tell the
   supervisor.
 - journals: 0 open Swofty journals (state\journal\*.json), since an open one means a modded game folder.
@@ -20,6 +22,13 @@ param(
     [string] $Build = '26566308'   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
 )
 $ErrorActionPreference = 'Stop'
+# first: a low-graphics swap a crash left active (tools/hw_swap.ps1 -Recover). The recorded test preset live (by hash,
+# or by value after the game re-serialised it) = Tyler's file restored and logged; any third state = stop and report.
+# No swap active: silent, nothing read or written (the opt-in rule)
+$hwr = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_swap.ps1') -Recover)
+$hwrCode = $LASTEXITCODE
+$hwr | ForEach-Object { "hw_swap: $_" }
+if ($hwrCode -ne 0) { "PREFLIGHT FAIL: hardware settings recovery (hw_swap exit $hwrCode, above): report to the supervisor; nothing launches until it is resolved."; exit 1 }
 $doc = & $Swofty doctor
 $doc
 $bid = ($doc | Where-Object { $_ -match '^build id\s+(\S+)' } | ForEach-Object { $Matches[1] })
