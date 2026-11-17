@@ -21,7 +21,8 @@ writes (36 ops). Model expectation (racecraft → reaction_speed, the identity c
 - **Build check, both launches:** 36/36 curve ops at the right keys. That's key-only, as approved: `db get` reads stock
   for data add-ons, so the values can't be read back. 0 dropped, gamedb 92 = 56 + 36.
 - **Safety:** tyler.json was restored in both launches, the saves were unchanged and the weather LOCKED, the session
-  check ok, with no skip-relaunch and no display fallback.
+  check ok, with no skip-relaunch. The display fallback (resolution only) fired in both launches and was auto-restored
+  (corrected 2026-11-17: this line first said "no display fallback"; see [docs/display_fallback.md](../../docs/display_fallback.md)).
 
 ## Reading (F-50)
 
