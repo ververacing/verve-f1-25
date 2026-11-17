@@ -149,6 +149,10 @@ The amendment PR writes M_p, M_h, M_c, C_race and the four bands, rounded to 3 s
 Context, not a rule: with §5's V-1-scaled SE(FE), the chance of DEAD under a true zero becomes passes_made ≈0.31 (was ≈0.9:
 the lower M_p narrows its band), contacts ≈0.75 (was ≈0.64), held_behind_s and exit_all_kph ≈1.0 (unchanged).
 
+The lower stock pass rate (0.651 vs V-1's 0.98 under ×3 maps) lowers the chance of a DEAD call for OVERLAP/COMMIT to about
+0.31; INCONCLUSIVE there is expected and reads as not-a-lever-for-now. (Supervisor: #185 approved as written, no band
+changes, 2026-11-17.)
+
 ## 4. Extremes validity smoke (validity only, never analysed for effects)
 
 **Run.** One launch, the first 2 races of the V-1 plan, with seed 2026111707:
