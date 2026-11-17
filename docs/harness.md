@@ -169,7 +169,7 @@ emote`, a UI toggle only ("Use launcher saves", ticked by default). The
   `addon-profiles\<id>\<label>` to `.saved-old`, then `remove_tree` fails). It aborts the wrapper before the game starts,
   and it aborts `swofty restore`'s rollback, which leaves the game folder modded. Draft report:
   `docs/upstream/swofty_addon_storage_lock.md`. **Sidestep** (supervisor's standing authorisation, EMPTY folders only):
-  `tools/storage_sidestep.ps1` moves the empty targets to `Documentserve-f1-25-recovery\<stamp>\` before every launch,
+  `tools/storage_sidestep.ps1` moves the empty targets to `Documents\verve-f1-25-recovery\<stamp>\` before every launch,
   and refuses if any holds a file. `tools/post_run_check.ps1` checks the game folder after every run and in PAUSE.
   **Never run `swofty apply` as a probe.**
 - **Defender exclusion: declined.** Tyler decided on 2026-11-14 not to add a Windows Defender exclusion for
