@@ -500,7 +500,7 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
         $hwo = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $hwSwap -Back -Tag $Out -Log (Join-Path $Out 'hw_swap.txt'))
         $hwc = $LASTEXITCODE
         $hwo | ForEach-Object { Log "hw_swap: $_" }
-        if ($hwc -eq 7) { Log 'URGENT: Tyler''s hardware settings were NOT restored (hw_swap.txt). Message the supervisor now.' }
+        if ($hwc -eq 7) { Log 'URGENT: message the supervisor now: Tyler''s hardware settings were NOT restored (hw_swap exit 7, see hw_swap.txt)' }
     }
 }
 Log "result: $result"

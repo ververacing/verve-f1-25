@@ -260,7 +260,7 @@ $st = State $c
 $bk = [IO.File]::ReadAllBytes($st.backup); $bk[$bk.Length - 3] = [byte](($bk[$bk.Length - 3] + 1) % 256); [IO.File]::WriteAllBytes($st.backup, $bk)   # the backup damaged
 $r = Swap $c @('-PauseGate')
 $line = @($r.Out | Where-Object { $_ })
-Check 'pause gate, backup damaged: exit 1, one line "WAIT: ... URGENT: message the supervisor", nothing overwritten' ($r.Code -eq 1 -and $line.Count -eq 1 -and $line[0] -match '^WAIT: ' -and $line[0] -match 'URGENT: message the supervisor' -and (Sha $c.Live) -eq $st.presetSha -and (State $c).active) "exit $($r.Code): $($r.Out -join ' / ')"
+Check 'pause gate, backup damaged: exit 1, one line "WAIT: URGENT: message the supervisor now: <reason>", nothing overwritten' ($r.Code -eq 1 -and $line.Count -eq 1 -and $line[0] -match '^WAIT: URGENT: message the supervisor now: \S' -and (Sha $c.Live) -eq $st.presetSha -and (State $c).active) "exit $($r.Code): $($r.Out -join ' / ')"
 $r = Swap $c @('-Back')
 Check 'back, backup damaged: exit 7 (URGENT)' ($r.Code -eq 7 -and "$($r.Out)" -match 'URGENT') "exit $($r.Code)"
 # the game running: swap-in refused, swap-back deferred (the game rewrites the file on quit), pause gate WAIT
@@ -273,8 +273,46 @@ Swap $c @('-In') | Out-Null
 $r = Swap $c @('-Back') $me
 Check 'back while the game runs: exit 3 (deferred), the swap stays active' ($r.Code -eq 3 -and (State $c).active) "exit $($r.Code)"
 $r = Swap $c @('-PauseGate') $me
-Check 'pause gate while the game runs: WAIT plus URGENT' ($r.Code -eq 1 -and "$($r.Out)" -match '^WAIT: .*URGENT') "exit $($r.Code): $($r.Out -join ' / ')"
+Check 'pause gate while the game runs: WAIT plus URGENT' ($r.Code -eq 1 -and "$($r.Out)" -match '^WAIT: URGENT: message the supervisor now: ') "exit $($r.Code): $($r.Out -join ' / ')"
 Swap $c @('-Back') | Out-Null
+
+# ---- 8b. the game rewrites the file in its OWN layout as it quits, after a swap-back was tried while it ran ----
+function Game-Layout([string] $from) {
+    # the same values, written the way another serialiser would: attributes in reverse order, four-space indents, LF,
+    # no XML declaration, no comment, no space before "/>"
+    $x = New-Object System.Xml.XmlDocument; $x.Load($from)
+    foreach ($el in @($x.SelectNodes('//*'))) {
+        $as = @($el.Attributes | ForEach-Object { $_ }); [array]::Reverse($as)
+        $el.Attributes.RemoveAll(); foreach ($a in $as) { [void]$el.Attributes.Append($a) }
+    }
+    foreach ($cm in @($x.SelectNodes('//comment()'))) { [void]$cm.ParentNode.RemoveChild($cm) }
+    $s = New-Object System.Xml.XmlWriterSettings
+    $s.Indent = $true; $s.IndentChars = '    '; $s.NewLineChars = "`n"; $s.OmitXmlDeclaration = $true; $s.Encoding = $enc
+    $ms = New-Object IO.MemoryStream; $w = [System.Xml.XmlWriter]::Create($ms, $s)
+    foreach ($n in @($x.ChildNodes)) { if ($n.NodeType -eq 'Element') { $n.WriteTo($w) } }
+    $w.Flush(); $w.Dispose()
+    $enc.GetString($ms.ToArray()) -replace ' />', '/>'
+}
+$c = New-Case 'game-exit-write'
+Put $c.Live (Make-Xml $base 'a'); Put $c.Ref (Make-Xml $base 'b')
+$orig = Sha $c.Live
+Swap $c @('-In', '-Tag', 'run-g') | Out-Null
+$st = State $c
+# the "game" is running (this test's own process name): the swap-back must wait and write nothing
+$r = Swap $c @('-Back', '-Tag', 'run-g') $me
+Check 'game exit write: a swap-back while the game runs waits (exit 3), writes nothing, the swap stays active' ($r.Code -eq 3 -and (Sha $c.Live) -eq $st.presetSha -and (State $c).active) "exit $($r.Code): $($r.Out -join ' / ')"
+# ... the game quits: its exit write is the preset's values in its own layout
+$gameText = Game-Layout $c.Live
+Put $c.Live $gameText
+$gameBytes = [IO.File]::ReadAllBytes($c.Live)
+$layoutDiffers = (Sha $c.Live) -ne $st.presetSha -and $gameText -notmatch "`r" -and $gameText -notmatch '<\?xml' -and $gameText -match '\n    <'
+$reordered = [regex]::Match($gameText, '<resolution [^>]*').Value -match '^<resolution frameRateLimiterValue='
+Check 'game exit write: other bytes (reordered attributes, 4-space indents, LF, no declaration), the preset''s values' ($layoutDiffers -and $reordered -and -not @(Compare-HwValues $st.preset $c.Live).Count)
+# the game has exited: the later swap-back restores Tyler's file over the game's write
+$r = Swap $c @('-Back', '-Tag', 'run-g')
+Check 'game exit write: the swap-back after the game exited gives Tyler''s reference by value AND Tyler''s file by SHA-256' ($r.Code -eq 0 -and -not @(Compare-HwValues $c.Ref $c.Live).Count -and (Sha $c.Live) -eq $orig -and (Sha $c.Live) -eq $st.backupSha -and -not (State $c).active -and "$($r.Out)" -match 'live was preset-values') "exit $($r.Code): $($r.Out -join ' / ')"
+# and nothing comes after it: the game's exit write came BEFORE the restore, so the restore is the last write
+Check 'game exit write: the game''s write was not left behind (the restore came after it)' (-not (HwSameBytes ([IO.File]::ReadAllBytes($c.Live)) $gameBytes))
 
 # ---- 9. an interrupted run: an exception between in and back still restores (the runners' try/finally) ----
 $c = New-Case 'interrupted'
@@ -311,6 +349,10 @@ foreach ($name in 'v1_run.ps1', 'b0016_run.ps1', 'sandbox_shell.ps1') {
         -not $g })
     $sw = @($ast.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'LowGraphics' })
     Check "${name}: -LowGraphics is a switch with no default, and all $($calls.Count) hw_swap call(s) are inside if (`$LowGraphics)" ($calls.Count -ge 1 -and -not $unguarded.Count -and $sw.Count -eq 1 -and $sw[0].StaticType -eq [switch] -and -not $sw[0].DefaultValue) "unguarded: $($unguarded.Count)"
+}
+foreach ($name in 'v1_run.ps1', 'b0016_run.ps1') {
+    $l18 = @(Get-Content (Join-Path $tools $name) | Where-Object { $_ -match '\bexit 18\b' -and $_ -notmatch '^\s*#' -and $_ -match '\{' })
+    Check "${name}: every exit 18 prints a line starting 'URGENT: message the supervisor now:' with the reason" ($l18.Count -ge 1 -and -not @($l18 | Where-Object { $_ -notmatch "'URGENT: message the supervisor now: \S[^']+''s hardware settings were NOT restored" }).Count) "$($l18.Count) line(s)"
 }
 $v1 = Get-Content (Join-Path $tools 'v1_run.ps1') -Raw
 Check 'v1_run: -LowGraphics is passed to the shell only when set' ($v1 -match "if \(\`$LowGraphics\) \{ \`$shellArgs \+= '-LowGraphics' \}")

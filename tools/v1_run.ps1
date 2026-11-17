@@ -32,7 +32,8 @@ Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
 -LowGraphics (opt-in, OFF by default; nothing changes without it): the shell swaps in the low-graphics test preset
 (tools/hw_swap.ps1 -In, after its saves snapshot) and Tyler's hardware_settings_config.xml back, byte-identical, when
 its launch ends; this runner's finally repeats the swap-back as a safety net (a no-op once restored). Exit 17 = the
-swap was refused (nothing launched); 18 = Tyler's hardware settings could not be restored (URGENT, stop the batch).
+swap was refused (nothing launched); 18 = Tyler's hardware settings could not be restored: it prints "URGENT: message the supervisor now: <reason>", and the
+agent messages the supervisor as URGENT at once and stops the batch.
 #>
 param(
     [Parameter(Mandatory)] [int] $Launch,
@@ -253,7 +254,7 @@ if ((Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)) { "
 
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
 if ($code -eq 7) { exit 7 }
-if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: Tyler''s hardware settings were NOT restored (hw_swap.txt); stop the batch and message the supervisor'; exit 18 }
+if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: message the supervisor now: Tyler''s hardware settings were NOT restored (hw_swap exit 7, see hw_swap.txt); stop the batch (exit 18)'; exit 18 }
 if ($LowGraphics -and $hwBackCode -eq 3) { "${tag}: hardware settings swap-back deferred (F1 25 still running); pause or pre-flight restores Tyler's file" }
 if (-not $tylerRestored) { exit 14 }
 if (-not $buildOk) { exit 16 }

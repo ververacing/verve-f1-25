@@ -17,7 +17,7 @@ Usage:
         Pre-flight: no swap active = silent no-op. Active and the live file is the recorded preset (by hash, or by value
         after the game re-serialised it) = restore Tyler's file and log it. Anything else = stop and report (exit 2).
     powershell -File tools/hw_swap.ps1 -PauseGate
-        tools/safe_to_play.ps1: -Back, printing one line only on failure: "WAIT: ... URGENT: message the supervisor".
+        tools/safe_to_play.ps1: -Back, printing one line only on failure: "WAIT: URGENT: message the supervisor now: <reason>".
     powershell -File tools/hw_swap.ps1 -Status
     powershell -File tools/hw_swap.ps1 -Preview -Source <copy.xml> [-OutFile <preset.xml>]
         The preset of a COPY, with the edit log; nothing live is read or written.
@@ -366,7 +366,7 @@ function Invoke-HwMain {
     $held = $false
     try {
         try { $held = $mutex.WaitOne(60000) } catch [Threading.AbandonedMutexException] { $held = $true }
-        if (-not $held) { HwSay 'another hw_swap call held the lock for 60 s'; if ($PauseGate) { 'WAIT: hardware settings swap is busy (another hw_swap call). URGENT: message the supervisor if it repeats'; return 1 }; return 7 }
+        if (-not $held) { HwSay 'another hw_swap call held the lock for 60 s'; if ($PauseGate) { 'WAIT: URGENT: message the supervisor now: Tyler''s hardware settings were not checked (another hw_swap call held the swap lock for 60 s)'; return 1 }; return 7 }
         if ($In) { return (Invoke-HwIn) }
         if ($Back) {
             $st = Read-HwState
@@ -383,7 +383,7 @@ function Invoke-HwMain {
             $r = Invoke-HwRestore $st 'pause'
             if ($r -eq 0) { return 0 }
             $last = Get-Content -LiteralPath $LogFile -Tail 1 -ErrorAction SilentlyContinue
-            "WAIT: Tyler's hardware settings are NOT restored (the low-graphics test preset is still live; hw_swap exit ${r}: $(($last -replace '^\S+ ', '').Trim())). URGENT: message the supervisor now"
+            "WAIT: URGENT: message the supervisor now: Tyler's hardware settings are NOT restored (the low-graphics test preset is still live; hw_swap exit ${r}: $(($last -replace '^\S+ ', '').Trim()))"
             return 1
         }
         if ($Status) {
@@ -411,7 +411,7 @@ function Invoke-HwMain {
 if ($In -or $Back -or $Recover -or $PauseGate -or $Status -or $Preview) {
     try { $code = Invoke-HwMain } catch {
         HwSay "ERROR: $($_.Exception.Message)"
-        if ($PauseGate) { "WAIT: Tyler's hardware settings could not be checked or restored (hw_swap error: $($_.Exception.Message)). URGENT: message the supervisor now"; exit 1 }
+        if ($PauseGate) { "WAIT: URGENT: message the supervisor now: Tyler's hardware settings could not be checked or restored (hw_swap error: $($_.Exception.Message))"; exit 1 }
         exit 7
     }
     $lines = @($code)

@@ -209,6 +209,16 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
     pre-flight for the supervisor. With no swap active, both do nothing.
   - **Never committed:** the file, its copies and the preset (they can hold device names). The commit holds only the
     key list.
+  - **Exit 18 = URGENT.** A runner exits 18 when Tyler's file could not be restored. It prints a line starting
+    `URGENT: message the supervisor now:` with the reason. The agent then messages the supervisor as URGENT at once and
+    starts nothing more. The pause gate's restore failure uses the same words, in its one verdict line:
+    `WAIT: URGENT: message the supervisor now: <reason>`. It gets the same at-once message.
+  - **Known edge case (recorded, not fixed; cosmetic and self-healing).** Suppose a crashed run leaves the preset live
+    and the agent isn't running, and Tyler then launches the game himself. He sees low graphics for that session.
+    When he quits, the game writes the preset back. The next pre-flight recovery sees the preset by value and restores
+    his file. If he changed a setting in that session, pre-flight sees a third state instead, and stops for the
+    supervisor.
+  - **The pilot** comes before any batch uses the switch: [hw_swap_pilot.md](hw_swap_pilot.md).
 
 ## Daily community add-on review (from 2026-11-16)
 

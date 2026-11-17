@@ -14,7 +14,7 @@ profiles left over (exit 10), a missing plan (exit 13); 5 if saves changed. Test
 2026-11-16, so there's no window or wrap-up refusal (exit 8) any more. Rerunning a race moves the earlier attempt to
 <Batch>\invalid\.
 -LowGraphics (opt-in, OFF by default): as tools/v1_run.ps1 (the shell swaps the low-graphics test preset in and back,
-this runner's finally repeats the swap-back); exit 17 = swap refused, 18 = Tyler's hardware settings not restored.
+this runner's finally repeats the swap-back); exit 17 = swap refused, 18 = Tyler's hardware settings not restored ("URGENT: message the supervisor now: <reason>").
 #>
 param(
     [Parameter(Mandatory)] [int] $Race,
@@ -141,7 +141,7 @@ elseif ($bin -and (Test-Path $bin)) {
     $ErrorActionPreference = 'Stop'
 } else { 'race_feel: no UDP capture found for this race' }
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
-if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: Tyler''s hardware settings were NOT restored (hw_swap.txt); stop the batch and message the supervisor'; exit 18 }
+if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: message the supervisor now: Tyler''s hardware settings were NOT restored (hw_swap exit 7, see hw_swap.txt); stop the batch (exit 18)'; exit 18 }
 if ($LowGraphics -and $hwBackCode -eq 3) { "race ${Race}: hardware settings swap-back deferred (F1 25 still running); pause or pre-flight restores Tyler's file" }
 # a pause-at the next race wouldn't make: pause now, at the end of this race (no turn of the agent needed)
 if (-not (Test-Path $pauseFlag)) {

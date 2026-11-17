@@ -11,7 +11,7 @@ SAFE TO PLAY only once all of these have FINISHED:
    preflight, post_run_check, cleanup, deferred check) and no process recorded in a recent runs/**/ours.csv.
 2. No F1 25 or Swofty process is up (if Tyler's own game or launcher is up, he is already in; the checks wait).
 2b. If a low-graphics swap is active (tools/hw_swap.ps1 state), Tyler's hardware_settings_config.xml is restored
-   byte-identical and verified; a failure is "WAIT: ... URGENT: message the supervisor now". No swap: a no-op.
+   byte-identical and verified; a failure is "WAIT: URGENT: message the supervisor now: <reason>". No swap: a no-op.
 3. post_run_check.ps1 exits 0 (CLEAN), cleanup_test_profiles.ps1 exits 0, deferred_saves_check.ps1 has nothing
    pending. These run only after 1 and 2 pass, so this script never runs a swofty command while a game or launcher is up.
 #>
@@ -44,7 +44,7 @@ $hwg = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScr
 $hwCode = $LASTEXITCODE
 if ($hwCode -ne 0) {
     $hwLine = "$($hwg | Select-Object -Last 1)"
-    if ($hwLine -notmatch '^WAIT: .*URGENT') { $hwLine = "WAIT: Tyler's hardware settings could not be checked (hw_swap exit $hwCode $hwLine). URGENT: message the supervisor now" }
+    if ($hwLine -notmatch '^WAIT: URGENT: message the supervisor now: ') { $hwLine = "WAIT: URGENT: message the supervisor now: Tyler's hardware settings could not be checked (hw_swap exit $hwCode $hwLine)" }
     Verdict $hwLine 1
 }
 # 3. the checks themselves
