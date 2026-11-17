@@ -199,7 +199,34 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
   hardware_settings_config.ref-20261116.xml`, never committed, since it can hold device names. At pre-flight and after
   every race, the agent compares the file's values (not timestamps) with the reference; a rewrite with identical
   values is fine. Any changed key goes to the supervisor with its old and new values. The agent never restores or
-  edits the file; Tyler decides.
+  edits the file; Tyler decides. **The one exception is the low-graphics test preset below.**
+- **Low-graphics test preset** (supervisor's spec, 2026-11-16; `tools/hw_swap.ps1`). It is **opt-in**: a runner's
+  `-LowGraphics` switch, off by default, so a batch without it runs exactly as before.
+  - **The preset** is Tyler's file with only the declared graphics and display keys edited in place. The list is
+    `tools/hw_test_preset_keys.csv` (key, test value, reason, `ok`/`unverified`). It asks for windowed 1280x720, a
+    60 fps cap, and ray tracing, upscalers, frame generation, AA, motion blur, reflections, shadows, particles, crowd
+    and grass off or at their minimum. Every other byte stays identical (motion/udp, controls, audio, devices).
+  - **Swap in:** the shell swaps it in after its saves snapshot. It first checks that the live file equals the
+    reference by value, and stops (writing nothing) if not.
+  - **Swap back:** on every exit of the launch block (a `finally`), the shell restores Tyler's file byte-identical
+    from a dated byte copy under `%LOCALAPPDATA%\verve-f1-25\settings-snapshots\hw-swap\`, and checks its hash. The
+    runner's own `finally` repeats this as a safety net.
+  - **Pause and pre-flight:** `tools/safe_to_play.ps1` restores and verifies Tyler's file before it can say SAFE TO
+    PLAY; a failure is `WAIT ... URGENT: message the supervisor`. `tools/preflight.ps1` first recovers a swap that a
+    crash left active: the recorded preset live (by hash, or by value) is restored and logged; any third state stops
+    pre-flight for the supervisor. With no swap active, both do nothing.
+  - **Never committed:** the file, its copies and the preset (they can hold device names). The commit holds only the
+    key list.
+  - **Exit 18 = URGENT.** A runner exits 18 when Tyler's file could not be restored. It prints a line starting
+    `URGENT: message the supervisor now:` with the reason. The agent then messages the supervisor as URGENT at once and
+    starts nothing more. The pause gate's restore failure uses the same words, in its one verdict line:
+    `WAIT: URGENT: message the supervisor now: <reason>`. It gets the same at-once message.
+  - **Known edge case (recorded, not fixed; cosmetic and self-healing).** Suppose a crashed run leaves the preset live
+    and the agent isn't running, and Tyler then launches the game himself. He sees low graphics for that session.
+    When he quits, the game writes the preset back. The next pre-flight recovery sees the preset by value and restores
+    his file. If he changed a setting in that session, pre-flight sees a third state instead, and stops for the
+    supervisor.
+  - **The pilot** comes before any batch uses the switch: [hw_swap_pilot.md](hw_swap_pilot.md).
 
 ## Daily community add-on review (from 2026-11-16)
 

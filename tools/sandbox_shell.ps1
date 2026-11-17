@@ -79,7 +79,8 @@ param(
     [switch] $Udp,                # record tools/udp_capture.py alongside and parse it into <Out>/udp/
     [string] $Python = 'python',
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $SteamApp = ''   # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
+    [string] $SteamApp = '',  # <Steam>\userdata\<steamid>\3059520; found by tools/find_steam_app.ps1 when empty
+    [switch] $LowGraphics     # opt-in (off by default): the low-graphics test preset for this run (tools/hw_swap.ps1)
 )
 $ErrorActionPreference = 'Stop'
 if (-not $SteamApp) { $SteamApp = & (Join-Path $PSScriptRoot 'find_steam_app.ps1') }
@@ -132,6 +133,21 @@ New-Item -ItemType Directory -Force $snapDir | Out-Null
 $before | ConvertTo-Json | Set-Content (Join-Path $snapDir "$snapId.json") -Encoding utf8
 Log "saves before: $($before.Count) entries; profile $ExpProfile ($settingsHash) +addons $($Addon -join ','); active profile $activeProfile"
 
+# -LowGraphics (opt-in): the test preset goes in AFTER the before-snapshot and Tyler's file comes back (the finally
+# after the attempt loop) BEFORE the after-snapshot, so the guard compares Tyler's values with Tyler's values. The tag
+# is this run's folder: the runner's own safety-net swap-back touches only this run's swap.
+$hwSwap = Join-Path $PSScriptRoot 'hw_swap.ps1'
+if ($LowGraphics) {
+    $hwo = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $hwSwap -In -Tag $Out -Log (Join-Path $Out 'hw_swap.txt'))
+    $hwc = $LASTEXITCODE
+    $hwo | ForEach-Object { Log "hw_swap: $_" }
+    if ($hwc -ne 0) {
+        Log "ABORT: the low-graphics swap was refused (hw_swap exit $hwc, hw_swap.txt); nothing launched"
+        Remove-Item (Join-Path $snapDir "$snapId.json") -ErrorAction SilentlyContinue
+        exit 17
+    }
+}
+try {
 if ($Channels) { $env:SWOFTY_GAME_LOG_CHANNELS = $Channels }
 $addonArgs = ($Addon | ForEach-Object { "--addon $_" }) -join ' '
 # UDP capture from %TEMP%: python here can't read under %APPDATA% or most of %LOCALAPPDATA% (docs/harness.md)
@@ -573,6 +589,16 @@ for ($attempt = 1; $attempt -le $IntroTries; $attempt++) {
     Copy-Item (Join-Path $run.FullName 'addons.json') (Join-Path $Out 'addons.json') -ErrorAction SilentlyContinue
     break
 }
+} finally {
+    # every exit of the block above (plan done or stopped, pause cut, game crash, a thrown error, exit 1): Tyler's
+    # hardware settings back, byte-identical. Deferred (exit 3) while a game still runs: pause and pre-flight finish it.
+    if ($LowGraphics) {
+        $hwo = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $hwSwap -Back -Tag $Out -Log (Join-Path $Out 'hw_swap.txt'))
+        $hwc = $LASTEXITCODE
+        $hwo | ForEach-Object { Log "hw_swap: $_" }
+        if ($hwc -eq 7) { Log 'URGENT: message the supervisor now: Tyler''s hardware settings were NOT restored (hw_swap exit 7, see hw_swap.txt)' }
+    }
+}
 Log "result: $result"
 
 if ($cap) {
@@ -639,6 +665,12 @@ if ($resOnly) {
 }
 if ($diff) { Log 'SAVES CHANGED: stop sandbox runs and tell Tyler'; $diff; exit 5 }
 Log "saves unchanged ($($after.Count) entries)"
+# -LowGraphics: the swap-back (above, before the after-snapshot) normally restores Tyler's file alone, so a display
+# fallback only ever sees a non-swap diff; if both acted on this run, hw_swap logs it as its own line
+if ($LowGraphics) {
+    $hwo = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $hwSwap -AfterGuard -Tag $Out -Log (Join-Path $Out 'hw_swap.txt'))
+    $hwo | ForEach-Object { Log "hw_swap: $_" }
+}
 if ($script:urgent) { Log 'URGENT: the game folder is not stock after the run (post_run_check.txt). Stop all testing; tell the supervisor and Tyler.'; exit 7 }
 if ($result -ne 'plan done') { exit 6 }
 exit 0

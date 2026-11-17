@@ -69,9 +69,14 @@ Steps, all logged in <Batch>\launch_<n>\:
 Exit codes as b0016_run.ps1: the guard's exit (0 plan done, 6 plan stopped, 7 URGENT, 11 deferred), 5 saves changed,
 9 / 10 / 12 / 13 refusals, plus 14 tyler.json not restored, 15 generate or install failed (nothing launched), 16 the
 build check failed (check_applied: the game didn't hold this launch's ops; stop the batch) and 19 the session check
-failed twice for this launch (STOP: tell the supervisor). gamedb_expected.txt is that launch's expected overwrite count
+failed twice for this launch (STOP: tell the supervisor); with -LowGraphics also 17 and 18 (below). gamedb_expected.txt is that launch's expected overwrite count
 for v1_check.
 Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
+-LowGraphics (opt-in, OFF by default; nothing changes without it): the shell swaps in the low-graphics test preset
+(tools/hw_swap.ps1 -In, after its saves snapshot) and Tyler's hardware_settings_config.xml back, byte-identical, when
+its launch ends; this runner's finally repeats the swap-back as a safety net (a no-op once restored). Exit 17 = the
+swap was refused (nothing launched); 18 = Tyler's hardware settings could not be restored: it prints "URGENT: message the supervisor now: <reason>", and the
+agent messages the supervisor as URGENT at once and stops the batch.
 #>
 param(
     [Parameter(Mandatory)] [int] $Launch,
@@ -85,6 +90,7 @@ param(
     [string] $ExpProfile = 'verve-test',
     [string] $Python = 'python',
     [int] $SkippedIntroS = 40,
+    [switch] $LowGraphics,  # opt-in, off by default: the low-graphics test preset for this launch (tools/hw_swap.ps1)
     [switch] $IsRetry,   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
     [ValidateSet('v1', 'd1', 'd4', 'c1', 's1')] [string] $Make = 'v1',   # which generator: v1_make.py (V-1), d1_make.py (D1), d4_make.py (D4), c1_make.py (C-1) or s1_make.py (S-1)
     [switch] $StockSmoke,   # C-1's stock smoke test: the plan with NO add-on (no make, no install); every other check runs
@@ -228,9 +234,21 @@ $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $
     '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
 if ($id) { $shellArgs += @('-Addon', $id) }   # -StockSmoke: no -Addon (an empty value through powershell -File is a missing argument)
 if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
+if ($LowGraphics) { $shellArgs += '-LowGraphics' }   # only when set: the shell swaps the preset in and back itself
+$hwBackCode = 0
+try {
 powershell @shellArgs |
-    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK|^startwait: start \d+ exit|STARTWAIT' }
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK|^startwait: start \d+ exit|STARTWAIT|hw_swap: (IN|restored|REFUSED|DEFERRED|URGENT|FAILED|STOP)|hardware settings were NOT restored|display fallback acted after a swap-back' }
 $code = $LASTEXITCODE
+} finally {
+    # safety net for every exit (the shell killed or crashed before its own swap-back): only this launch's swap
+    # (tagged with its folder), and a no-op once the shell has restored Tyler's file
+    if ($LowGraphics) {
+        $hb = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'hw_swap.ps1') -Back -Tag $out -Log (Join-Path $out 'hw_swap.txt'))
+        $hwBackCode = $LASTEXITCODE
+        $hb | ForEach-Object { "hw_swap: $(Scrub $_)" }
+    }
+}
 "guard exit: $code"
 
 # 10. the session check at race 1's lights out (session_check.txt, first line the verdict): mark a failed one now, so
@@ -370,6 +388,8 @@ if ((Test-Path (Join-Path $out 'pause_cut.txt')) -or (Test-Path $pauseFlag)) { "
 
 if ($code -eq 5) { 'SAVES CHANGED: stop the batch and tell Tyler'; exit 5 }
 if ($code -eq 7) { exit 7 }
+if ($LowGraphics -and $hwBackCode -eq 7) { 'URGENT: message the supervisor now: Tyler''s hardware settings were NOT restored (hw_swap exit 7, see hw_swap.txt); stop the batch (exit 18)'; exit 18 }
+if ($LowGraphics -and $hwBackCode -eq 3) { "${tag}: hardware settings swap-back deferred (F1 25 still running); pause or pre-flight restores Tyler's file" }
 if (-not $tylerRestored) { exit 14 }
 if (-not $buildOk) { exit 16 }
 # 10. a failed session check: rerun this launch ONCE (it moves this attempt to invalid\); failing twice is a stop
@@ -383,6 +403,7 @@ if ($scFailed) {
     if ($StockSmoke) { $re += '-StockSmoke' }
     if ($Levels) { $re += @('-Levels', $Levels) }
     if ($Smoke) { $re += '-Smoke' }
+    if ($LowGraphics) { $re += '-LowGraphics' }   # the rerun keeps the low-graphics preset (its own swap-in and swap-back)
     & powershell @re
     exit $LASTEXITCODE
 }
