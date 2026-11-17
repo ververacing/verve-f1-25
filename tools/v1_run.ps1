@@ -6,12 +6,23 @@ Usage:
     powershell -File tools/v1_run.ps1 -Launch <n> -Batch runs/<date>-V-1 -Seed <int> [-Plan <plan>] [-Amp 3] [-NoUncapped]
     powershell -File tools/v1_run.ps1 -Make d1 -Launch <n> -Batch runs/<date>-D1 -Seed <int> [-Plan <plan>]
     powershell -File tools/v1_run.ps1 -Make d4 -Launch <n> -Batch runs/<date>-D4 -Seed <int> [-Plan <plan>]
+    powershell -File tools/v1_run.ps1 -Make c1 -Launch <n> -Batch runs/<date>-C1 -Seed <int> [-Plan <plan>]
+    powershell -File tools/v1_run.ps1 -StockSmoke -Launch 1 -Batch runs/<date>-C1-smoke [-Plan <plan>]
     (-IsRetry is set only by v1_run itself, on its one rerun after a failed session check; see 10.)
 
 -Make v1 (the default) is V-1. -Make d1 is D1 (docs/verve_d1_d2_prereg.md): step 2 calls tools/d1_make.py instead, the
 add-on is gen\verve.d1-L<LL> with the id verve.d1-l<LL>, and every other step is the same. -Make d4 is D4
 (docs/verve_d4_prereg.md), the same with tools/d4_make.py, gen\verve.d4-L<LL> and verve.d4-l<LL>. -Amp and -NoUncapped
 are ignored for d1 and d4 (they write no maps; a note says so). Below, verve.v1-* reads verve.d1-* / verve.d4-* for them.
+-Make c1 is C-1 (docs/verve_c1_prereg.md), the same with tools/c1_make.py, gen\verve.c1-L<LL> and verve.c1-l<LL>; its plan
+defaults to harness\sessions\c1_austria_20starts.plan (20 start-only starts, `@startwait`) and -LaunchMinutes to 40.
+-StockSmoke is C-1's stock smoke test: the plan (default harness\sessions\c1_smoke_4starts.plan; -LaunchMinutes 16)
+runs with NO add-on: steps 2, 5 and 7 (make, install, uninstall) are skipped, -Seed and -Make aren't needed (ignored),
+and every other step runs as below: the refusals, the leftover removal, the profile hashes (trivially unchanged), the
+guard, the session check and its rerun, the logs, the capture and weather. The build check (9) becomes: addons.json
+names no verve test add-on and the loader's gamedb count is the baseline 56 (check_applied.txt in check_applied's
+format, ops 0; gamedb_expected.txt 56). arm.txt reads "SMOKE stock (no add-on) launch <n>, <plan>" (tools/c1_check.py
+--smoke). A plan stop from `@startwait` (no lights out, a stall, a pause) is the guard's normal exit 6: no rerun.
 
 Steps, all logged in <Batch>\launch_<n>\:
 1. Refusals as tools/b0016_run.ps1: a PAUSE or a due pause-at (exit 12), a game or launcher running that it didn't
@@ -30,7 +41,8 @@ Steps, all logged in <Batch>\launch_<n>\:
    if not, TYLER PROFILE CHANGED (exit 14). Its list only ever held a disabled entry for the id, so nothing of Tyler's
    is enabled or disabled either way.
 8. launcher.txt (as b0016_run), v1addon.txt (addons.json and the loader.log lines naming the add-on), and the capture
-   copied to <launch>\raw\udp.bin (gitignored). The per-race split is udp_races.txt (written by sandbox_shell).
+   copied to <launch>\raw\udp.bin (gitignored). The per-race split is udp_races.txt (written by sandbox_shell), and
+   for C-1's start-only plans udp_starts.txt (`@startwait`).
    boot.txt: the boot's skip-relaunches (the shell's `intro skipped` lines) beside the session check, per launch
    (supervisor, 2026-11-17: does difficulty 99 only follow a skip-relaunch?).
 9. The build check (check_applied).
@@ -52,18 +64,27 @@ Rerunning a launch moves the earlier attempt to <Batch>\invalid\.
 param(
     [Parameter(Mandatory)] [int] $Launch,
     [Parameter(Mandatory)] [string] $Batch,
-    [Parameter(Mandatory)] [int] $Seed,
-    [string] $Plan = 'harness\sessions\v1_austria_4races.plan',
+    [int] $Seed,   # required, except with -StockSmoke
+    [string] $Plan = '',   # default: v1_austria_4races.plan; c1_austria_20starts.plan for -Make c1; c1_smoke_4starts.plan for -StockSmoke
     [double] $Amp = 3,
     [switch] $NoUncapped,
     [int] $LaunchMinutes = 80,   # for pause-at: the menu (~9 min) + 4 races at the plan's @udpfinish cap, worst case
+                                 # (unset: 40 for -Make c1, 20 starts of about 1-1.25 min; 16 for -StockSmoke, 4 starts)
     [string] $ExpProfile = 'verve-test',
     [string] $Python = 'python',
     [int] $SkippedIntroS = 40,
     [switch] $IsRetry,   # set by v1_run's own rerun after a failed session check (step 10): a second failure is exit 19
-    [ValidateSet('v1', 'd1', 'd4')] [string] $Make = 'v1'   # which generator: v1_make.py (V-1), d1_make.py (D1) or d4_make.py (D4)
+    [ValidateSet('v1', 'd1', 'd4', 'c1')] [string] $Make = 'v1',   # which generator: v1_make.py (V-1), d1_make.py (D1), d4_make.py (D4) or c1_make.py (C-1)
+    [switch] $StockSmoke   # C-1's stock smoke test: the plan with NO add-on (no make, no install); every other check runs
 )
 $ErrorActionPreference = 'Stop'
+if (-not $StockSmoke -and -not $PSBoundParameters.ContainsKey('Seed')) { throw '-Seed is required (except with -StockSmoke)' }
+if (-not $Plan) {
+    $Plan = if ($StockSmoke) { 'harness\sessions\c1_smoke_4starts.plan' } elseif ($Make -eq 'c1') { 'harness\sessions\c1_austria_20starts.plan' } else { 'harness\sessions\v1_austria_4races.plan' }
+}
+if (-not $PSBoundParameters.ContainsKey('LaunchMinutes')) {
+    if ($StockSmoke) { $LaunchMinutes = 16 } elseif ($Make -eq 'c1') { $LaunchMinutes = 40 }
+}
 $tz = [TimeZoneInfo]::FindSystemTimeZoneById('Pacific Standard Time')
 $now = [TimeZoneInfo]::ConvertTime((Get-Date), $tz)
 $tag = "launch ${Launch}"
@@ -100,9 +121,16 @@ function AddonCall([string[]] $a, [string] $log) {
     return $c
 }
 
-# 2. the launch's add-on and assignment
+# 2. the launch's add-on and assignment (none for -StockSmoke)
 $gen = Join-Path $out 'gen'
 $ll = '{0:D2}' -f $Launch
+$retryNote = if ($IsRetry) { ' (rerun after a failed session check)' } else { '' }
+$folder = $null; $id = ''
+if ($StockSmoke) {
+    if (-not $IsRetry -and ($PSBoundParameters.ContainsKey('Make') -or $PSBoundParameters.ContainsKey('Seed'))) { "${tag}: note: -Make/-Seed are ignored for -StockSmoke (no add-on)" }
+    Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value "SMOKE stock (no add-on) launch $Launch, $Plan$retryNote"
+    "${tag} at $($now.ToString('HH:mm:ss')) PT: stock smoke, no add-on, $Plan$retryNote"
+} else {
 $mk = @('-I', (Join-Path $PSScriptRoot "${Make}_make.py"), '--seed', "$Seed", '--launch', "$Launch", '--out', $gen)
 if ($Make -eq 'v1') {
     $mk += @('--amp', "$Amp")
@@ -116,10 +144,10 @@ $folder = Join-Path $gen "verve.$Make-L$ll"
 if ($mkCode -ne 0 -or -not (Test-Path (Join-Path $folder 'swofty.json'))) { "${tag}: ${Make}_make failed (exit $mkCode, ${Make}_make.txt); nothing installed or launched"; exit 15 }
 $id = (Get-Content (Join-Path $folder 'swofty.json') -Raw | ConvertFrom-Json).id
 if ($id -ne "verve.$Make-l$ll") { "${tag}: the generated add-on id is '$id', not verve.$Make-l$ll; nothing installed or launched"; exit 15 }
-$retryNote = if ($IsRetry) { ' (rerun after a failed session check)' } else { '' }
 $armText = if ($Make -ne 'v1') { "$($Make.ToUpper()) seed $Seed launch $Launch, add-on $id, $Plan$retryNote" } else { "V-1 seed $Seed launch $Launch, add-on $id (amp $Amp$(if ($NoUncapped) { ', no-uncapped' })), $Plan$retryNote" }
 Set-Content (Join-Path $out 'arm.txt') -Encoding utf8 -Value $armText
 "${tag} at $($now.ToString('HH:mm:ss')) PT: seed $Seed, add-on $id, $Plan$retryNote"
+}
 
 # 3./4. profile hashes, leftovers, install
 $profDir = Join-Path $env:LOCALAPPDATA 'Swofty\profiles'
@@ -137,23 +165,24 @@ function IdState([string] $f, [string] $want) {
     return 'disabled'
 }
 function HashLine([string] $when) {
-    $l = "{0,-16} tyler {1}  {2} {3}  ({4} in tyler: {5}; in {2}: {6})" -f $when, (Sha256Of $tylerFile), $ExpProfile, (Sha256Of $expFile), $id, (IdState $tylerFile $id), (IdState $expFile $id)
+    $l = if ($id) { "{0,-16} tyler {1}  {2} {3}  ({4} in tyler: {5}; in {2}: {6})" -f $when, (Sha256Of $tylerFile), $ExpProfile, (Sha256Of $expFile), $id, (IdState $tylerFile $id), (IdState $expFile $id) } else { "{0,-16} tyler {1}  {2} {3}  (stock smoke: no add-on)" -f $when, (Sha256Of $tylerFile), $ExpProfile, (Sha256Of $expFile) }
     Add-Content $hashLog $l -Encoding utf8
     "profiles: $l"
 }
-if ((IdState $tylerFile $id) -eq 'ENABLED') { "${tag}: tyler lists $id ENABLED; never removed from Tyler's setup, so not installing"; exit 15 }
-# a verve.v1-l*, verve.d1-l* or verve.d4-l* add-on that an earlier launch left installed (its uninstall deferred or
-# failed): ours, remove it first (any kind, whatever -Make this launch uses)
+if ($id -and (IdState $tylerFile $id) -eq 'ENABLED') { "${tag}: tyler lists $id ENABLED; never removed from Tyler's setup, so not installing"; exit 15 }
+# a verve.v1-l*, verve.d1-l*, verve.d4-l* or verve.c1-l* add-on that an earlier launch left installed (its uninstall
+# deferred or failed): ours, remove it first (any kind, whatever -Make this launch uses; -StockSmoke too)
 $left = @()
 if (Test-Path $expFile) {
-    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.(v1|d1|d4)-l\d+$' })
+    $left = @((Get-Content $expFile -Raw | ConvertFrom-Json).addons | ForEach-Object { $_.id } | Where-Object { $_ -match '^verve\.(v1|d1|d4|c1)-l\d+$' })
 }
 foreach ($lid in $left) {
     if ((IdState $tylerFile $lid) -eq 'ENABLED') { "${tag}: leftover $lid is ENABLED in tyler; not touching it; not launching"; exit 15 }
     "${tag}: leftover $lid from an earlier launch; removing it (exit $(AddonCall @('-Id', $lid, '-Uninstall') 'leftover_uninstall.txt'))"
 }
-HashLine 'before install'
+HashLine $(if ($id) { 'before install' } else { 'before run' })
 $tylerBefore = Sha256Of $tylerFile
+if ($id) {
 $insCode = AddonCall @('-Folder', $folder) 'install.txt'
 HashLine 'after install'
 $expState = IdState $expFile $id
@@ -167,16 +196,18 @@ if ($insCode -ne 0 -or $expState -eq 'ENABLED' -or $tylerState -eq 'ENABLED') {
     if ((Sha256Of $tylerFile) -ne $tylerBefore) { 'TYLER PROFILE CHANGED: tyler.json does not hash as before the install (profile_hashes.txt); stop and tell the supervisor'; exit 14 }
     exit 15
 }
+}
 
 # 6. the run (the launcher updates itself: record its version every launch)
 $launcherExe = Join-Path $env:LOCALAPPDATA 'Programs\SwoftyLauncher\bin\swofty-launcher.exe'
 $launcherBefore = if (Test-Path $launcherExe) { (Get-Item $launcherExe).VersionInfo.ProductVersion } else { 'MISSING' }
 $shellArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $PSScriptRoot 'sandbox_shell.ps1'), '-Fixture', 'tyler-profile-20261031',
-    '-ExpProfile', $ExpProfile, '-Plan', $Plan, '-Udp', '-Addon', $id,
+    '-ExpProfile', $ExpProfile, '-Plan', $Plan, '-Udp',
     '-Channels', 'default,RaceStarts:info,LAPTIMES:info,CUTSCENE_MANAGER:info,CUTSCENE_PODIUM:info', '-Out', $out)
+if ($id) { $shellArgs += @('-Addon', $id) }   # -StockSmoke: no -Addon (an empty value through powershell -File is a missing argument)
 if ($SkippedIntroS -ne 40) { $shellArgs += @('-SkippedIntroS', "$SkippedIntroS") }   # only when changed (the shell's default is 40)
 powershell @shellArgs |
-    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK' }
+    ForEach-Object { Scrub $_ } | Where-Object { $_ -match 'EXPECT|intro|ABORT|^result:|^saves |SAVES CHANGED|NO RESULT|udp recording|udpfinish: race \d+ exit|^restart \d+: (race started|garage)|RESTART FAILED|^sessioncheck: exit|SESSION CHECK|^startwait: start \d+ exit|STARTWAIT' }
 $code = $LASTEXITCODE
 "guard exit: $code"
 
@@ -201,11 +232,20 @@ $boot
 
 # 7. remove the add-on (never while a game or Swofty process is up: no Swofty steps then, incident 2026-11-15)
 $tylerRestored = $true
-if (Busy) {
+if (-not $id) {
+    # -StockSmoke: nothing was installed; tyler.json must still hash as before the run
+    HashLine 'after run'
+    if ((Sha256Of $tylerFile) -eq $tylerBefore) { Add-Content $hashLog 'tyler.json: unchanged (stock smoke, no add-on)' -Encoding utf8; 'tyler.json: hash as before the run (no add-on)' }
+    else {
+        $tylerRestored = $false
+        Add-Content $hashLog "tyler.json: CHANGED ($tylerBefore -> $(Sha256Of $tylerFile))" -Encoding utf8
+        'TYLER PROFILE CHANGED: tyler.json does not hash as before the run (profile_hashes.txt); stop and tell the supervisor'
+    }
+} elseif (Busy) {
     $who = (@(Get-Process F1_25, swofty, swofty-launcher -ErrorAction SilentlyContinue) | ForEach-Object { "$($_.ProcessName) $($_.Id)" }) -join ', '
     Set-Content (Join-Path $out 'uninstall_deferred.txt') -Encoding utf8 -Value @("pending $(Get-Date -Format s)", "reason: running as the launch ended: $who",
         "next: with F1 25, the launcher and swofty closed: powershell -File tools/reinstall_addon.ps1 -Id $id -Uninstall, then compare tyler.json's hash with profile_hashes.txt ('before install')",
-        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l*, verve.d1-l* or verve.d4-l* in verve-test)')
+        'the next tools/v1_run.ps1 launch also removes it first (leftover verve.v1-l*, verve.d1-l*, verve.d4-l* or verve.c1-l* in verve-test)')
     "ADD-ON LEFT INSTALLED: $id (a disabled entry in every profile); a game or Swofty process is running ($who); see uninstall_deferred.txt"
 } else {
     "uninstall exit: $(AddonCall @('-Id', $id, '-Uninstall') 'uninstall.txt')"
@@ -223,15 +263,23 @@ if (Busy) {
 $lines = @()
 $aj = Join-Path $out 'addons.json'
 $lines += if (Test-Path $aj) { "addons.json: $((Get-Content $aj -Raw) -replace '\s+', ' ')" } else { 'addons.json: MISSING' }
-$lines += if ((Test-Path $aj) -and ((Get-Content $aj -Raw) -match [regex]::Escape($id))) { "addons.json names ${id}: yes" } else { "addons.json names ${id}: NO (the run may not have had the add-on)" }
+$smokeAddon = $false   # -StockSmoke: a verve test add-on in the run's addons.json (it must have none)
+if ($id) {
+    $lines += if ((Test-Path $aj) -and ((Get-Content $aj -Raw) -match [regex]::Escape($id))) { "addons.json names ${id}: yes" } else { "addons.json names ${id}: NO (the run may not have had the add-on)" }
+} else {
+    $smokeAddon = (Test-Path $aj) -and ((Get-Content $aj -Raw) -match 'verve\.(v1|d1|d4|c1)-l\d+')
+    $lines += if (-not (Test-Path $aj)) { 'addons.json names a verve test add-on: unknown (no addons.json)' } elseif ($smokeAddon) { 'addons.json names a verve test add-on: YES (the stock smoke must have none)' } else { 'addons.json names a verve test add-on: no (stock smoke, as expected)' }
+}
 $llog = Join-Path $out 'raw\loader.log'
-if (Test-Path $llog) {
+if (-not $id) { if (Test-Path $llog) { $lines += 'loader.log: present (no add-on lines to list)' } else { $lines += 'loader.log: MISSING' } }
+elseif (Test-Path $llog) {
     $l1 = @(Get-Content $llog | Where-Object { $_ -match "verve\.$Make" })
     $lines += "loader.log $id lines: $($l1.Count)"
     $lines += $l1 | ForEach-Object { Scrub $_ }
 } else { $lines += 'loader.log: MISSING' }
-$lines | Set-Content (Join-Path $out "${Make}addon.txt") -Encoding utf8
-"${Make}addon.txt: $($lines[1])"
+$addonTxt = if ($id) { "${Make}addon.txt" } else { 'smokeaddon.txt' }
+$lines | Set-Content (Join-Path $out $addonTxt) -Encoding utf8
+"${addonTxt}: $($lines[1])"
 
 $inGame = if (Test-Path $llog) { $m = Select-String $llog -Pattern 'state: Swofty Launcher (\S+),' | Select-Object -First 1; if ($m) { $m.Matches[0].Groups[1].Value } else { 'not found' } } else { 'no loader.log' }
 $lv = @("launcher before launch: $launcherBefore", "launcher in game (loader.log): $inGame")
@@ -263,6 +311,8 @@ if (Test-Path $rawBin) {
 } else { Set-Content (Join-Path $out 'weather.txt') 'weather: no capture' -Encoding utf8; 'weather_check: no capture' }
 $ur = Join-Path $out 'udp_races.txt'
 if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else { 'udp_races: none (no @udpfinish ran)' }
+$us = Join-Path $out 'udp_starts.txt'
+if (Test-Path $us) { Get-Content $us | ForEach-Object { "udp_starts: $_" } } elseif ($Make -eq 'c1' -or $StockSmoke) { 'udp_starts: none (no @startwait ran)' }
 
 # 9. the build check per launch (V-1 readback, 16 Nov): the game must hold every op this launch's add-on wrote. Which
 # equal-to-stock writes the build drops varies (2 of 4 at seed 1 launch 1), so each launch gets its own expected
@@ -270,7 +320,20 @@ if (Test-Path $ur) { Get-Content $ur | ForEach-Object { "udp_races: $_" } } else
 # (D1's 76 race_start paths once check_applied -PrefillOnly docs/stock/d1_paths.txt has filled it; D4's 38 racecraft
 # curves once docs/stock/d4_paths.txt has: those are key-checked only, a curve's value isn't logged).
 $buildOk = $true
-if (Test-Path $llog) {
+if (-not $id) {
+    # -StockSmoke: no add-on, so no ops; the build check is the baseline count and no verve test add-on in the run
+    $tot = if (Test-Path $llog) { Select-String $llog -Pattern 'gamedb: (\d+) overwritten' | Select-Object -First 1 } else { $null }
+    $totN = if ($tot) { [int]$tot.Matches[0].Groups[1].Value } else { -1 }
+    $base = 56
+    $ca = @('stock smoke: no add-on, no ops (tools/v1_run.ps1 -StockSmoke)',
+        'ops 0: 0 applied (0 value-checked, 0 curves written at the right key but their value isn''t logged), 0 dropped as equal to stock (), 0 problem(s)',
+        "loader total $(if ($totN -ge 0) { $totN } else { 'none' }) overwritten; expected $base + 0 = $base$(if ($totN -ne $base) { ' (DIFFERS: something else wrote records, or no loader count)' })")
+    if ($smokeAddon) { $ca += 'DIFFERS: addons.json names a verve test add-on; the stock smoke must run with none' }
+    $ca | Set-Content (Join-Path $out 'check_applied.txt') -Encoding utf8
+    $ca | ForEach-Object { "check_applied: $_" }
+    Set-Content (Join-Path $out 'gamedb_expected.txt') "$base" -Encoding ascii
+    if ($totN -ne $base -or $smokeAddon) { $buildOk = $false; 'BUILD CHECK FAILED (stock smoke): the loader count is not the baseline, or a test add-on ran; stop and tell the supervisor' }
+} elseif (Test-Path $llog) {
     $keyCache = Join-Path (Split-Path $PSScriptRoot -Parent) 'docs\stock\v1_key_cache_26566308.csv'
     $ca = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'check_applied.ps1') -Loader $llog -Folder $folder -Baseline 56 -KeyCache $keyCache 2>&1 | ForEach-Object { "$_" })
     $caCode = $LASTEXITCODE
@@ -294,6 +357,7 @@ if ($scFailed) {
         '-Plan', $Plan, '-Amp', "$Amp", '-LaunchMinutes', "$LaunchMinutes", '-ExpProfile', $ExpProfile, '-Python', $Python,
         '-SkippedIntroS', "$SkippedIntroS", '-IsRetry', '-Make', $Make)
     if ($NoUncapped) { $re += '-NoUncapped' }
+    if ($StockSmoke) { $re += '-StockSmoke' }
     & powershell @re
     exit $LASTEXITCODE
 }
