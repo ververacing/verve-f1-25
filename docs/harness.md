@@ -128,6 +128,17 @@ it was black-flagged (penalty type 6 at 20 s, RTMT reason 6 at 30 s), and there 
 EA-app 1.0.145 bindings and save work, with no car-field port. Doctor: build 26566308, plus only the benign
 `exe-sha256.tsv` line.
 
+**Launcher 1.9.63** (17 Nov, about 00:55 PT, after V-1 was scored and the freeze lifted): `swofty update` 1.9.59 →
+1.9.63 (1.9.60-1.9.62 had also shipped).
+- Doctor on verve-test: build 26566308, 21 add-ons, and only the benign `exe-sha256.tsv` line. PREFLIGHT OK (settings
+  identical to the reference).
+- **Route check** (`runs/2026-11-17-routecheck-1.9.63`, `harness/sessions/austria_routecheck_2races.plan`, stock):
+  - It boots, and the intro plays.
+  - The session check is OK (difficulty 100, track 17, weather 0), and `@restart` works.
+  - 2 races ran with 19/19 AI finished; weather LOCKED; saves unchanged.
+  - **The stock gamedb baseline is unchanged at 56** (322 created), so the build check's `-Baseline 56` holds.
+  - No trace of the core's default-on `startup_intro` in the loader log.
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)

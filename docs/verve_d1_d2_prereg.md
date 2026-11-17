@@ -22,7 +22,7 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
   writes: no traits, no maps, no bundles.
 - **Assignment:** in each of the 9 two-AI teams, a seeded coin flip pins one teammate and leaves the other stock.
   Alonso (no AI teammate) stays stock. That gives 9 pinned and 10 stock cars per launch, with a new draw per launch.
-  The seed is fixed when this is approved, and the assignment is recorded (`assignment.csv`).
+  **Seed: 2026111701** (fixed before D1's first launch), and the assignment is recorded (`assignment.csv`).
 - **Size:** 2 launches × 4 races, 5 laps (V-1's plan `v1_austria_4races.plan`, with the race-1 session check). That's
   about 70 min.
 - **Validity:** as V-1: aionly_check per race uid, the session check, the per-launch build check (check_applied: all
