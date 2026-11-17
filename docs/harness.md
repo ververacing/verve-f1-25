@@ -128,6 +128,17 @@ it was black-flagged (penalty type 6 at 20 s, RTMT reason 6 at 30 s), and there 
 EA-app 1.0.145 bindings and save work, with no car-field port. Doctor: build 26566308, plus only the benign
 `exe-sha256.tsv` line.
 
+**Launcher 1.9.63** (17 Nov, about 00:55 PT, after V-1 was scored and the freeze lifted): `swofty update` 1.9.59 →
+1.9.63 (1.9.60-1.9.62 had also shipped).
+- Doctor on verve-test: build 26566308, 21 add-ons, and only the benign `exe-sha256.tsv` line. PREFLIGHT OK (settings
+  identical to the reference).
+- **Route check** (`runs/2026-11-17-routecheck-1.9.63`, `harness/sessions/austria_routecheck_2races.plan`, stock):
+  - It boots, and the intro plays.
+  - The session check is OK (difficulty 100, track 17, weather 0), and `@restart` works.
+  - 2 races ran with 19/19 AI finished; weather LOCKED; saves unchanged.
+  - **The stock gamedb baseline is unchanged at 56** (322 created), so the build check's `-Baseline 56` holds.
+  - No trace of the core's default-on `startup_intro` in the loader log.
+
 ## Swofty 1.9.51 (checked 2026-11-14)
 
 Tyler updated on 2026-11-14 (1.9.50 at 16:23 PT, then 1.9.51 at 17:01 PT). **Launcher 1.9.51, core (swofty.core)
@@ -158,7 +169,7 @@ emote`, a UI toggle only ("Use launcher saves", ticked by default). The
   `addon-profiles\<id>\<label>` to `.saved-old`, then `remove_tree` fails). It aborts the wrapper before the game starts,
   and it aborts `swofty restore`'s rollback, which leaves the game folder modded. Draft report:
   `docs/upstream/swofty_addon_storage_lock.md`. **Sidestep** (supervisor's standing authorisation, EMPTY folders only):
-  `tools/storage_sidestep.ps1` moves the empty targets to `Documentserve-f1-25-recovery\<stamp>\` before every launch,
+  `tools/storage_sidestep.ps1` moves the empty targets to `Documents\verve-f1-25-recovery\<stamp>\` before every launch,
   and refuses if any holds a file. `tools/post_run_check.ps1` checks the game folder after every run and in PAUSE.
   **Never run `swofty apply` as a probe.**
 - **Defender exclusion: declined.** Tyler decided on 2026-11-14 not to add a Windows Defender exclusion for

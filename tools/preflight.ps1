@@ -19,8 +19,10 @@ Checks, in order, and exits 1 on the first hard failure:
 #>
 param(
     [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
-    [string] $Build = '26566308'   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
+    [string] $Build = '26566308',   # F1 25 1.0.145.2472 (Steam), since 2026-11-16 (docs/harness.md "F1 25 1.0.145"); was 25251167
+    [string] $Profile = 'verve-test'   # doctor names it, never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
 # first: a low-graphics swap a crash left active (tools/hw_swap.ps1 -Recover). The recorded test preset live (by hash,
 # or by value after the game re-serialised it) = Tyler's file restored and logged; any third state = stop and report.
@@ -29,7 +31,7 @@ $hwr = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScr
 $hwrCode = $LASTEXITCODE
 $hwr | ForEach-Object { "hw_swap: $_" }
 if ($hwrCode -ne 0) { "PREFLIGHT FAIL: hardware settings recovery (hw_swap exit $hwrCode, above): report to the supervisor; nothing launches until it is resolved."; exit 1 }
-$doc = & $Swofty doctor
+$doc = & $Swofty --profile $Profile doctor
 $doc
 $bid = ($doc | Where-Object { $_ -match '^build id\s+(\S+)' } | ForEach-Object { $Matches[1] })
 if ($bid -ne $Build) { "PREFLIGHT FAIL: build $bid, pinned $Build. Stop and tell the supervisor."; exit 1 }

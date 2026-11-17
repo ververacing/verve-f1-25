@@ -30,8 +30,10 @@ param(
     [ValidateSet('', 'ok', 'launcher', 'files')] [string] $SimulateSidestep = '',   # test only: the sidestep's outcome
     [ValidateSet('', 'game', 'launcher')] [string] $SimulateRunning = '',   # test only: pretend F1 25 / the launcher is up
     [string] $ExpProfile = 'verve-test',   # fallback addon list when doctor names an open journal but its file isn't found
-    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe"
+    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
+    [string] $Profile = 'verve-test'   # doctor names it, never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 $ErrorActionPreference = 'Stop'
 $log = if ($Out) { New-Item -ItemType Directory -Force $Out | Out-Null; Join-Path $Out 'post_run_check.txt' } else { '' }
 function L([string] $s) { $s = $s.Replace($env:USERPROFILE, '%USERPROFILE%'); $s; if ($log) { Add-Content $log $s -Encoding utf8 } }
@@ -46,7 +48,7 @@ if ($running.Count) {
 }
 
 function State {
-    $doc = if ($DoctorFile) { Get-Content $DoctorFile } else { & $Swofty doctor }
+    $doc = if ($DoctorFile) { Get-Content $DoctorFile } else { & $Swofty --profile $Profile doctor }
     $game = $doc | Where-Object { $_ -match '^game dir\s+(.+)$' } | ForEach-Object { $Matches[1].Trim() } | Select-Object -First 1
     $drift = @($doc | Where-Object { $_ -match '^drift\s+' -and $_ -notmatch '^drift\s+swofty is not part of the game\s*$' -and
         $_ -notmatch '^drift\s+swofty/cache/exe-sha256\.tsv is not part of the game\s*$' })

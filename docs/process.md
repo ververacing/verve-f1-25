@@ -71,7 +71,7 @@ supervisor, 2026-11-14, after a check ran against Tyler's live session at 20:55;
   `storage_sidestep.ps1`, `cleanup_test_profiles.ps1`, `guard_snapshot.ps1` and `post_run_check.ps1` refuse or skip
   on their own when the game or the launcher is running.
 - No reads of Steam's userdata (Tyler's saves, `remotecache.vdf`) either (supervisor, 2026-11-15): repo files and our own
-  `%LOCALAPPDATA%erve-f1-25` only.
+  `%LOCALAPPDATA%\verve-f1-25` only.
 - No live selftests (the dummy processes of `test_ours.ps1` / `test_pause.ps1`) while paused, even with the game and
   launcher closed: paused is Tyler's PC time. Pure tests are fine. Live tests, and merges that need them, wait for RESUME.
 - Only repo, docs and analysis work on files already copied out.
@@ -143,6 +143,14 @@ The supervisor's scheduled tasks post into the local session: "Verve testing win
   logs the exact profile file (`profile.json`) and its hash (`settings_hash.txt`) in its folder.
 - `swofty test` makes a throwaway `test-*` profile per run. Every run script deletes it when the run ends
   (`tools/cleanup_test_profiles.ps1`), and pre-flight fails if any is left over.
+- **No tool resolves the profile implicitly** (supervisor, 2026-11-16, ruling on #159). Every `db get` and `doctor`
+  names `--profile verve-test`.
+  - **For the record:** before #159, `check_applied.ps1`, `dump_stock.ps1` and `dump_ai_driver_config.ps1` ran
+    `db get` under the ACTIVE profile, which was Tyler's. Those were read-only stock lookups and changed nothing.
+  - `addons install/remove` (all profiles, by design), `profile list/delete` (test-* cleanup) and `restore` have no
+    profile.
+  - The per-launch `doctor` calls (`preflight.ps1`, `post_run_check.ps1`, `sandbox_run.ps1`) now name
+    `--profile verve-test` too: each has `-Profile` (default `verve-test`, refuses anything not `verve-*`).
 - **`swofty addons install` writes the new id into every profile,** Tyler's included (as a disabled entry). Install only
   when a batch needs it, and say so in the batch's PR.
 - **Standing OK for Swofty add-ons** (Tyler, relayed by the supervisor, 2026-11-16: "yes you are always allowed to

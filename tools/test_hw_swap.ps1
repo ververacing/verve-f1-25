@@ -419,7 +419,7 @@ foreach ($m in @('-Back'), @('-Recover'), @('-PauseGate')) { $r = Swap $c $m; $o
 Check 'no swap active: -Back, -Recover and -PauseGate exit 0 and write nothing (live file, state, backups)' (-not @($outs | Where-Object { $_.Code -ne 0 }).Count -and (Sha $c.Live) -eq $orig -and (Get-Item $c.Live).LastWriteTimeUtc -eq $t0 -and -not (Test-Path $c.State) -and -not (Test-Path $c.Backup)) (($outs | ForEach-Object { "$($_.Mode) $($_.Code)" }) -join ', ')
 Check 'no swap active: -Recover and -PauseGate print nothing (pre-flight and the SAFE TO PLAY line unchanged)' (-not @($outs | Where-Object { $_.Mode -ne '-Back' -and $_.Out.Count }).Count)
 $pf = Get-Content (Join-Path $tools 'preflight.ps1') -Raw
-Check 'preflight: the recovery runs first (before swofty doctor) and a failure is PREFLIGHT FAIL' ($pf.IndexOf('hw_swap.ps1') -gt 0 -and $pf.IndexOf('hw_swap.ps1') -lt $pf.IndexOf('& $Swofty doctor') -and $pf -match 'PREFLIGHT FAIL: hardware settings recovery')
+Check 'preflight: the recovery runs first (before swofty doctor) and a failure is PREFLIGHT FAIL' ($pf.IndexOf('hw_swap.ps1') -gt 0 -and $pf.IndexOf('-Recover') -gt 0 -and $pf.IndexOf('-Recover') -lt [regex]::Match($pf, '(?m)^\$doc = & \$Swofty( --profile \$Profile)? doctor').Index -and [regex]::IsMatch($pf, '(?m)^\$doc = & \$Swofty( --profile \$Profile)? doctor') -and $pf -match 'PREFLIGHT FAIL: hardware settings recovery')
 
 # the declared key list: what the preset may change is committed, nothing else (no values of Tyler's)
 Check 'hw_test_preset_keys.csv: every row is a graphics/display key, never motion, cpu, audio, controls or devices' (-not @($rules | Where-Object { $_.key -match '^(motion|cpu|audio|led_display|replay_directory)|@(deviceId|name|index)$' }).Count)

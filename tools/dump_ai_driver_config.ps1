@@ -11,8 +11,10 @@ param(
     [Parameter(Mandatory)] [string] $Drivers,   # comma-separated driver labels
     [Parameter(Mandatory)] [string] $Out,
     [string] $Catalogue = "docs/ai_driver_config_keys.csv",
-    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe"
+    [string] $Swofty = "$env:LOCALAPPDATA\Programs\SwoftyLauncher\bin\swofty.exe",
+    [string] $Profile = 'verve-test'   # never the active profile, which is Tyler's (process.md, Profiles)
 )
+if ($Profile -notlike 'verve-*') { throw "-Profile $Profile isn't one of ours (verve-*)" }
 # 'Continue', not 'Stop': swofty reports a missing key on stderr, which must not abort the dump
 $ErrorActionPreference = 'Continue'
 $DriverList = @($Drivers -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
@@ -20,7 +22,7 @@ $keys = Import-Csv $Catalogue
 $rows = foreach ($k in $keys) {
     $row = [ordered]@{ key = "ai_driver_config.$($k.group).$($k.leaf)"; type = $k.type }
     foreach ($d in $DriverList) {
-        $lines = & $Swofty db get "entrants.drivers.driver[_metadata_=$d].ai_driver_config.$($k.group).$($k.leaf)" 2>$null
+        $lines = & $Swofty db get --profile $Profile "entrants.drivers.driver[_metadata_=$d].ai_driver_config.$($k.group).$($k.leaf)" 2>$null
         $v = if ($LASTEXITCODE -eq 0) { (($lines | Where-Object { $_ -match '^\s+value:' }) -replace '^\s+value:\s*', '') -join ' ' } else { 'MISSING' }
         $row[$d] = $v
     }

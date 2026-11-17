@@ -22,7 +22,7 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
   writes: no traits, no maps, no bundles.
 - **Assignment:** in each of the 9 two-AI teams, a seeded coin flip pins one teammate and leaves the other stock.
   Alonso (no AI teammate) stays stock. That gives 9 pinned and 10 stock cars per launch, with a new draw per launch.
-  The seed is fixed when this is approved, and the assignment is recorded (`assignment.csv`).
+  **Seed: 2026111701** (fixed before D1's first launch), and the assignment is recorded (`assignment.csv`).
 - **Size:** 2 launches × 4 races, 5 laps (V-1's plan `v1_austria_4races.plan`, with the race-1 session check). That's
   about 70 min.
 - **Validity:** as V-1: aionly_check per race uid, the session check, the per-launch build check (check_applied: all
@@ -50,6 +50,22 @@ totalDistance gain ≥ 0.3 m (`MOVE_M`), 60 Hz, relative only.
   - whether UDP LapData and an LGOT event arrive;
   - the vehicle → driver map.
   If any of these fails, D2 stops there and is reported. No other mode is tried without approval.
+- **D2.0 feasibility, from Swofty 1.9.63's source (2026-11-17, d2-probe PR; awaiting the supervisor's review): NOT
+  RUNNABLE, so D2 stops at this report.** The supervisor's condition is `--profile verve-test` *and* the save sandbox.
+  - **No sandbox for a benchmark.** `swofty test run` sandboxes a batch only for `career`, or `session` with a
+    `fixture` (`apps/cli/src/testing.rs:564-566`). The `benchmark` env takes no `fixture` key
+    (`packages/core/src/testsuite/suite.rs:86-95`). Neither `test shell` nor `test session` can start the game's
+    `-benchmark` mode. Without saves in `run.json` the core logs "no save sandbox ... the game uses the player's own
+    saves" (`native/src/core/save_sandbox.cpp:563-567`), which `tools/sandbox_run.ps1` kills as OFF.
+  - **`--profile` doesn't reach `test run`.** It builds a fresh `test-<run>` profile with swofty.core, the test's
+    add-ons and the registry's locked ones (`testing.rs:271-274`, `451`, `1069-1097`).
+  - **Even sandboxed, the measure would be missing.** Benchmark sent 0 UDP packets on 25251167
+    (`runs/2026-10-30-B-0003/summary.md`, UDP check). Game log channels need a `log_channels.tsv` for the running
+    exe's PE stamp (`native/src/gamelog/gamelog.cpp:417-423`; the shipped one is 1789118616). So on 26566308 there is
+    no RaceStarts and no LAPTIMES driver map.
+  - `tools/run_with_udp.ps1` is retired: it ran `swofty test run` with no save sandbox (its route tests ran on
+    Tyler's real saves, under the saves guard). The only sandboxed
+    racing route on 26566308 is the GP menu route through `tools/sandbox_shell.ps1` (D1, V-1).
 - **Lever, as B-0008 but at the extremes and split by teammates:** `driver_characteristics.reaction_speed` = 0 for one
   teammate per team and 1 for the other (seeded coin per team). No other writes. B-0008 left Ferrari (vehicles 8 and
   19) out of the arms and the stock field; D2 does the same. Ferrari stays stock and isn't scored.
