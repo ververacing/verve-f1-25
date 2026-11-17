@@ -1,0 +1,121 @@
+{
+ "batch": "runs\\2026-11-17-D1",
+ "launches": [
+  1,
+  2
+ ],
+ "races_total": 8,
+ "races_valid": 8,
+ "track": "17",
+ "gamedb": null,
+ "pinned": {
+  "1": [
+   "oscar_piastri",
+   "lewis_hamilton",
+   "max_verstappen",
+   "george_russell",
+   "franco_colapinto",
+   "esteban_ocon",
+   "liam_lawson",
+   "carlos_sainz-jr",
+   "nico_hulkenberg"
+  ],
+  "2": [
+   "oscar_piastri",
+   "lewis_hamilton",
+   "yuki_tsunoda",
+   "george_russell",
+   "franco_colapinto",
+   "oliver_bearman",
+   "isack_hadjar",
+   "carlos_sainz-jr",
+   "gabriel_bortoleto"
+  ]
+ },
+ "dropped": [],
+ "constants": {
+  "MOVE_M": 0.3,
+  "SPEED_AT_S": 1.0,
+  "T1_M": 345.0,
+  "THRESHOLD_S": 0.12,
+  "N_LAUNCHES": 2
+ },
+ "verdict": "PASS",
+ "why": "pinned - stock >= 0.12 s in both launches",
+ "threshold_s": 0.12,
+ "per_launch": {
+  "1": {
+   "primary": {
+    "measure": "reaction_s",
+    "races_valid": 4,
+    "races_total": 4,
+    "n_pinned": 9,
+    "n_stock": 10,
+    "pinned_mean": 0.9362820982933044,
+    "stock_mean": 0.4692650854587555,
+    "diff": 0.46701701283454894
+   },
+   "secondary": {
+    "speed_1s_kph": {
+     "measure": "speed_1s_kph",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_pinned": 9,
+     "n_stock": 10,
+     "pinned_mean": 11.0,
+     "stock_mean": 19.175,
+     "diff": -8.175
+    },
+    "gain_t1": {
+     "measure": "gain_t1",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_pinned": 9,
+     "n_stock": 10,
+     "pinned_mean": -0.9722222222222222,
+     "stock_mean": 0.875,
+     "diff": -1.8472222222222223
+    }
+   }
+  },
+  "2": {
+   "primary": {
+    "measure": "reaction_s",
+    "races_valid": 4,
+    "races_total": 4,
+    "n_pinned": 9,
+    "n_stock": 10,
+    "pinned_mean": 0.9364052414894104,
+    "stock_mean": 0.4830449759960175,
+    "diff": 0.4533602654933929
+   },
+   "secondary": {
+    "speed_1s_kph": {
+     "measure": "speed_1s_kph",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_pinned": 9,
+     "n_stock": 10,
+     "pinned_mean": 11.0,
+     "stock_mean": 18.6,
+     "diff": -7.600000000000001
+    },
+    "gain_t1": {
+     "measure": "gain_t1",
+     "races_valid": 4,
+     "races_total": 4,
+     "n_pinned": 9,
+     "n_stock": 10,
+     "pinned_mean": -0.8611111111111112,
+     "stock_mean": 0.775,
+     "diff": -1.636111111111111
+    }
+   }
+  }
+ },
+ "ignored_launches": [],
+ "secondary_mean_over_launches": {
+  "speed_1s_kph": -7.887500000000001,
+  "gain_t1": -1.7416666666666667
+ }
+}

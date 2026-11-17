@@ -1,0 +1,199 @@
+{
+  "session_uid": 8562764277959372348,
+  "track_id": 17,
+  "track_length_m": 4323,
+  "laps": 5,
+  "ai_difficulty": 100,
+  "player_car": 19,
+  "ai_cars": 19,
+  "median_green_lap_s": 69.371,
+  "lap1_loss_median_s": 5.846,
+  "lap1_positions_changed": 16,
+  "lap1_held_changes": 20,
+  "lap1_spread_s": 8.872,
+  "lap1_collisions": 1,
+  "train_time_share": 0.5955,
+  "held_passes_net_2plus": 16,
+  "held_passes_2plus_as_71": 28,
+  "ovtk_raw": 117,
+  "longest_train_median": 9.5,
+  "longest_train_max": 14,
+  "early_brakes_total": 29,
+  "early_brakes_in_traffic": 29,
+  "phantom_brakes": 0,
+  "phantom_brakes_clear2s": 0,
+  "phantom_cars_scored": 18,
+  "phantom_onsets_scored_share": 0.991,
+  "phantom_ref_counts": {
+    "own": 14,
+    "field": 516
+  },
+  "phantom_by_ref": {
+    "own": 0,
+    "field": 29
+  },
+  "corners": {
+    "total": 7,
+    "scored": 7
+  },
+  "rear_end_contacts": 3,
+  "pit_cycle_passes": 0,
+  "contacts": [
+    {
+      "t": 9.066,
+      "cars": [
+        5,
+        4
+      ],
+      "kind": "side",
+      "outcome": {
+        "5": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "4": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 79.936,
+      "cars": [
+        7,
+        5
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "7": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "5": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 95.298,
+      "cars": [
+        8,
+        11
+      ],
+      "kind": "side",
+      "outcome": {
+        "8": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "11": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 291.375,
+      "cars": [
+        12,
+        13
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "12": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "13": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 297.972,
+      "cars": [
+        2,
+        3
+      ],
+      "kind": "side",
+      "outcome": {
+        "2": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "3": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    },
+    {
+      "t": 298.772,
+      "cars": [
+        5,
+        6
+      ],
+      "kind": "rear_end",
+      "outcome": {
+        "5": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        },
+        "6": {
+          "wing_hit": false,
+          "spin": false,
+          "places_lost": false,
+          "wing_added": 0,
+          "costly": false
+        }
+      }
+    }
+  ],
+  "costly_contact_cars": 0,
+  "lap1_costly_contacts": 0,
+  "front_wing_increments": 0,
+  "guards": {
+    "collisions": 6,
+    "wing_damage_added": 0,
+    "dnfs": 0,
+    "penalties": 0,
+    "median_green_lap_s": 69.371
+  },
+  "damage_packets_seen": true,
+  "bad_sizes": {}
+}
